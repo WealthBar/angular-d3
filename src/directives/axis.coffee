@@ -5,18 +5,19 @@ angular.module('ad3').directive 'axis', ->
     ticks: '5'
     format: null
 
+  priority: 1
+
   scope:
-    values: '='
+    domain: '='
 
   restrict: 'E'
 
   require: '^chart'
 
   link: (scope, el, attrs, chartController) ->
-    console.log(attrs)
     attrs = angular.extend(defaults, attrs)
-    console.log(attrs)
 
+    console.log(chartController.innerWidth())
     range = ->
       if attrs.orientation is 'top' or attrs.orientation is 'bottom'
         [0 ,chartController.innerWidth()]
@@ -33,11 +34,12 @@ angular.module('ad3').directive 'axis', ->
       else if attrs.orientation is 'right'
         "translate(#{chartController.innerWidth()}, 0)"
 
-    x = d3.scale.linear()
-    x.range(range())
-    x.domain d3.extent scope.values
+    scale = d3.scale.linear()
+    scale.range(range())
+    scale.domain d3.extent scope.domain
+    chartController.addScale(attrs.name, scale)
 
-    xAxis = d3.svg.axis().scale(x).orient(attrs.orientation)
+    xAxis = d3.svg.axis().scale(scale).orient(attrs.orientation)
       .ticks(attrs.ticks)
 
     if attrs.format
@@ -72,3 +74,5 @@ angular.module('ad3').directive 'axis', ->
     positionLabel(label)
 
     axis.call(xAxis)
+    axis.selectAll('line').attr("style", "fill: none; stroke-width: 2px; stroke: #303030;")
+    axis.selectAll('path').attr("style", "fill: none; stroke-width: 2px; stroke: #303030;")

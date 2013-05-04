@@ -1,9 +1,17 @@
-<div class="hero-unit" ng-controller="MainCtrl">
-  <h1>Bar Chart</h1>
-  <chart>
-    <axis values="xvalues" label="X Values" orientation="bottom" ticks="5"></axis>
-    <axis values="xvalues" label="X2 Values" orientation="top" ticks="5"></axis>
-    <axis values="xvalues" label="Y Values" orientation="left" ticks="5"></axis>
-    <axis values="xvalues" label="Y2 Values" orientation="right" ticks="5"></axis>
-  </chart>
+<div class="row-fluid">
+  <div class="span12">
+    <h1>OMG CHARTZ!</h>
+  </div>
+</div>
+<div class="row-fluid">
+  <div class="span12">
+    <div class="hero-unit" ng-controller="MainCtrl">
+      <h2>Line Chart</h2>
+      <chart>
+        <axis name="xaxis" domain="xvalues" label="X Values" orientation="bottom" ticks="5"></axis>
+        <axis name="yaxis" domain="yvalues" label="Y Values" orientation="left" ticks="5"></axis>
+        <line data="data" xscale="xaxis" yscale="yaxis">
+      </chart>
+    </div>
+  </div>
 </div>

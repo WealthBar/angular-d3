@@ -1,7 +1,7 @@
-angular.module('ad3').directive 'chart', () ->
+angular.module('ad3').directive 'chart',  ->
   defaults =
-    height: 480
-    width: 640
+    width: '100%'
+    height: '480'
 
   restrict: 'E'
 
@@ -16,11 +16,16 @@ angular.module('ad3').directive 'chart', () ->
     chart = svg.append("g")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 
+    @width = -> svg[0][0].offsetWidth
+    @height = -> svg[0][0].offsetHeight
+    @innerWidth = -> @width() - margin.left - margin.right
+    @innerHeight = -> @height() - margin.top - margin.bottom
+
     @getChart = () -> chart
-    @width = -> attrs.width
-    @height = -> attrs.height
-    @innerWidth = -> attrs.width - margin.left - margin.right
-    @innerHeight = -> attrs.height - margin.top - margin.bottom
+
+    scales = {}
+    @addScale = (name, scale) -> scales[name] = scale
+    @getScale = (name) -> scales[name]
   ]
 
   link: (scope, el, attrs) ->
