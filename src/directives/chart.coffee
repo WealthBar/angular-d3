@@ -1,4 +1,4 @@
-angular.module('ad3').directive 'chart',  ->
+angular.module('ad3').directive 'chart', ->
   defaults =
     width: '100%'
     height: '480'
@@ -29,4 +29,3 @@ angular.module('ad3').directive 'chart',  ->
   ]
 
   link: (scope, el, attrs) ->
-
