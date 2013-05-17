@@ -69,6 +69,16 @@ module.exports = function (grunt) {
             ];
           }
         }
+      },
+      dist: {
+        options: {
+          keepalive: true,
+          middleware: function (connect) {
+            return [
+              mountFolder(connect, yeomanConfig.dist),
+            ];
+          }
+        }
       }
     },
     open: {
@@ -116,7 +126,7 @@ module.exports = function (grunt) {
           expand: true,
           cwd: 'src',
           src: '{,*/}*.coffee',
-          dest: '.tmp/scripts/ad3',
+          dest: '.tmp/ad3',
           ext: '.js'
         }]
       },
@@ -148,13 +158,13 @@ module.exports = function (grunt) {
       }
     },
     concat: {
-      dist: {
-        files: {
-          '<%= yeoman.dist %>/scripts/scripts.js': [
-            '.tmp/scripts/{,*/}*.js',
-            '<%= yeoman.app %>/scripts/{,*/}*.js'
-          ]
-        }
+      ad3: {
+        dest: '<%= yeoman.dist %>/ad3/angularD3.js',
+        src:[ '.tmp/ad3/**/*.js' ]
+      },
+      app: {
+        dest: '<%= yeoman.dist %>/scripts/scripts.js',
+        src:[ '.tmp/scripts/**/*.js' ]
       }
     },
     useminPrepare: {
@@ -278,6 +288,8 @@ module.exports = function (grunt) {
     'watch'
   ]);
 
+  grunt.registerTask('serverDist',[ 'connect:dist', 'open' ] );
+
   grunt.registerTask('test', [
     'clean:server',
     'coffee',
@@ -289,19 +301,18 @@ module.exports = function (grunt) {
   grunt.registerTask('build', [
     'clean:dist',
     'jshint',
-    'test',
     'coffee',
     'compass:dist',
-    'useminPrepare',
+    //'useminPrepare',
     'imagemin',
     'cssmin',
     'htmlmin',
     'concat',
     'copy',
-    'cdnify',
-    'ngmin',
-    'uglify',
-    'rev',
+    //'cdnify',
+    //'ngmin',
+    //'uglify',
+    //'rev',
     'usemin'
   ]);
 

@@ -5,8 +5,9 @@
   <div class="span12">
     <div class="hero-unit" ng-controller="MainCtrl">
       <h1>OMG CHARTZ!</h1>
+      <p>{{hello}}</p>
       <chart>
-        <axis name="xaxis" domain="xvalues" label="X Values" orientation="bottom" ticks="5"></axis>
+        <axis name="xaxis" domain="xvalues" label="Money" orientation="bottom" ticks="5"></axis>
         <axis name="yaxis" domain="yvalues" label="Y Values" orientation="left" ticks="5"></axis>
         <axis name="y2axis" domain="yvalues" label="Y2 Values" orientation="right" ticks="5"></axis>
         <area data="area" xscale="xaxis" yscale="yaxis"></area>
