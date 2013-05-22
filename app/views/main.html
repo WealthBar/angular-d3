@@ -6,14 +6,14 @@
     <div class="hero-unit" ng-controller="MainCtrl">
       <h1>OMG CHARTZ!</h1>
       <p>{{hello}}</p>
-      <chart>
-        <axis name="xaxis" domain="xvalues" label="Money" orientation="bottom" ticks="5"></axis>
-        <axis name="yaxis" domain="yvalues" label="Y Values" orientation="left" ticks="5"></axis>
-        <axis name="y2axis" domain="yvalues" label="Y2 Values" orientation="right" ticks="5"></axis>
-        <area data="area" xscale="xaxis" yscale="yaxis"></area>
-        <line data="line" xscale="xaxis" yscale="yaxis"></line>
-        <bars data="bar" xscale="xaxis" yscale="y2axis"></bar>
-      </chart>
+      <d3-chart>
+        <d3-axis name="xaxis" domain="xvalues" label="X Values" orientation="bottom" ticks="5"></d3-axis>
+        <d3-axis name="yaxis" domain="yvalues" label="Y Values" orientation="left" ticks="5"></d3-axis>
+        <d3-axis name="y2axis" domain="yvalues" label="Y2 Values" orientation="right" ticks="5"></d3-axis>
+        <d3-area data="area" xscale="xaxis" yscale="yaxis"></d3-area>
+        <d3-line data="line" xscale="xaxis" yscale="yaxis"></d3-line>
+        <d3-bars data="bar" xscale="xaxis" yscale="y2axis"></d3-bar>
+      </d3-chart>
     </div>
   </div>
 </div>

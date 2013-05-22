@@ -1,4 +1,4 @@
-angular.module('ad3').directive 'chart', ->
+angular.module('ad3').directive 'd3Chart', ->
   defaults =
     width: '100%'
     height: '480'
@@ -27,5 +27,3 @@ angular.module('ad3').directive 'chart', ->
     @addScale = (name, scale) -> scales[name] = scale
     @getScale = (name) -> scales[name]
   ]
-
-  link: (scope, el, attrs) ->

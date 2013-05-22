@@ -1,10 +1,10 @@
-angular.module('ad3').directive 'area', ->
+angular.module('ad3').directive 'd3Area', () ->
   scope:
     data: '='
 
   restrict: 'E'
 
-  require: '^chart'
+  require: '^d3Chart'
 
   link: (scope, el, attrs, chartController) ->
     x = chartController.getScale(attrs.xscale)

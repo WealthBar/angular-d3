@@ -1,10 +1,10 @@
-angular.module('ad3').directive 'line', ->
+angular.module('ad3').directive 'd3Line', ->
   scope:
     data: '='
 
   restrict: 'E'
 
-  require: '^chart'
+  require: '^d3Chart'
 
   link: (scope, el, attrs, chartController) ->
     x = chartController.getScale(attrs.xscale)

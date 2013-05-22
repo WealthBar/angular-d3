@@ -1,4 +1,4 @@
-angular.module('ad3').directive 'axis', ->
+angular.module('ad3').directive 'd3Axis', ->
   defaults =
     orientation: 'bottom'
     label: 'X-Axis'
@@ -12,7 +12,7 @@ angular.module('ad3').directive 'axis', ->
 
   restrict: 'E'
 
-  require: '^chart'
+  require: '^d3Chart'
 
   link: (scope, el, attrs, chartController) ->
     attrs = angular.extend(defaults, attrs)
