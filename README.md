@@ -29,7 +29,7 @@ to try and provide a declarative syntax for every possible scenario in which d3
 be useful. So for now I'm just developing a basic charting and graphing syntax
 but I am interested in the larger possibilities. If you have ideas and are
 interested in lending a hand, please open an issue, submit a pull request or
-just [ping me @lucisferre](https://twitter.com/lucisferre). This could be the
+just ping me [@lucisferre](https://twitter.com/lucisferre). This could be the
 beginning of beautiful friendship.
 
 ## Charting Directives
@@ -45,23 +45,16 @@ beginning of beautiful friendship.
 
 ## Feature Roadmap
 
-[x] Basic chart forms for: Area, Line and Bars
-
-[x] Supports multiple axis and multiple charts can be stacked
-
-[ ] Dynamically updating charts supporting animations (should be able to
+- [x] Basic chart forms for: Area, Line and Bars
+- [x] Supports multiple axis and multiple charts can be stacked
+- [ ] Dynamically updating charts supporting animations (should be able to
 display and track incoming time-series data)
-
-[ ] Data source directives to declaratively specify and load external data
+- [ ] Data source directives to declaratively specify and load external data
 sources and support D3's built in parsers for CSV, TSV, etc.
-
-[ ] Support for customizable chart legends
-
-[ ] Mouse-over and touch-based overlay support
-
-[ ] Other common chart types: Scatter, Pie, Bullet
-
-[ ] Useful chart functionality, like regression lines for scatter plots
+- [ ] Support for customizable chart legends
+- [ ] Mouse-over and touch-based overlay support
+- [ ] Other common chart types: Scatter, Pie, Bullet
+- [ ] Useful chart functionality, like regression lines for scatter plots
 
 If you have any other ideas for me, or feel like contributing to help add any
 of this missing functionality, I encourage you to submit a pull request.
