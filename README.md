@@ -43,6 +43,22 @@ beginning of beautiful friendship.
 - d3-bars - Defines a set of bars for a bar chart
 
 
+## Try it
+
+This project uses Yeoman and provides a fully functional demo project under the
+`/app` folder. To run it clone this repo and do:
+
+```
+npm install
+
+# If you don't already have bower installed then install it with
+npm install -g bower
+
+bower install
+
+grunt server
+```
+
 ## Feature Roadmap
 
 - [x] Basic chart forms for: Area, Line and Bars
