@@ -23,7 +23,7 @@
     "grunt-karma": "~0.3.0",
     "grunt-open": "~0.2.0",
     "matchdep": "~0.1.1",
-    "grunt-google-cdn": "git://github.com/AdamQuadmon/grunt-google-cdn.git#89c911",
+    "grunt-google-cdn": "btford/grunt-google-cdn.git",
     "grunt-ngmin": "~0.0.2"
   },
   "engines": {
