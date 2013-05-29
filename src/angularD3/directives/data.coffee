@@ -5,7 +5,7 @@ angular.module('ad3').directive 'd3Data', () ->
   restrict: 'E'
 
   link: (scope, el, attrs) ->
-
+    console.log "Iam working"
     d3.csv defaults.src, 
       (row)->
         datum = {}
@@ -13,6 +13,7 @@ angular.module('ad3').directive 'd3Data', () ->
           name = name.trim()
           datum[name] = row[name]
         datum
+        console.log datum
       (error, rows) -> 
         scope.data = rows
         scope.$digest()
