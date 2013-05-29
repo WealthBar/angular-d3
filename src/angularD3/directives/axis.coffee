@@ -1,5 +1,5 @@
 angular.module('ad3').directive 'd3Axis', ->
-  defaults =
+  defaults = ->
     orientation: 'bottom'
     label: 'X-Axis'
     ticks: '5'
@@ -15,62 +15,61 @@ angular.module('ad3').directive 'd3Axis', ->
   require: '^d3Chart'
 
   link: (scope, el, attrs, chartController) ->
-    attrs = angular.extend(defaults, attrs)
+    options = angular.extend(defaults(), attrs)
 
-    console.log(chartController.innerWidth())
     range = ->
-      if attrs.orientation is 'top' or attrs.orientation is 'bottom'
+      if options.orientation is 'top' or options.orientation is 'bottom'
         [0 ,chartController.innerWidth()]
       else
         [chartController.innerHeight(), 0]
 
     translation = ->
-      if attrs.orientation is 'bottom'
+      if options.orientation is 'bottom'
         "translate(0, #{chartController.innerHeight()})"
-      else if attrs.orientation is 'top'
+      else if options.orientation is 'top'
         "translate(0, 0)"
-      else if attrs.orientation is 'left'
+      else if options.orientation is 'left'
         "translate(0, 0)"
-      else if attrs.orientation is 'right'
+      else if options.orientation is 'right'
         "translate(#{chartController.innerWidth()}, 0)"
 
     scale = d3.scale.linear()
     scale.range(range())
     scale.domain d3.extent scope.domain
-    chartController.addScale(attrs.name, scale)
+    chartController.addScale(options.name, scale)
 
-    xAxis = d3.svg.axis().scale(scale).orient(attrs.orientation)
-      .ticks(attrs.ticks)
+    xAxis = d3.svg.axis().scale(scale).orient(options.orientation)
+      .ticks(options.ticks)
 
-    if attrs.format
-      format = d3.format(attrs.format)
+    if options.format
+      format = d3.format(options.format)
       xAxis.tickFormat(format)
 
     # Append x-axis to chart
     axis = chartController.getChart().append("g")
-      .attr("class", "#{attrs.orientation} axis")
+      .attr("class", "#{options.orientation} axis")
       .attr("transform", translation())
 
     positionLabel = (label) ->
-      if attrs.orientation is 'bottom'
+      if options.orientation is 'bottom'
         label
           .attr("x", "#{chartController.innerWidth() / 2}")
           .attr("dy", "2.5em").attr("style", "text-anchor: middle;")
-      else if attrs.orientation is 'top'
+      else if options.orientation is 'top'
         label.attr("x", "#{chartController.innerWidth() / 2}")
           .attr("dy", "-1.5em").attr("style", "text-anchor: middle;")
-      else if attrs.orientation is 'left'
+      else if options.orientation is 'left'
         label.attr("dy", "-2.5em")
           .attr("x", "-#{chartController.innerHeight() / 2}")
           .attr("style", "text-anchor: middle;")
           .attr("transform", "rotate(-90)")
-      else if attrs.orientation is 'right'
+      else if options.orientation is 'right'
         label.attr("dy", "-2.5em")
           .attr("x", "#{chartController.innerHeight() / 2}")
           .attr("style", "text-anchor: middle;")
           .attr("transform", "rotate(90)")
 
-    label = axis.append("text").attr("class", "axis-label").text(attrs.label)
+    label = axis.append("text").attr("class", "axis-label").text(options.label)
     positionLabel(label)
 
     axis.call(xAxis)

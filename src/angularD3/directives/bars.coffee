@@ -1,4 +1,8 @@
 angular.module('ad3').directive 'd3Bars', () ->
+  defaults = ->
+    x: 0
+    y: 1
+
   scope:
     data: '='
 
@@ -7,8 +11,9 @@ angular.module('ad3').directive 'd3Bars', () ->
   require: '^d3Chart'
 
   link: (scope, el, attrs, chartController) ->
-    x = chartController.getScale(attrs.xscale)
-    y = chartController.getScale(attrs.yscale)
+    options = angular.extend(defaults(), attrs)
+    x = chartController.getScale(options.xscale)
+    y = chartController.getScale(options.yscale)
     chart = chartController.getChart()
     height = chartController.innerHeight()
     width = 20
@@ -18,16 +23,16 @@ angular.module('ad3').directive 'd3Bars', () ->
       .attr("height", 0)
       .remove()
     bars.transition().duration(500)
-      .attr("x", (d) -> x(d[0]) - width/2)
-      .attr("y", (d) -> y(d[1]))
-      .attr("height", (d) -> height - y(d[1]))
+      .attr("x", (d) -> x(d[options.x]) - width/2)
+      .attr("y", (d) -> y(d[options.y]))
+      .attr("height", (d) -> height - y(d[options.y]))
       .attr("width", width)
     bars.enter()
       .append("rect")
-      .attr("x", (d) -> x(d[0]) - width/2)
+      .attr("x", (d) -> x(d[options.x]) - width/2)
       .attr("width", width)
       .attr("y", height)
       .attr("height", 0)
       .transition().duration(500)
-      .attr("y", (d) -> y(d[1]))
-      .attr("height", (d) -> height - y(d[1]))
+      .attr("y", (d) -> y(d[options.y]))
+      .attr("height", (d) -> height - y(d[options.y]))

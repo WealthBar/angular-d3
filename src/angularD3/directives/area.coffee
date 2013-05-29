@@ -1,4 +1,8 @@
 angular.module('ad3').directive 'd3Area', () ->
+  defaults = ->
+    x: 0
+    y: 1
+
   scope:
     data: '='
 
@@ -7,17 +11,18 @@ angular.module('ad3').directive 'd3Area', () ->
   require: '^d3Chart'
 
   link: (scope, el, attrs, chartController) ->
-    x = chartController.getScale(attrs.xscale)
-    y = chartController.getScale(attrs.yscale)
+    options = angular.extend(defaults(), attrs)
+    x = chartController.getScale(options.xscale)
+    y = chartController.getScale(options.yscale)
     height = chartController.innerHeight()
     areaStart = d3.svg.area()
-      .x((d) -> x(d[0]))
+      .x((d) -> x(d[options.x]))
       .y0(height)
       .y1(height)
     area = d3.svg.area()
-      .x((d) -> x(d[0]))
+      .x((d) -> x(d[options.x]))
       .y0(height)
-      .y1((d) -> y(d[1]))
+      .y1((d) -> y(d[options.y]))
     chartController.getChart().append("path").attr("class", "area")
       .attr("style", "fill: #FF3030; stroke: #FF3030; opacity: 0.8")
       .datum(scope.data)
