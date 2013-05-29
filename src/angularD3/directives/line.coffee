@@ -1,4 +1,8 @@
 angular.module('ad3').directive 'd3Line', ->
+  defaults = ->
+    x: 0
+    y: 1
+
   scope:
     data: '='
 
@@ -7,16 +11,17 @@ angular.module('ad3').directive 'd3Line', ->
   require: '^d3Chart'
 
   link: (scope, el, attrs, chartController) ->
-    x = chartController.getScale(attrs.xscale)
-    y = chartController.getScale(attrs.yscale)
+    options = angular.extend(defaults(), attrs)
+    x = chartController.getScale(options.xscale)
+    y = chartController.getScale(options.yscale)
     height = chartController.innerHeight()
     lineStart = d3.svg.line()
-      .x((d) -> x(d[0]))
+      .x((d) -> x(d[options.x]))
       .y(height)
     line = d3.svg.line()
-      .x((d) -> x(d[0]))
-      .y((d) -> y(d[1]))
-    chartController.getChart().append("path").attr("class", "line")
+      .x((d) -> x(d[options.x]))
+      .y((d) -> y(d[options.y]))
+    graph = chartController.getChart().append("path").attr("class", "line")
       .attr("style", "fill: none; stroke-width: 2px; stroke: #3030FF")
       .datum(scope.data)
       .attr("d", lineStart)
