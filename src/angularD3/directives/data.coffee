@@ -1,12 +1,11 @@
 angular.module('ad3').directive 'd3Data', () ->
-  defaults = 
-    src : "data/data.csv"
 
   restrict: 'E'
 
   link: (scope, el, attrs) ->
-    console.log "Iam working"
-    d3.csv defaults.src, 
+
+    src = attrs.src
+    d3.csv src, 
       (row)->
         datum = {}
         for name in attrs.columns.split(',')
