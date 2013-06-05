@@ -3,16 +3,17 @@
 </div>
 <div class="row-fluid">
   <div class="span12">
-    <div class="hero-unit" ng-controller="MainCtrl">
+    <div class="hero-unit">
       <h1>OMG CHARTZ!</h1>
       <p>{{hello}}</p>
+      <d3-data src="data/data.csv" data="line" columns="year, savings"></d3-data>
+      <d3-data src="data/donutData.csv" data="pie" columns="age,population"></d3-data>
       <d3-chart>
-        <d3-axis name="xaxis" domain="xvalues" label="X Values" orientation="bottom" ticks="5"></d3-axis>
-        <d3-axis name="yaxis" domain="yvalues" label="Y Values" orientation="left" ticks="5"></d3-axis>
-        <d3-axis name="y2axis" domain="yvalues" label="Y2 Values" orientation="right" ticks="5"></d3-axis>
-        <d3-area data="area" xscale="xaxis" yscale="yaxis"></d3-area>
-        <d3-line data="line" x="age" y="savings" xscale="xaxis" yscale="yaxis"></d3-line>
-        <d3-bars data="bar" xscale="xaxis" yscale="y2axis"></d3-bar>
+        <d3-axis data="line" name="year" label="Year" orientation="bottom" ticks="5"></d3-axis>
+        <d3-axis data="line" name="savings" label="Savings" orientation="left" ticks="5"></d3-axis>
+        <d3-line data="line" x="year" y="savings"></d3-line>
+        <d3-bars data="line" x="year" y="savings"></d3-bars>
+        <d3-donut data="pie" value="age" amount="population"></d3-donut>
       </d3-chart>
     </div>
   </div>
