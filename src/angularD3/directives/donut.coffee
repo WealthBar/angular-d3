@@ -8,14 +8,11 @@ angular.module('ad3').directive 'd3Donut', () ->
   require: '^d3Chart'
 
   link: (scope, el, attrs, chartController) ->
-    debugger
     options = angular.extend(defaults(), attrs)
-    x = chartController.getScale(options.x)
-    y = chartController.getScale(options.y)
-    
+
     chart = chartController.getChart()
-    height = chartController.innerHeight()
-    width = chartController.innerWidth()
+    height = 500
+    width = 960
 
     radius = Math.min(width,height) / 2
 
@@ -27,9 +24,9 @@ angular.module('ad3').directive 'd3Donut', () ->
       .outerRadius(radius - 10)
       .innerRadius(radius - 70)
 
-    pie = d3.layout.pie()
-      .sort(null)
-      .value((d) -> d[options.amount])
+    pie = d3.layout.pie().sort(null)
+      .value((d) -> 
+        d[options.amount])
 
     svg = d3.select("body").append("svg")
       .attr("width", width)
@@ -40,19 +37,25 @@ angular.module('ad3').directive 'd3Donut', () ->
     draw = (data, old, scope) ->
       return unless data?
 
+      reversedDataMap = {}
+      for datum in data
+        do (datum) ->
+          reversedDataMap[datum[options.amount]] = datum[options.value]
+
       g = svg.selectAll(".arc")
-        .data(data)
+        .data(pie(data))
         .enter().append("g")
         .attr("class", "arc")
 
       g.append("path")
         .attr("d", arc)
-        .style("fill", (d) -> color(d[options.value]))
+        .style("fill", (d) -> color(reversedDataMap[d.value])
+        )
 
       g.append("text")
         .attr("transform", (d) -> "translate(" + arc.centroid(d) + ")")
         .attr("dy", ".35em")
         .style("text-anchor", "middle")
-        .text((d) -> d[options.value])
+        .text((d) -> reversedDataMap[d.value])
 
     scope.$watch attrs.data, draw , true
