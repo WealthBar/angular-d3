@@ -1,14 +1,11 @@
 angular.module('ad3').directive 'd3Axis', ->
   defaults = ->
     orientation: 'bottom'
-    label: 'X-Axis'
+    label: 'axis'
     ticks: '5'
     format: null
 
   priority: 1
-
-  scope:
-    domain: '='
 
   restrict: 'E'
 
@@ -35,7 +32,16 @@ angular.module('ad3').directive 'd3Axis', ->
 
     scale = d3.scale.linear()
     scale.range(range())
-    scale.domain d3.extent scope.domain
+
+    update = (data) ->
+      return unless data?
+      domainValues = (datum[options.name] for datum in data)
+      scale.domain d3.extent domainValues
+      axis.call(xAxis)
+      axis.selectAll('line').attr("style", "fill: none; stroke-width: 2px; stroke: #303030;")
+      axis.selectAll('path').attr("style", "fill: none; stroke-width: 2px; stroke: #303030;")
+    scope.$watch options.data, update, true
+
     chartController.addScale(options.name, scale)
 
     xAxis = d3.svg.axis().scale(scale).orient(options.orientation)
@@ -71,7 +77,3 @@ angular.module('ad3').directive 'd3Axis', ->
 
     label = axis.append("text").attr("class", "axis-label").text(options.label)
     positionLabel(label)
-
-    axis.call(xAxis)
-    axis.selectAll('line').attr("style", "fill: none; stroke-width: 2px; stroke: #303030;")
-    axis.selectAll('path').attr("style", "fill: none; stroke-width: 2px; stroke: #303030;")
