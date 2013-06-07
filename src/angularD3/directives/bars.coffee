@@ -11,14 +11,13 @@ angular.module('ad3').directive 'd3Bars', () ->
     options = angular.extend(defaults(), attrs)
     x = chartController.getScale(options.x)
     y = chartController.getScale(options.y)
-    
+
     chart = chartController.getChart()
     height = chartController.innerHeight()
     width = 20
-    
+
     draw = (data, old, scope) ->
       return unless data?
-
       bars = chart.selectAll("rect.bar").data(data)
       bars.exit().transition().duration(500)
         .attr("y", (d) -> height)
