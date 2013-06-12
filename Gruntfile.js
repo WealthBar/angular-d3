@@ -22,7 +22,9 @@ module.exports = function (grunt) {
     yeoman: yeomanConfig,
     watch: {
       coffee: {
-        files: ['<%= yeoman.app %>/**/*.coffee', 'src/**/*.coffee'],
+        files: ['<%= yeoman.app %>/scripts/*.coffee',
+          '<%= yeoman.app %>/scripts/**/*.coffee',
+          'src/**/*.coffee'],
         tasks: ['coffee:dist']
       },
       coffeeTest: {
@@ -30,8 +32,12 @@ module.exports = function (grunt) {
         tasks: ['coffee:test']
       },
       compass: {
-        files: ['<%= yeoman.app %>/**/*.{scss,sass}'],
+        files: ['<%= yeoman.app %>/styles/*.{scss,sass}'],
         tasks: ['compass']
+      },
+      less: {
+        files: ['<%= yeoman.app %>/styles/*.{less}'],
+        tasks: ['less']
       },
       livereload: {
         files: [
@@ -155,6 +161,13 @@ module.exports = function (grunt) {
       server: {
         options: {
           debugInfo: true
+        }
+      }
+    },
+    less: {
+      server: {
+        files: {
+          '.tmp/styles/bootstrap.css' :'<%= yeoman.app %>/components/bootstrap/less/bootstrap.less'
         }
       }
     },
@@ -283,6 +296,7 @@ module.exports = function (grunt) {
     'clean:server',
     'coffee:dist',
     'compass:server',
+    'less:server',
     'livereload-start',
     'connect:livereload',
     'open',
