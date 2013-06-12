@@ -32,17 +32,18 @@ angular.module('ad3').directive 'd3Axis', ->
 
     scale = d3.scale.linear()
     scale.range(range())
+    chartController.addScale(options.name, scale)
 
     update = (data) ->
       return unless data?
-      domainValues = (datum[options.name] for datum in data)
+      domainValues = (new Number(datum[options.name]) for datum in data)
       scale.domain d3.extent domainValues
+      console.log(domainValues)
       axis.call(xAxis)
       axis.selectAll('line').attr("style", "fill: none; stroke-width: 2px; stroke: #303030;")
       axis.selectAll('path').attr("style", "fill: none; stroke-width: 2px; stroke: #303030;")
-    scope.$watch options.data, update, true
 
-    chartController.addScale(options.name, scale)
+    scope.$watch options.data, update, true
 
     xAxis = d3.svg.axis().scale(scale).orient(options.orientation)
       .ticks(options.ticks)
