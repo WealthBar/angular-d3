@@ -2,6 +2,7 @@ angular.module('ad3').directive 'd3Bars', () ->
   defaults = ->
     x: 0
     y: 1
+    width: 15
 
   restrict: 'E'
 
@@ -14,7 +15,7 @@ angular.module('ad3').directive 'd3Bars', () ->
 
     chart = chartController.getChart()
     height = chartController.innerHeight()
-    width = 20
+    width = options.width
 
     draw = (data, old, scope) ->
       return unless data?
