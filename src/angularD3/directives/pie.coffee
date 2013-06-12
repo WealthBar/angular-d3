@@ -20,10 +20,6 @@ angular.module('ad3').directive 'd3Pie', () ->
 
     radius = Math.min(width,height) / 2
 
-    color = d3.scale.ordinal()
-      .range(["#98abc5", "#8a89a6", "#7b6888",
-              "#6b486b", "#a05d56", "#d0743c", "#ff8c00"])
-
     arc = d3.svg.arc()
       .outerRadius(radius)
       .innerRadius(radius * innerRadius)
@@ -54,11 +50,10 @@ angular.module('ad3').directive 'd3Pie', () ->
       g = center.selectAll(".arc")
         .data(pie(data))
         .enter().append("g")
-        .attr("class", "arc")
+        .attr("class", (d,i) ->  "arc arc-#{i}")
 
       g.append("path")
         .attr("d", arc)
-        .style("fill", (d) -> color(reversedDataMap[d.value]))
 
       g.append("text")
         .attr("transform", (d) -> "translate(" + labelArc.centroid(d) + ")")
