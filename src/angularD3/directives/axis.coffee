@@ -38,7 +38,6 @@ angular.module('ad3').directive 'd3Axis', ->
       return unless data?
       domainValues = (new Number(datum[options.name]) for datum in data)
       scale.domain d3.extent domainValues
-      console.log(domainValues)
       axis.call(xAxis)
       axis.selectAll('line').attr("style", "fill: none; stroke-width: 2px; stroke: #303030;")
       axis.selectAll('path').attr("style", "fill: none; stroke-width: 2px; stroke: #303030;")
