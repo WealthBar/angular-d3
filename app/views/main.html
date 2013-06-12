@@ -14,7 +14,12 @@
 
 <section id="pie-charts" class="well">
   <h1>Pie and Donut Charts</h1>
-  <d3-chart>
-    <d3-donut data="pie" value="age" amount="population"></d3-donut>
-  </d3-chart>
+  <div class="row">
+    <d3-chart height="320" class="span6">
+      <d3-pie data="pie" value="age" amount="population"></d3-donut>
+    </d3-chart>
+    <d3-chart height="320" class="span6">
+      <d3-pie inner-radius="0.5" label-radius="1.1" data="pie" value="age" amount="population"></d3-donut>
+    </d3-chart>
+  </div>
 </section>

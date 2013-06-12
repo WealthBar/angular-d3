@@ -1,7 +1,9 @@
-angular.module('ad3').directive 'd3Donut', () ->
+angular.module('ad3').directive 'd3Pie', () ->
   defaults = ->
     x: 0
     y: 1
+    innerRadius: 0
+    labelRadius: 0.7
 
   restrict: 'E'
 
@@ -11,18 +13,20 @@ angular.module('ad3').directive 'd3Donut', () ->
     options = angular.extend(defaults(), attrs)
 
     chart = chartController.getChart()
-    height = 500
-    width = 960
+    height = chartController.innerHeight()
+    width = chartController.innerWidth()
+    innerRadius = parseFloat(options.innerRadius)
+    labelRadius = parseFloat(options.labelRadius)
 
     radius = Math.min(width,height) / 2
 
-    color = d3.scale.ordinal()
-      .range(["#98abc5", "#8a89a6", "#7b6888",
-              "#6b486b", "#a05d56", "#d0743c", "#ff8c00"])
-
     arc = d3.svg.arc()
-      .outerRadius(radius - 10)
-      .innerRadius(radius - 70)
+      .outerRadius(radius)
+      .innerRadius(radius * innerRadius)
+
+    labelArc = d3.svg.arc()
+      .outerRadius(radius * labelRadius)
+      .innerRadius(radius * labelRadius)
 
     pie = d3.layout.pie().sort(null)
       .value((d) ->
@@ -46,15 +50,14 @@ angular.module('ad3').directive 'd3Donut', () ->
       g = center.selectAll(".arc")
         .data(pie(data))
         .enter().append("g")
-        .attr("class", "arc")
+        .attr("class", (d,i) ->  "arc arc-#{i}")
 
       g.append("path")
         .attr("d", arc)
-        .style("fill", (d) -> color(reversedDataMap[d.value]))
 
       g.append("text")
-        .attr("transform", (d) -> "translate(" + arc.centroid(d) + ")")
-        .attr("dy", ".35em")
+        .attr("transform", (d) -> "translate(" + labelArc.centroid(d) + ")")
+        .attr("dy", "0.35em")
         .style("text-anchor", "middle")
         .text((d) -> reversedDataMap[d.value])
 
