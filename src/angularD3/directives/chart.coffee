@@ -1,5 +1,5 @@
 angular.module('ad3').directive 'd3Chart', ->
-  defaults =
+  defaults = ->
     width: '100%'
     height: '480'
 
@@ -12,11 +12,11 @@ angular.module('ad3').directive 'd3Chart', ->
   template: "<svg ng-transclude></svg>"
 
   controller: ['$scope', '$element', '$attrs', (scope, el, attrs) ->
-    angular.extend(attrs, defaults)
+    options = angular.extend(defaults(), attrs)
     margin = { top: 40, right: 60, bottom: 40, left: 60 }
     svg = d3.select(el[0])
-      .attr("width", attrs.width)
-      .attr("height", attrs.height)
+      .attr("width", options.width)
+      .attr("height", options.height)
     chart = svg.append("g")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 
