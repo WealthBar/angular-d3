@@ -25,7 +25,6 @@ angular.module('ad3').directive 'd3Area', () ->
 
     draw = (data) ->
       return unless data?
-      console.log(data)
       chartController.getChart().append("path").attr("class", "area")
         .attr("style", "fill: #FF3030; stroke: #FF3030; opacity: 0.8")
         .datum(data)

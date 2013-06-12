@@ -1,23 +1,20 @@
-<div class="row-fluid">
-  <p>
-</div>
-<div class="row-fluid">
-  <div class="span12">
-    <div class="hero-unit">
-      <h1>OMG CHARTZ!</h1>
-      <p>{{hello}}</p>
-      <d3-data src="data/data.csv" data="line" columns="year, savings"></d3-data>
-      <d3-data src="data/donutData.csv" data="pie" columns="age,population"></d3-data>
-      <d3-chart>
-        <d3-axis data="line" name="year" label="Year" orientation="bottom" ticks="5"></d3-axis>
-        <d3-axis data="line" name="savings" label="Savings" orientation="left" ticks="5"></d3-axis>
-        <d3-line data="line" x="year" y="savings"></d3-line>
-        <d3-area data="line" x="year" y="savings"></d3-area>
-        <d3-bars data="line" x="year" y="savings"></d3-bars>
-      </d3-chart>
-      <d3-chart>
-        <d3-donut data="pie" value="age" amount="population"></d3-donut>
-      </d3-chart>
-    </div>
-  </div>
-</div>
+<section id="graphs" class="well">
+  <h1>Basic Graphs</h1>
+  <p>Basic line, area and bar graphs can be stacked in the same chart.</p>
+  <d3-data src="data/data.csv" data="line" columns="year, savings"></d3-data>
+  <d3-data src="data/donutData.csv" data="pie" columns="age,population"></d3-data>
+  <d3-chart>
+    <d3-axis data="line" name="year" label="Year" orientation="bottom" ticks="5"></d3-axis>
+    <d3-axis data="line" name="savings" label="Savings" orientation="left" ticks="5"></d3-axis>
+    <d3-line data="line" x="year" y="savings"></d3-line>
+    <d3-area data="line" x="year" y="savings"></d3-area>
+    <d3-bars data="line" x="year" y="savings"></d3-bars>
+  </d3-chart>
+</section>
+
+<section id="pie-charts" class="well">
+  <h1>Pie and Donut Charts</h1>
+  <d3-chart>
+    <d3-donut data="pie" value="age" amount="population"></d3-donut>
+  </d3-chart>
+</section>
