@@ -8,9 +8,10 @@ angular.module('ad3').directive 'd3Area', () ->
   require: '^d3Chart'
 
   link: (scope, el, attrs, chartController) ->
+    # todo: DRY this up in line, area and bar directives
     options = angular.extend(defaults(), attrs)
-    x = chartController.getScale(options.x)
-    y = chartController.getScale(options.y)
+    x = chartController.getScale(options.xscale or options.x)
+    y = chartController.getScale(options.yscale or options.y)
     height = chartController.innerHeight()
 
     areaStart = d3.svg.area()
