@@ -9,9 +9,10 @@ angular.module('ad3').directive 'd3Bars', () ->
   require: '^d3Chart'
 
   link: (scope, el, attrs, chartController) ->
+    # todo: DRY this up in line, area and bar directives
     options = angular.extend(defaults(), attrs)
-    x = chartController.getScale(options.x)
-    y = chartController.getScale(options.y)
+    x = chartController.getScale(options.xscale or options.x)
+    y = chartController.getScale(options.yscale or options.y)
 
     chart = chartController.getChart()
     height = chartController.innerHeight()
@@ -31,6 +32,7 @@ angular.module('ad3').directive 'd3Bars', () ->
         .attr("width", width)
       bars.enter()
         .append("rect")
+        .attr("class", (d,i) -> "bar bar-#{i}")
         .attr("x", (d) -> x(d[options.x]) - width/2)
         .attr("width", width)
         .attr("y", height)
