@@ -4,6 +4,7 @@ angular.module('ad3').directive 'd3Axis', ->
     label: 'axis'
     ticks: '5'
     format: null
+    extent: false
 
   priority: 1
 
@@ -37,7 +38,10 @@ angular.module('ad3').directive 'd3Axis', ->
     update = (data) ->
       return unless data?
       domainValues = (new Number(datum[options.name]) for datum in data)
-      scale.domain d3.extent domainValues
+      if options.extent
+        scale.domain d3.extent domainValues
+      else
+        scale.domain [0, d3.max domainValues]
       axis.call(xAxis)
       axis.selectAll('line').attr("style", "fill: none; stroke-width: 2px; stroke: #303030;")
       axis.selectAll('path').attr("style", "fill: none; stroke-width: 2px; stroke: #303030;")
@@ -53,7 +57,7 @@ angular.module('ad3').directive 'd3Axis', ->
 
     # Append x-axis to chart
     axis = chartController.getChart().append("g")
-      .attr("class", "#{options.orientation} axis")
+      .attr("class", "axis axis-#{options.orientation}")
       .attr("transform", translation())
 
     positionLabel = (label) ->

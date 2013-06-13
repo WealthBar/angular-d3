@@ -9,7 +9,7 @@ angular.module('ad3').directive 'd3Chart', ->
 
   transclude: true
 
-  template: "<svg ng-transclude></svg>"
+  template: "<svg class='d3' ng-transclude></svg>"
 
   controller: ['$scope', '$element', '$attrs', (scope, el, attrs) ->
     options = angular.extend(defaults(), attrs)

@@ -1,13 +1,14 @@
 <section id="graphs" class="well">
   <h1>Basic Graphs</h1>
   <p>Basic line, area and bar graphs can be stacked in the same chart.</p>
-  <d3-data src="data/data.csv" data="line" columns="year, savings"></d3-data>
+  <d3-data src="data/data.csv" data="line" columns="year, savings, total, optimal"></d3-data>
   <d3-data src="data/donutData.csv" data="pie" columns="age,population"></d3-data>
   <d3-chart>
-    <d3-axis data="line" name="year" label="Year" orientation="bottom" ticks="5"></d3-axis>
-    <d3-axis data="line" name="savings" label="Savings" orientation="left" ticks="5"></d3-axis>
-    <d3-line data="line" x="year" y="savings"></d3-line>
-    <d3-area data="line" x="year" y="savings"></d3-area>
+    <d3-axis data="line" name="year" label="Year" extent="true" orientation="bottom" ticks="5"></d3-axis>
+    <d3-axis data="line" name="savings" label="Deposits" orientation="left" ticks="5"></d3-axis>
+    <d3-axis data="line" name="total" label="Savings" orientation="right" ticks="5"></d3-axis>
+    <d3-line data="line" x="year" y="optimal" yscale="total"></d3-line>
+    <d3-area data="line" x="year" y="total"></d3-area>
     <d3-bars data="line" x="year" y="savings"></d3-bars>
   </d3-chart>
 </section>
