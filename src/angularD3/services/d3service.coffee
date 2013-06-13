@@ -16,8 +16,11 @@ angular.module('ad3').provider 'd3Service', () ->
             datum[name] = row[name]
           datum
         (error, rows) ->
-          results.push.apply(results, rows)
-          $rootScope.$apply()
+          if error?
+            cache.remove(src)
+          else
+            results.push.apply(results, rows)
+            $rootScope.$apply()
       results
   ]
 
