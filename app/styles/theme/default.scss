@@ -4,6 +4,14 @@ $green: #00a79d;
 $orange: #eda646;
 $black: #222a2b;
 
+/* Axis */
+
+.d3 .axis {
+  line { fill: none; stroke-width: 2px; stroke: $black; }
+  path { fill: none; stroke-width: 2px; stroke: $black; }
+  text { fill: $black };
+}
+
 /* Area Chart */
 
 .d3 .area {

@@ -57,7 +57,7 @@ angular.module('ad3').directive 'd3Axis', ->
 
     # Append x-axis to chart
     axis = chartController.getChart().append("g")
-      .attr("class", "#{options.orientation} axis")
+      .attr("class", "axis axis-#{options.orientation}")
       .attr("transform", translation())
 
     positionLabel = (label) ->
