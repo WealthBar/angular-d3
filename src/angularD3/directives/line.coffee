@@ -24,7 +24,6 @@ angular.module('ad3').directive 'd3Line', ->
     draw = (data, old, scope) ->
       return unless data?
       chartController.getChart().append("path").attr("class", "line")
-        .attr("style", "fill: none; stroke-width: 2px; stroke: #3030FF")
         .datum(data)
         .attr("d", lineStart)
         .transition()

@@ -31,6 +31,7 @@ angular.module('ad3').directive 'd3Bars', () ->
         .attr("width", width)
       bars.enter()
         .append("rect")
+        .attr("class", (d,i) -> "bar bar-#{i}")
         .attr("x", (d) -> x(d[options.x]) - width/2)
         .attr("width", width)
         .attr("y", height)
