@@ -63,13 +63,13 @@ grunt server
 
 - [x] Basic chart forms for: Area, Line and Bars
 - [x] Supports multiple axis and multiple charts can be stacked
-- [ ] Dynamically updating charts supporting animations (should be able to
+- [x] Dynamically updating charts supporting animations (should be able to
 display and track incoming time-series data)
-- [ ] Data source directives to declaratively specify and load external data
+- [x] Data source directives to declaratively specify and load external data
 sources and support D3's built in parsers for CSV, TSV, etc.
 - [ ] Support for customizable chart legends
 - [ ] Mouse-over and touch-based overlay support
-- [ ] Other common chart types: Scatter, Pie, Bullet
+- [ ] Other common chart types: Scatter, Bullet
 - [ ] Useful chart functionality, like regression lines for scatter plots
 
 If you have any other ideas for me, or feel like contributing to help add any
