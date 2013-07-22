@@ -20,7 +20,15 @@
       <d3-pie data="pie" value="age" amount="population"></d3-pie>
     </d3-chart>
     <d3-chart height="320" class="span6">
-      <d3-pie inner-radius="0.5" label-radius="1.1" data="pie" value="age" amount="population"></d3-pie>
+      <d3-pie inner-radius="0.5" label-radius="0" data="pie" value="age" amount="population"></d3-pie>
+    </d3-chart>
+  </div>
+  <div class="row">
+    <d3-chart height="320" class="span6 simple-arc1">
+      <d3-arc inner-radius="0.5"  data="{{ {percentVal:60, text:'60%'}  }}" label="text" amount="percentVal" transition="bounce" transition-duration="1000"></d3-arc>
+    </d3-chart>
+    <d3-chart height="320" class="span6 simple-arc2">
+      <d3-arc inner-radius="0.5"  data="{{ {percentVal:90, text:'90%'}  }}" label="text" amount="percentVal"></d3-arc>
     </d3-chart>
   </div>
 </section>
