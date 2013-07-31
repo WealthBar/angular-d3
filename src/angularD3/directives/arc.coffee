@@ -46,23 +46,23 @@ angular.module('ad3').directive 'd3Arc', () ->
 
     draw = (data, old, scope) ->
       return unless data?
-     
+
       path = center.selectAll("path")
         .data([{"value":data[options.amount]}])
 
-      path.enter().append("svg:path")
+      path.enter().append("path")
+        .attr("class", "arc")
         .transition()
           .ease(options.transition)
           .duration(options.transitionDuration)
           .attrTween("d", arcTween)
 
       path.transition()
-          .ease(options.transition)
-          .duration(options.transitionDuration)
-          .attrTween("d", arcTween)
+        .ease(options.transition)
+        .duration(options.transitionDuration)
+        .attrTween("d", arcTween)
 
-      path.enter().append("svg:text")
-        .attr("transform", (d) -> "translate(" + labelArc.centroid(d) + ")")
+      path.enter().append("text")
         .attr("dy", "0.35em")
         .style("text-anchor", "middle")
         .text(data[options.label])

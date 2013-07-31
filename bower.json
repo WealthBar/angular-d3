@@ -9,7 +9,7 @@
     "angular-resource": "~1.0.6",
     "angular-cookies": "~1.0.6",
     "angular-sanitize": "~1.0.6",
-    "bootstrap": "~2.3.2",
+    "bootstrap": "twbs/bootstrap#v2.3.2",
     "jquery": "~2.0.2"
   },
   "devDependencies": {
