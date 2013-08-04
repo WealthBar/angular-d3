@@ -173,7 +173,7 @@ module.exports = function (grunt) {
     },
     concat: {
       angularD3: {
-        dest: '<%= yeoman.dist %>/angualrD3/angularD3.js',
+        dest: '<%= yeoman.dist %>/angularD3/angularD3.js',
         src:[ '.tmp/angularD3/**/*.js' ]
       },
       app: {
@@ -208,8 +208,8 @@ module.exports = function (grunt) {
       dist: {
         files: {
           '<%= yeoman.dist %>/styles/main.css': [
-            '.tmp/styles/**/*.css',
-            '<%= yeoman.app %>/styles/**/*.css'
+            '<%= yeoman.app %>/components/bootstrap/docs/assets/css/bootstrap.css',
+            '.tmp/styles/main.css'
           ]
         }
       }
@@ -283,7 +283,8 @@ module.exports = function (grunt) {
             '.htaccess',
             'components/**/*',
             'images/**/*.{gif,webp}',
-            'styles/fonts/*'
+            'styles/fonts/*',
+            'data/*'
           ]
         }]
       }
@@ -324,7 +325,7 @@ module.exports = function (grunt) {
     'htmlmin',
     'concat',
     'copy',
-    //'cdnify',
+    'cdnify',
     //'ngmin',
     //'uglify',
     //'rev',
