@@ -6,3 +6,4 @@ angular.module('angularD3App', ['ad3'])
       controller: 'MainCtrl'
     )
   $locationProvider.html5Mode(true);
+
