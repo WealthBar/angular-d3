@@ -12,7 +12,11 @@
 
 //@ sourceMappingURL=main.map
 (function() {
-  angular.module('angularD3App').controller('MainCtrl', function($scope, $timeout) {});
+  angular.module('angularD3App').controller('MainCtrl', function($scope) {
+    return $scope.$watch('', function() {
+      return $('body').scrollspy('refresh');
+    });
+  });
 
 }).call(this);
 
