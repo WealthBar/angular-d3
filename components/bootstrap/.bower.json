@@ -1,20 +1,23 @@
 {
   "name": "bootstrap",
-  "version": "2.3.2",
+  "version": "3.0.0-rc1",
   "main": [
     "./docs/assets/js/bootstrap.js",
     "./docs/assets/css/bootstrap.css"
   ],
+  "ignore": [
+    "**/.*"
+  ],
   "dependencies": {
-    "jquery": ">=1.8.0 <2.1.0"
+    "jquery": ">= 1.9.0"
   },
   "homepage": "https://github.com/twbs/bootstrap",
-  "_release": "2.3.2",
+  "_release": "3.0.0-rc1",
   "_resolution": {
     "type": "version",
-    "tag": "v2.3.2",
-    "commit": "b4c4072679943773a7582daa63f545ba818fa627"
+    "tag": "v3.0.0-rc1",
+    "commit": "9c63ffa00fd55c7e61c51b58778b06b28f93e1a8"
   },
   "_source": "git://github.com/twbs/bootstrap.git",
-  "_target": "v2.3.2"
+  "_target": "~3.0.0-rc1"
 }
