@@ -15,11 +15,12 @@
 
 <section id="pie-charts" class="well">
   <h1>Pie and Donut Charts</h1>
+  <d3-data src="data/data.csv" data="line" columns="year, savings, total, optimal"></d3-data>
   <div class="row">
-    <d3-chart height="320" class="span6">
+    <d3-chart height="320" class="col-lg-6">
       <d3-pie data="pie" value="age" amount="population"></d3-pie>
     </d3-chart>
-    <d3-chart height="320" class="span6">
+    <d3-chart height="320" class="col-lg-6">
       <d3-pie inner-radius="0.5" label-radius="0.8" data="pie" value="age" amount="population"></d3-pie>
     </d3-chart>
   </div>
@@ -28,10 +29,10 @@
 <section id="arc-charts" class="well">
   <h1>Arc Charts</h1>
   <div class="row">
-    <d3-chart height="320" class="span6 simple-arc1">
+    <d3-chart height="320" class="col-lg-6 simple-arc1">
       <d3-arc inner-radius="0.5"  data="{{ {percentVal:60, text:'60%'}  }}" label="text" amount="percentVal" transition="bounce" transition-duration="1000"></d3-arc>
     </d3-chart>
-    <d3-chart height="320" class="span6 simple-arc2">
+    <d3-chart height="320" class="col-lg-6 simple-arc2">
       <d3-arc inner-radius="0.5"  data="{{ {percentVal:90, text:'90%'}  }}" label="text" amount="percentVal"></d3-arc>
     </d3-chart>
   </div>

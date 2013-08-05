@@ -10,6 +10,27 @@ section {
   margin-bottom: 40px;
 }
 
-.docs-sidebar {
-  width: 20%;
+footer {
+  min-height: 500px;
+}
+
+#side-nav.affix {
+  width: 100%;
+  top: 40px;
+  margin: 0 auto;
+  @media (min-width: 768px) {
+    max-width: 758px;
+  }
+  @media (min-width: 992px) {
+    max-width: 970px;
+  }
+  @media (min-width: 1200px) {
+    max-width: 1200px;
+  }
+  ul {
+    width: 25%;
+    padding: 0 15px;
+    margin-left: -15px;
+    z-index: 2;
+  }
 }

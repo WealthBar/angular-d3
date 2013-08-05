@@ -1,1 +1,1 @@
-angular.module('angularD3App').controller 'MainCtrl', ($scope) ->
+angular.module('angularD3App').controller 'MainCtrl', ($scope, $timeout) ->
