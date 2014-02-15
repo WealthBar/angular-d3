@@ -263,10 +263,7 @@
       };
     };
     return {
-      restrict: 'E',
-      replace: true,
-      transclude: true,
-      template: "<svg class='d3' ng-transclude></svg>",
+      restrict: 'EA',
       controller: [
         '$scope', '$element', '$attrs', function(scope, el, attrs) {
           var chart, margin, options, scales, svg;
@@ -277,7 +274,7 @@
             bottom: 40,
             left: 60
           };
-          svg = d3.select(el[0]).attr("width", options.width).attr("height", options.height);
+          svg = d3.select(el[0]).append('svg').attr('class', "d3").attr("width", options.width).attr("height", options.height);
           chart = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
           this.width = function() {
             return svg[0][0].offsetWidth;
@@ -298,7 +295,7 @@
           this.addScale = function(name, scale) {
             return scales[name] = scale;
           };
-          return this.getScale = function(name) {
+          this.getScale = function(name) {
             return scales[name];
           };
         }

@@ -3,37 +3,37 @@
   <p>Basic line, area and bar graphs can be stacked in the same chart.</p>
   <d3-data src="data/data.csv" data="line" columns="year, savings, total, optimal"></d3-data>
   <d3-data src="data/donutData.csv" data="pie" columns="age,population"></d3-data>
-  <d3-chart>
+  <div d3-chart="">
     <d3-axis data="line" name="year" label="Year" extent="true" orientation="bottom" ticks="5"></d3-axis>
     <d3-axis data="line" name="savings" label="Deposits" orientation="left" ticks="5"></d3-axis>
     <d3-axis data="line" name="total" label="Savings" orientation="right" ticks="5"></d3-axis>
     <d3-line data="line" x="year" y="optimal" yscale="total"></d3-line>
     <d3-area data="line" x="year" y="total"></d3-area>
     <d3-bars data="line" x="year" y="savings"></d3-bars>
-  </d3-chart>
+  </div>
 </section>
 
 <section id="pie-charts" class="well">
   <h1>Pie and Donut Charts</h1>
   <d3-data src="data/data.csv" data="line" columns="year, savings, total, optimal"></d3-data>
   <div class="row">
-    <d3-chart height="320" class="col-lg-6">
+    <div d3-chart="" height="320" class="col-md-6">
       <d3-pie data="pie" value="age" amount="population"></d3-pie>
-    </d3-chart>
-    <d3-chart height="320" class="col-lg-6">
+    </div>
+    <div d3-chart="" height="320" class="col-md-6">
       <d3-pie inner-radius="0.5" label-radius="0.8" data="pie" value="age" amount="population"></d3-pie>
-    </d3-chart>
+    </div>
   </div>
 </section>
 
 <section id="arc-charts" class="well">
   <h1>Arc Charts</h1>
   <div class="row">
-    <d3-chart height="320" class="col-lg-6 simple-arc1">
+    <div d3-chart="" height="320" class="col-md-6 simple-arc1">
       <d3-arc inner-radius="0.5" data="{{ {percentVal:60, text:'60%'}  }}" label="text" amount="percentVal" transition="bounce" transition-duration="1000"></d3-arc>
-    </d3-chart>
-    <d3-chart height="320" class="col-lg-6 simple-arc2">
+    </div>
+    <div d3-chart="" height="320" class="col-md-6 simple-arc2">
       <d3-arc inner-radius="0.5" data="{{ {percentVal:90, text:'90%'}  }}" label="text" amount="percentVal"></d3-arc>
-    </d3-chart>
+    </div>
   </div>
 </section>
