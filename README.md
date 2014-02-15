@@ -11,48 +11,71 @@ inspired in part by [this blog post][radian] however since that project is not
 currently open source I've begun work on building my own.
 
 The first goal of this project is to create a simple reusable set of D3
-directives that are sufficiently complete to be able to put together
-[a chart like this](http://j.mp/10FJZNy) which requires the following features:
+directives that are sufficiently complete to be able to put together flexible
+charts of nearly any type. It is also intended to be extensible by providing a
+d3ChartController similar to ngModelController so it is easy to create
+additional custom chart elements.
 
-- Multiple charts with multiple y-axes
-- Line, area and bar chart types
-- A chart legend overlay
-- A mouse/touch informative overlay
-- Automatic and animated updates whenever source data is changed
+This project is meant to provide enough flexibility to allow for anything d3 is
+capable of with no limitations, but still provide convenience, re-usability and
+declarative functionality. Essentially creating simple graphs should be simple
+yet doing complex customizable things should be possible.
 
-While that example happens to be implemented using D3 and AngularJS it exists
-as a single, all-in-one directive `<plan-chart>` and as such is not at all
-reusable for future charting purposes.
+If you have ideas and are interested in lending a hand, please open an issue,
+submit a pull request or just ping me
+[@chrismnicola](https://twitter.com/chrismnicola). This could be the beginning
+of beautiful friendship.
 
-D3 is an extremely powerful and flexible tool and it would be an enormous task
-to try and provide a declarative syntax for every possible scenario in which d3
-be useful. So for now I'm just developing a basic charting and graphing syntax
-but I am interested in the larger possibilities. If you have ideas and are
-interested in lending a hand, please open an issue, submit a pull request or
-just ping me [@lucisferre](https://twitter.com/lucisferre). This could be the
-beginning of beautiful friendship.
-
-## Charting Directives
+## Current Directives
 
 - d3-chart - Provides the top level directives meant to contain the rest of the
   chart declarations.
+- d3-data - Provides a declarative way to load data into the current scope
+  directly from a URL
 - d3-axis - Defines an axis and provide it's range and location (top, left,
   bottom, right)
 - d3-area - Define an area graph
 - d3-line - Defines a line graph
 - d3-bars - Defines a set of bars for a bar chart
 
+The directives are meant to be used to compost charts like so:
 
-## Try it
+```html
+  <d3-data src="data/data.csv" data="line" columns="year, savings, total, optimal"></d3-data>
+  <d3-data src="data/donutData.csv" data="pie" columns="age,population"></d3-data>
+  <div d3-chart>
+    <d3-axis data="line" name="year" label="Year" extent="true" orientation="bottom" ticks="5"></d3-axis>
+    <d3-axis data="line" name="savings" label="Deposits" orientation="left" ticks="5"></d3-axis>
+    <d3-axis data="line" name="total" label="Savings" orientation="right" ticks="5"></d3-axis>
+    <d3-line data="line" x="year" y="optimal" yscale="total"></d3-line>
+    <d3-area data="line" x="year" y="total"></d3-area>
+    <d3-bars data="line" x="year" y="savings"></d3-bars>
+  </div>
+```
+
+The `d3-chart` directive will first append `<svg class="d3"><g></g></svg>` to
+itself and then each inner directives will attach their own d3 powered elements
+to that. The `d3ChartController` provides access to its `<g></g>` element via
+`getChart()` so that child directives can append themselves.
+
+The `d3-data` directive provides a way of declaratively binding data, but this
+is entirely optional and it simply is a convenient way to bind data to your
+current scope.
+
+Documentation will be forthcoming as things develop but for now you will have
+to rely on a quick reading of the code.
+
+## Try it out
 
 This project uses Yeoman and provides a fully functional demo project under the
 `/app` folder. To run it clone this repo and do:
 
 ```
 npm install
+npm install -g bower
+npm install -g grunt
 
 # If you don't already have bower installed then install it with
-npm install -g bower
 
 bower install
 
@@ -67,21 +90,12 @@ grunt server
 display and track incoming time-series data)
 - [x] Data source directives to declaratively specify and load external data
 sources and support D3's built in parsers for CSV, TSV, etc.
-- [ ] Support for customizable chart legends
-- [ ] Mouse-over and touch-based overlay support
-- [ ] Other common chart types: Scatter, Bullet
-- [ ] Useful chart functionality, like regression lines for scatter plots
+- [ ] Customizable chart legends
+- [ ] Customizable and flexible labels 
+- [ ] Mouse and touch overlay support
+- [ ] Scatter and Bubble plots
+- [ ] Bullet charts
+- [ ] Stacked area charts
 
 If you have any other ideas for me, or feel like contributing to help add any
 of this missing functionality, I encourage you to submit a pull request.
-
-
-## Differences with Radian
-
-Radian provides it's own expression syntax. While I think this is cool, it's
-outside the scope of what I want to build and I'm not sure if introducing
-another expression syntax is necessarily a good idea. For now I'm building with
-the assumption that it won't be needed.
-
-
-[radian]: http://www.skybluetrades.net/blog/posts/2013/04/24/radian/
