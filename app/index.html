@@ -28,13 +28,13 @@
 
     <div class="container">
       <div class="row">
-        <div class="col-lg-9 col-offset-3">
+        <div class="col-md-9 col-md-offset-3">
           <h1>Anguar D3</h1>
           <p class="lead">A set of basic directives that support declarative charts and graphs powered by D3</p>
         </div>
       </div>
       <div class="row">
-        <div class="col-3">
+        <div class="col-md-3">
           <div id="side-nav"  data-spy="affix" data-offset-top="160">
             <ul class="nav nav-pills nav-stacked">
               <li>
@@ -49,8 +49,8 @@
             </ul>
           </div>
         </div>
-        <div class="col-9">
-          <div ng-view></div>
+        <div class="col-md-9" ng-controller="MainCtrl">
+          <div ng-include="'views/main.html'" ng-controller="MainCtrl"></div>
         </div>
       </div>
       <footer class="row">
@@ -58,12 +58,9 @@
     </div>
 
     <script src="components/d3/d3.js"></script>
-    <script src="components/angular-unstable/angular.js"></script>
-    <script src="components/angular-resource/angular-resource.js"></script>
-    <script src="components/angular-cookies/angular-cookies.js"></script>
-    <script src="components/angular-sanitize/angular-sanitize.js"></script>
-    <script src="components/jquery/jquery.min.js"></script>
-    <script src="components/bootstrap/dist/js/bootstrap.js"></script>
+    <script src="components/angular/angular.js"></script>
+    <script src="components/jquery/dist/jquery.min.js"></script>
+    <script src="components/bootstrap/dist/js/bootstrap.min.js"></script>
 
     <!-- build:js angularD3/angularD3.js -->
     <script src="angularD3/angularD3.js"></script>

@@ -3,18 +3,12 @@ angular.module('ad3').directive 'd3Chart', ->
     width: '100%'
     height: '480'
 
-  restrict: 'E'
-
-  replace: true
-
-  transclude: true
-
-  template: "<svg class='d3' ng-transclude></svg>"
+  restrict: 'EA'
 
   controller: ['$scope', '$element', '$attrs', (scope, el, attrs) ->
     options = angular.extend(defaults(), attrs)
     margin = { top: 40, right: 60, bottom: 40, left: 60 }
-    svg = d3.select(el[0])
+    svg = d3.select(el[0]).append('svg').attr('class', "d3")
       .attr("width", options.width)
       .attr("height", options.height)
     chart = svg.append("g")
@@ -30,4 +24,5 @@ angular.module('ad3').directive 'd3Chart', ->
     scales = {}
     @addScale = (name, scale) -> scales[name] = scale
     @getScale = (name) -> scales[name]
+    return
   ]

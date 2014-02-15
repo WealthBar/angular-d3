@@ -35,10 +35,6 @@ module.exports = function (grunt) {
         files: ['<%= yeoman.app %>/styles/**/*.{scss,sass}', '<%= yeoman.app %>/styles/*.{scss,sass}'],
         tasks: ['compass']
       },
-      less: {
-        files: ['<%= yeoman.app %>/styles/*.{less}'],
-        tasks: ['less']
-      },
       livereload: {
         files: [
           '<%= yeoman.app %>/**/*.{js,html,css}',
@@ -161,13 +157,6 @@ module.exports = function (grunt) {
       server: {
         options: {
           debugInfo: true
-        }
-      }
-    },
-    less: {
-      server: {
-        files: {
-          '.tmp/styles/bootstrap.css' :'<%= yeoman.app %>/components/bootstrap/less/bootstrap.less'
         }
       }
     },
@@ -297,7 +286,6 @@ module.exports = function (grunt) {
     'clean:server',
     'coffee:dist',
     'compass:server',
-    'less:server',
     'livereload-start',
     'connect:livereload',
     'open',

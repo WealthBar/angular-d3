@@ -40,7 +40,7 @@ $black: #222a2b;
 
 /* Pie Chart */
 
-svg.d3 {
+.d3 {
   .arc.arc-0 path { fill: #98abc5; }
   .arc.arc-1 path { fill: #8a89a6; }
   .arc.arc-2 path { fill: #7b6888; }
@@ -52,10 +52,14 @@ svg.d3 {
 
 /* Simple Arcs */
 
-svg.d3.simple-arc1 path {
+.d3 path.arc {
   fill: #98abc5;
 }
 
-svg.d3.simple-arc2 path {
+.simple-arc1 .d3 .arc {
+  fill: #98abc5;
+}
+
+.simple-arc2 .d3 .arc {
   fill: #d0743c;
 }
