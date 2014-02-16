@@ -1,8 +1,9 @@
-angular.module('ad3').directive 'd3Data', () ->
+angular.module('ad3').directive 'd3Data',['d3Service', (d3) ->
   restrict: 'E'
-
-  controller: ['$scope', '$attrs', 'd3Service', (scope, attrs, d3) ->
+  scope: false
+  link: (scope, el, attrs) ->
     src = attrs.src
     binding = attrs.data
     scope[binding] = d3.csv(src, attrs.columns.split(','))
-  ]
+    console.log('data loaded')
+]
