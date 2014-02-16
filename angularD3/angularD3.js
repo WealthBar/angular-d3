@@ -81,7 +81,7 @@
       restrict: 'E',
       require: '^d3Chart',
       link: function(scope, el, attrs, chartController) {
-        var area, areaStart, draw, height, options, x, y;
+        var area, areaStacked, areaStart, draw, height, options, x, y;
         options = angular.extend(defaults(), attrs);
         x = chartController.getScale(options.xscale || options.x);
         y = chartController.getScale(options.yscale || options.y);
@@ -94,11 +94,58 @@
         }).y0(height).y1(function(d) {
           return y(d[options.y]);
         });
+        areaStacked = d3.svg.area().x(function(d) {
+          return x(d.x);
+        }).y0(function(d) {
+          return y(d.y0);
+        }).y1(function(d) {
+          return y(d.y + d.y0);
+        });
         draw = function(data) {
-          if (data == null) {
+          var columns, name, stack, stackedData, temp, value;
+          if (!((data != null) && data.length !== 0)) {
             return;
           }
-          return chartController.getChart().append("path").attr("class", "area").datum(data).attr("d", areaStart).transition().duration(500).attr("d", area);
+          columns = options.y.split(',');
+          if (columns.length === 1) {
+            return chartController.getChart().append("path").attr("class", "area").datum(data).attr("d", areaStart).transition().duration(500).attr("d", area);
+          } else {
+            temp = (function() {
+              var _i, _len, _results;
+              _results = [];
+              for (_i = 0, _len = columns.length; _i < _len; _i++) {
+                name = columns[_i];
+                _results.push({
+                  name: name,
+                  values: (function() {
+                    var _j, _len1, _results1;
+                    _results1 = [];
+                    for (_j = 0, _len1 = data.length; _j < _len1; _j++) {
+                      value = data[_j];
+                      _results1.push({
+                        x: Number(value[options.x]),
+                        y: Number(value[name.trim()])
+                      });
+                    }
+                    return _results1;
+                  })()
+                });
+              }
+              return _results;
+            })();
+            stack = d3.layout.stack().values(function(d) {
+              return d.values;
+            });
+            if (options.offset != null) {
+              stack.offset(options.offset);
+            }
+            stackedData = stack(temp);
+            return chartController.getChart().selectAll('.area-stacked').data(stackedData).enter().append("path").attr("class", function(d) {
+              return "area area-stacked " + d.name;
+            }).attr("d", function(d) {
+              return areaStacked(d.values);
+            });
+          }
         };
         return scope.$watch(attrs.data, draw, true);
       }
@@ -307,19 +354,21 @@
 
 //@ sourceMappingURL=data.map
 (function() {
-  angular.module('ad3').directive('d3Data', function() {
-    return {
-      restrict: 'E',
-      controller: [
-        '$scope', '$attrs', 'd3Service', function(scope, attrs, d3) {
+  angular.module('ad3').directive('d3Data', [
+    'd3Service', function(d3) {
+      return {
+        restrict: 'E',
+        scope: false,
+        link: function(scope, el, attrs) {
           var binding, src;
           src = attrs.src;
           binding = attrs.data;
-          return scope[binding] = d3.csv(src, attrs.columns.split(','));
+          scope[binding] = d3.csv(src, attrs.columns.split(','));
+          return console.log('data loaded');
         }
-      ]
-    };
-  });
+      };
+    }
+  ]);
 
 }).call(this);
 
