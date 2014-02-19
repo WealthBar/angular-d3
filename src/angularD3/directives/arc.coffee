@@ -15,57 +15,52 @@ angular.module('ad3').directive 'd3Arc', () ->
     options = angular.extend(defaults(), attrs)
 
     chart = chartController.getChart()
-    height = chartController.innerHeight()
-    width = chartController.innerWidth()
     innerRadius = parseFloat(options.innerRadius)
     labelRadius = parseFloat(options.labelRadius)
 
-    radius = Math.min(width,height) / 2
+    center = chartController.getChart().append("g").attr("class", "arc")
 
-    arc = d3.svg.arc()
-      .outerRadius(radius)
-      .innerRadius(radius * innerRadius)
-      .startAngle(0)
-      .endAngle( (d) -> d.value/100 * 2 * Math.PI )
+    redraw = ->
+      data = scope.$eval(attrs.data)
+      return unless data? and data.length isnt 0
 
-    labelArc = d3.svg.arc()
-      .outerRadius(radius * labelRadius)
-      .innerRadius(radius * labelRadius)
+      radius = Math.min(chartController.innerWidth(), chartController.innerHeight())/2
 
-    width = chartController.innerWidth()
-    height = chartController.innerHeight()
+      center.attr("transform", "translate(" + radius  + "," + radius + ")")
 
-    center = chartController.getChart()
-      .append("svg:g")
-      .attr("transform", "translate(" + width / 2  + "," + height / 2 + ")")
+      arc = d3.svg.arc()
+        .outerRadius(radius)
+        .innerRadius(radius * innerRadius)
+        .startAngle(0)
+        .endAngle( (d) -> d.value/100 * 2 * Math.PI )
 
-    arcTween = (b) ->
-      i = d3.interpolate({value: 0}, b)
-      (t) ->
-         arc(i(t))
+      labelArc = d3.svg.arc()
+        .outerRadius(radius * labelRadius)
+        .innerRadius(radius * labelRadius)
 
-    draw = (data, old, scope) ->
-      return unless data?
+      arcTween = (b) ->
+        i = d3.interpolate({value: 0}, b)
+        (t) -> arc(i(t))
 
       path = center.selectAll("path")
         .data([{"value":data[options.amount]}])
 
       path.enter().append("path")
-        .attr("class", "arc")
         .transition()
           .ease(options.transition)
           .duration(options.transitionDuration)
           .attrTween("d", arcTween)
+
+      path.enter().append("text")
+        .attr("class", "arc-label")
+        .attr("dy", "0.35em")
+        .style("text-anchor", "middle")
+        .text(data[options.label])
 
       path.transition()
         .ease(options.transition)
         .duration(options.transitionDuration)
         .attrTween("d", arcTween)
 
-      path.enter().append("text")
-        .attr("dy", "0.35em")
-        .style("text-anchor", "middle")
-        .text(data[options.label])
-
-
-    scope.$watch attrs.data, draw , true
+    scope.$watch attrs.data, redraw , true
+    chartController.registerElement({ redraw: redraw })

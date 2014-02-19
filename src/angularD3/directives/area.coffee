@@ -13,6 +13,7 @@ angular.module('ad3').directive 'd3Area', () ->
     x = chartController.getScale(options.xscale or options.x)
     y = chartController.getScale(options.yscale or options.y)
     height = chartController.innerHeight()
+    columns = options.y.split(',').map((c) -> c.trim())
 
     areaStart = d3.svg.area()
       .x((d) -> x(d[options.x]))
@@ -24,17 +25,24 @@ angular.module('ad3').directive 'd3Area', () ->
       .y0(height)
       .y1((d) -> y(d[options.y]))
 
+    areaStackedStart = d3.svg.area()
+      .x((d) -> x(d.x))
+      .y0((d) -> y(d.y0))
+      .y1((d) -> y(d.y0))
+
     areaStacked = d3.svg.area()
       .x((d) -> x(d.x))
       .y0((d) -> y(d.y0))
       .y1((d) -> y(d.y + d.y0))
 
-    draw = (data) ->
+    redraw = ->
+      data = scope.$eval(attrs.data)
       return unless data? and data.length isnt 0
-      columns = options.y.split(',')
       if columns.length is 1
-        chartController.getChart().append("path").attr("class", "area").datum(data)
-          .attr("d", areaStart)
+        chart = chartController.getChart().select("path.area")
+        unless chart[0][0]
+          chart = chartController.getChart().append("path").attr("class", "area")
+        chart.datum(data)
           .transition()
           .duration(500)
           .attr("d", area)
@@ -43,12 +51,18 @@ angular.module('ad3').directive 'd3Area', () ->
           name: name
           values: for value in data
             x: Number(value[options.x])
-            y: Number(value[name.trim()])
+            y: Number(value[name])
         stack = d3.layout.stack().values((d) -> d.values)
         stack.offset(options.offset) if options.offset?
         stackedData = stack(temp)
-        chartController.getChart().selectAll('.area-stacked').data(stackedData)
-          .enter().append("path").attr("class", (d) -> "area area-stacked #{d.name}")
+        charts = chartController.getChart().selectAll('.area-stacked')
+        if charts[0].length is 0
+          charts = charts.data(stackedData).enter().append("path").attr("class", (d) -> "area area-stacked #{d.name}")
+        else
+          charts = charts.data(stackedData)
+        charts.transition()
+          .duration(500)
           .attr("d", (d) -> areaStacked(d.values))
 
-    scope.$watch attrs.data, draw, true
+    scope.$watch attrs.data, redraw, true
+    chartController.registerElement({ redraw: redraw })

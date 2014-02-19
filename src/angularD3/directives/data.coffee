@@ -5,5 +5,4 @@ angular.module('ad3').directive 'd3Data',['d3Service', (d3) ->
     src = attrs.src
     binding = attrs.data
     scope[binding] = d3.csv(src, attrs.columns.split(','))
-    console.log('data loaded')
 ]

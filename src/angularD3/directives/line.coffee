@@ -14,21 +14,19 @@ angular.module('ad3').directive 'd3Line', ->
     y = chartController.getScale(options.yscale or options.y)
     height = chartController.innerHeight()
 
-    lineStart = d3.svg.line()
-      .x((d) -> x(d[options.x]))
-      .y(height)
-
     line = d3.svg.line()
       .x((d) -> x(d[options.x]))
       .y((d) -> y(d[options.y]))
 
-    draw = (data, old, scope) ->
-      return unless data?
-      chartController.getChart().append("path").attr("class", "line")
-        .datum(data)
-        .attr("d", lineStart)
+    linePath = chartController.getChart().append("path").attr("class", "line")
+
+    redraw = ->
+      data = scope.$eval(attrs.data)
+      return unless data? and data.length isnt 0
+      linePath.datum(data)
         .transition()
         .duration(500)
         .attr("d", line)
 
-    scope.$watch attrs.data, draw , true
+    scope.$watch attrs.data, redraw , true
+    chartController.registerElement({ redraw: redraw })

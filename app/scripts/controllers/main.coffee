@@ -1,5 +1,4 @@
 angular.module('angularD3App').controller 'MainCtrl', ($scope) ->
-  console.log('laoded')
   $scope.$watch '', ->
     $('body').scrollspy('refresh')
 
