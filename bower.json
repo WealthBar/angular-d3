@@ -1,7 +1,7 @@
 {
   "name": "angularD3",
-  "version": "0.0.2",
-  "main": "dist/angularD3/angularD3.js",
+  "version": "0.0.3",
+  "main": "angularD3.js",
   "ignore": [ ".*", "app" ],
   "dependencies": {
     "d3": "~3.4.0",

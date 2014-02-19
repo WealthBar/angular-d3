@@ -243,9 +243,9 @@ module.exports = function (grunt) {
     uglify: {
       dist: {
         files: {
-          '<%= yeoman.dist %>/scripts/scripts.js': [
-            '<%= yeoman.dist %>/scripts/scripts.js'
-          ]
+          'angularD3.min.js': [
+            'angularD3.js'
+          ],
         }
       }
     },
@@ -262,6 +262,12 @@ module.exports = function (grunt) {
       }
     },
     copy: {
+      main: {
+        files: [{
+          src: '<%= yeoman.dist %>/angularD3/angularD3.js',
+          dest: 'angularD3.js'
+        }]
+      },
       dist: {
         files: [{
           expand: true,
@@ -315,8 +321,7 @@ module.exports = function (grunt) {
     'concat',
     'copy',
     'cdnify',
-    //'ngmin',
-    //'uglify',
+    'uglify',
     //'rev',
     'usemin'
   ]);
