@@ -1,7 +1,6 @@
 angular.module('ad3').directive 'd3Axis', ->
   defaults = ->
     orientation: 'bottom'
-    label: 'axis'
     ticks: '5'
     format: null
     extent: false
@@ -17,9 +16,15 @@ angular.module('ad3').directive 'd3Axis', ->
 
     range = ->
       if options.orientation is 'top' or options.orientation is 'bottom'
-        [0 ,chartController.innerWidth()]
+        if options.reverse?
+          [chartController.innerWidth(), 0]
+        else
+          [0 ,chartController.innerWidth()]
       else
-        [chartController.innerHeight(), 0]
+        if options.reverse?
+          [0, chartController.innerHeight()]
+        else
+          [chartController.innerHeight(), 0]
 
     translation = ->
       if options.orientation is 'bottom'
@@ -65,13 +70,13 @@ angular.module('ad3').directive 'd3Axis', ->
       .attr("class", "axis axis-#{options.orientation} axis-#{options.name}")
       .attr("transform", translation())
 
-    label = axisElement.append("text").attr("class", "axis-label").text(options.label)
+    label = axisElement.append("text").attr("class", "axis-label").text(options.label) if options.label
 
     redraw = ->
       data = scope.$eval(attrs.data)
       return unless data? and data.length isnt 0
       scale.range(range())
-      positionLabel(label.transition().duration(500))
+      positionLabel(label.transition().duration(500)) if label
       domainValues = (new Number(datum[options.name]) for datum in data)
       if options.extent
         scale.domain d3.extent domainValues

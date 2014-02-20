@@ -90,28 +90,53 @@
         columns = options.y.split(',').map(function(c) {
           return c.trim();
         });
-        areaStart = d3.svg.area().x(function(d) {
-          return x(d[options.x]);
-        }).y0(height).y1(height);
-        area = d3.svg.area().x(function(d) {
-          return x(d[options.x]);
-        }).y0(height).y1(function(d) {
-          return y(d[options.y]);
-        });
-        areaStackedStart = d3.svg.area().x(function(d) {
-          return x(d.x);
-        }).y0(function(d) {
-          return y(d.y0);
-        }).y1(function(d) {
-          return y(d.y0);
-        });
-        areaStacked = d3.svg.area().x(function(d) {
-          return x(d.x);
-        }).y0(function(d) {
-          return y(d.y0);
-        }).y1(function(d) {
-          return y(d.y + d.y0);
-        });
+        if (options.vertical) {
+          areaStart = d3.svg.area().y(function(d) {
+            return x(d[options.x]);
+          }).x0(0).x1(0);
+          area = d3.svg.area().y(function(d) {
+            return x(d[options.x]);
+          }).x0(0).x1(function(d) {
+            return y(d[options.y]);
+          });
+          areaStackedStart = d3.svg.area().y(function(d) {
+            return x(d.x);
+          }).x0(function(d) {
+            return y(d.y0);
+          }).x1(function(d) {
+            return y(d.y0);
+          });
+          areaStacked = d3.svg.area().y(function(d) {
+            return x(d.x);
+          }).x0(function(d) {
+            return y(d.y0);
+          }).x1(function(d) {
+            return y(d.y + d.y0);
+          });
+        } else {
+          areaStart = d3.svg.area().x(function(d) {
+            return x(d[options.x]);
+          }).y0(height).y1(height);
+          area = d3.svg.area().x(function(d) {
+            return x(d[options.x]);
+          }).y0(height).y1(function(d) {
+            return y(d[options.y]);
+          });
+          areaStackedStart = d3.svg.area().x(function(d) {
+            return x(d.x);
+          }).y0(function(d) {
+            return y(d.y0);
+          }).y1(function(d) {
+            return y(d.y0);
+          });
+          areaStacked = d3.svg.area().x(function(d) {
+            return x(d.x);
+          }).y0(function(d) {
+            return y(d.y0);
+          }).y1(function(d) {
+            return y(d.y + d.y0);
+          });
+        }
         redraw = function() {
           var chart, charts, data, name, stack, stackedData, temp, value;
           data = scope.$eval(attrs.data);
@@ -185,7 +210,6 @@
     defaults = function() {
       return {
         orientation: 'bottom',
-        label: 'axis',
         ticks: '5',
         format: null,
         extent: false
@@ -200,9 +224,17 @@
         options = angular.extend(defaults(), attrs);
         range = function() {
           if (options.orientation === 'top' || options.orientation === 'bottom') {
-            return [0, chartController.innerWidth()];
+            if (options.reverse != null) {
+              return [chartController.innerWidth(), 0];
+            } else {
+              return [0, chartController.innerWidth()];
+            }
           } else {
-            return [chartController.innerHeight(), 0];
+            if (options.reverse != null) {
+              return [0, chartController.innerHeight()];
+            } else {
+              return [chartController.innerHeight(), 0];
+            }
           }
         };
         translation = function() {
@@ -234,7 +266,9 @@
           }
         };
         axisElement = chartController.getChart().append("g").attr("class", "axis axis-" + options.orientation + " axis-" + options.name).attr("transform", translation());
-        label = axisElement.append("text").attr("class", "axis-label").text(options.label);
+        if (options.label) {
+          label = axisElement.append("text").attr("class", "axis-label").text(options.label);
+        }
         redraw = function() {
           var data, datum, domainValues;
           data = scope.$eval(attrs.data);
@@ -242,7 +276,9 @@
             return;
           }
           scale.range(range());
-          positionLabel(label.transition().duration(500));
+          if (label) {
+            positionLabel(label.transition().duration(500));
+          }
           domainValues = (function() {
             var _i, _len, _results;
             _results = [];
