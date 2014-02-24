@@ -82,7 +82,7 @@
       restrict: 'E',
       require: '^d3Chart',
       link: function(scope, el, attrs, chartController) {
-        var area, areaStacked, areaStackedStart, areaStart, columns, height, options, redraw, x, y;
+        var area, areaStacked, columns, height, options, redraw, x, y;
         options = angular.extend(defaults(), attrs);
         x = chartController.getScale(options.xscale || options.x);
         y = chartController.getScale(options.yscale || options.y);
@@ -91,20 +91,10 @@
           return c.trim();
         });
         if (options.vertical) {
-          areaStart = d3.svg.area().y(function(d) {
-            return x(d[options.x]);
-          }).x0(0).x1(0);
           area = d3.svg.area().y(function(d) {
             return x(d[options.x]);
           }).x0(0).x1(function(d) {
             return y(d[options.y]);
-          });
-          areaStackedStart = d3.svg.area().y(function(d) {
-            return x(d.x);
-          }).x0(function(d) {
-            return y(d.y0);
-          }).x1(function(d) {
-            return y(d.y0);
           });
           areaStacked = d3.svg.area().y(function(d) {
             return x(d.x);
@@ -114,20 +104,10 @@
             return y(d.y + d.y0);
           });
         } else {
-          areaStart = d3.svg.area().x(function(d) {
-            return x(d[options.x]);
-          }).y0(height).y1(height);
           area = d3.svg.area().x(function(d) {
             return x(d[options.x]);
           }).y0(height).y1(function(d) {
             return y(d[options.y]);
-          });
-          areaStackedStart = d3.svg.area().x(function(d) {
-            return x(d.x);
-          }).y0(function(d) {
-            return y(d.y0);
-          }).y1(function(d) {
-            return y(d.y0);
           });
           areaStacked = d3.svg.area().x(function(d) {
             return x(d.x);
