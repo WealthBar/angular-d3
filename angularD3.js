@@ -73,23 +73,17 @@
   angular.module('ad3').directive('d3Area', function() {
     var defaults;
     defaults = function() {
-      return {
-        x: 0,
-        y: 1
-      };
+      return {};
     };
     return {
       restrict: 'E',
       require: '^d3Chart',
       link: function(scope, el, attrs, chartController) {
-        var area, areaStacked, columns, height, options, redraw, x, y;
+        var area, areaStacked, height, options, redraw, x, y;
         options = angular.extend(defaults(), attrs);
         x = chartController.getScale(options.xscale || options.x);
         y = chartController.getScale(options.yscale || options.y);
         height = chartController.innerHeight();
-        columns = options.y.split(',').map(function(c) {
-          return c.trim();
-        });
         if (options.vertical) {
           area = d3.svg.area().y(function(d) {
             return x(d[options.x]);
@@ -118,11 +112,23 @@
           });
         }
         redraw = function() {
-          var chart, charts, data, name, stack, stackedData, temp, value;
-          data = scope.$eval(attrs.data);
+          var chart, charts, columns, data, name, stack, stackedData, temp, value;
+          data = scope.$eval(options.data);
           if (!((data != null) && data.length !== 0)) {
             return;
           }
+          if (options.y != null) {
+            columns = options.y;
+          }
+          if (options.columns != null) {
+            columns = scope.$eval(options.columns);
+          }
+          if (columns == null) {
+            return;
+          }
+          columns = columns.split(',').map(function(c) {
+            return c.trim();
+          });
           if (columns.length === 1) {
             chart = chartController.getChart().select("path.area");
             if (!chart[0][0]) {
@@ -173,7 +179,8 @@
             });
           }
         };
-        scope.$watch(attrs.data, redraw, true);
+        scope.$watch(options.data, redraw, true);
+        scope.$watch(options.columns, redraw, true);
         return chartController.registerElement({
           redraw: redraw
         });

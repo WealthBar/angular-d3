@@ -1,7 +1,5 @@
 angular.module('ad3').directive 'd3Area', () ->
-  defaults = ->
-    x: 0
-    y: 1
+  defaults = -> {}
 
   restrict: 'E'
 
@@ -13,7 +11,6 @@ angular.module('ad3').directive 'd3Area', () ->
     x = chartController.getScale(options.xscale or options.x)
     y = chartController.getScale(options.yscale or options.y)
     height = chartController.innerHeight()
-    columns = options.y.split(',').map((c) -> c.trim())
 
     if options.vertical
       area = d3.svg.area()
@@ -35,8 +32,12 @@ angular.module('ad3').directive 'd3Area', () ->
         .y1((d) -> y(d.y + d.y0))
 
     redraw = ->
-      data = scope.$eval(attrs.data)
+      data = scope.$eval(options.data)
       return unless data? and data.length isnt 0
+      columns = options.y if options.y?
+      columns = scope.$eval(options.columns) if options.columns?
+      return unless columns?
+      columns = columns.split(',').map((c) -> c.trim())
       if columns.length is 1
         chart = chartController.getChart().select("path.area")
         unless chart[0][0]
@@ -63,5 +64,6 @@ angular.module('ad3').directive 'd3Area', () ->
           .duration(500)
           .attr("d", (d) -> areaStacked(d.values))
 
-    scope.$watch attrs.data, redraw, true
+    scope.$watch options.data, redraw, true
+    scope.$watch options.columns, redraw, true
     chartController.registerElement({ redraw: redraw })
