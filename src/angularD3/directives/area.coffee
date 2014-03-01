@@ -65,5 +65,5 @@ angular.module('ad3').directive 'd3Area', () ->
           .attr("d", (d) -> areaStacked(d.values))
 
     scope.$watch options.data, redraw, true
-    scope.$watch options.columns, redraw, true
+    scope.$watch options.columns, redraw, true if options.columns?
     chartController.registerElement({ redraw: redraw })

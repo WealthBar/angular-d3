@@ -180,7 +180,9 @@
           }
         };
         scope.$watch(options.data, redraw, true);
-        scope.$watch(options.columns, redraw, true);
+        if (options.columns != null) {
+          scope.$watch(options.columns, redraw, true);
+        }
         return chartController.registerElement({
           redraw: redraw
         });
