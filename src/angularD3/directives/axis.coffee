@@ -11,8 +11,8 @@ angular.module('ad3').directive 'd3Axis', ->
 
   require: '^d3Chart'
 
-  link: (scope, el, attrs, chartController) ->
-    options = angular.extend(defaults(), attrs)
+  link: ($scope, $el, $attrs, chartController) ->
+    options = angular.extend(defaults(), $attrs)
 
     range = ->
       if options.orientation is 'top' or options.orientation is 'bottom'
@@ -72,12 +72,15 @@ angular.module('ad3').directive 'd3Axis', ->
 
     label = axisElement.append("text").attr("class", "axis-label").text(options.label) if options.label
 
-    redraw = ->
-      data = scope.$eval(attrs.data)
+    redraw = (data) ->
       return unless data? and data.length isnt 0
       scale.range(range())
       positionLabel(label.transition().duration(500)) if label
-      domainValues = (new Number(datum[options.name]) for datum in data)
+      if options.filter
+        filteredValues = $scope.$eval("#{options.filter}(data)", { data: data })
+        domainValues = (new Number(value) for value in filteredValues)
+      else
+        domainValues = (new Number(datum[options.name]) for datum in data)
       if options.extent
         scale.domain d3.extent domainValues
       else
@@ -88,5 +91,4 @@ angular.module('ad3').directive 'd3Axis', ->
       axisElement.selectAll('line').attr("style", "fill: none; stroke-width: 2px; stroke: #303030;")
       axisElement.selectAll('path').attr("style", "fill: none; stroke-width: 2px; stroke: #303030;")
 
-    scope.$watch attrs.data, redraw, true
     chartController.addScale(options.name, { scale: scale, redraw: redraw })

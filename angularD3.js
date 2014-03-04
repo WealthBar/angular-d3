@@ -28,9 +28,8 @@
         innerRadius = parseFloat(options.innerRadius);
         labelRadius = parseFloat(options.labelRadius);
         center = chartController.getChart().append("g").attr("class", "arc");
-        redraw = function() {
-          var arc, arcTween, data, labelArc, path, radius;
-          data = scope.$eval(attrs.data);
+        redraw = function(data) {
+          var arc, arcTween, labelArc, path, radius;
           if (!((data != null) && data.length !== 0)) {
             return;
           }
@@ -58,7 +57,6 @@
           path.enter().append("text").attr("class", "arc-label").attr("dy", "0.35em").style("text-anchor", "middle").text(data[options.label]);
           return path.transition().ease(options.transition).duration(options.transitionDuration).attrTween("d", arcTween);
         };
-        scope.$watch(attrs.data, redraw, true);
         return chartController.registerElement({
           redraw: redraw
         });
@@ -111,9 +109,8 @@
             return y(d.y + d.y0);
           });
         }
-        redraw = function() {
-          var chart, charts, columns, data, name, stack, stackedData, temp, value;
-          data = scope.$eval(options.data);
+        redraw = function(data) {
+          var chart, charts, columns, name, stack, stackedData, temp, value;
           if (!((data != null) && data.length !== 0)) {
             return;
           }
@@ -179,9 +176,8 @@
             });
           }
         };
-        scope.$watch(options.data, redraw, true);
         if (options.columns != null) {
-          scope.$watch(options.columns, redraw, true);
+          scope.$watch(options.columns, chartControlle.redraw(), true);
         }
         return chartController.registerElement({
           redraw: redraw
@@ -258,9 +254,8 @@
         if (options.label) {
           label = axisElement.append("text").attr("class", "axis-label").text(options.label);
         }
-        redraw = function() {
-          var data, datum, domainValues;
-          data = scope.$eval(attrs.data);
+        redraw = function(data) {
+          var datum, domainValues;
           if (!((data != null) && data.length !== 0)) {
             return;
           }
@@ -286,7 +281,6 @@
           axisElement.selectAll('line').attr("style", "fill: none; stroke-width: 2px; stroke: #303030;");
           return axisElement.selectAll('path').attr("style", "fill: none; stroke-width: 2px; stroke: #303030;");
         };
-        scope.$watch(attrs.data, redraw, true);
         return chartController.addScale(options.name, {
           scale: scale,
           redraw: redraw
@@ -319,9 +313,8 @@
         chart = chartController.getChart();
         height = chartController.innerHeight();
         width = options.width;
-        redraw = function() {
-          var bars, data;
-          data = scope.$eval(attrs.data);
+        redraw = function(data) {
+          var bars;
           if (!((data != null) && data.length !== 0)) {
             return;
           }
@@ -346,7 +339,6 @@
             return height - y(d[options.y]);
           });
         };
-        scope.$watch(attrs.data, redraw, true);
         return chartController.registerElement({
           redraw: redraw
         });
@@ -363,16 +355,18 @@
       restrict: 'EA',
       scope: true,
       controller: [
-        '$scope', '$element', '$attrs', '$window', '$timeout', function(scope, el, attrs, window, $timeout) {
-          var chart, debounce, elements, redraw, scales, svg,
-            _this = this;
-          this.margin = scope.$eval(attrs.margin) || {
+        '$scope', '$element', '$attrs', '$window', '$timeout', function($scope, $el, $attrs, $window, $timeout) {
+          var binding, chart, debounce, elements, scales, svg;
+          scales = $scope.scales = {};
+          elements = $scope.elements = [];
+          binding = $scope.binding = $attrs.data;
+          this.margin = $scope.$eval($attrs.margin) || {
             top: 10,
             right: 10,
             bottom: 10,
             left: 10
           };
-          svg = d3.select(el[0]).append('svg').attr('class', "d3").attr("width", attrs.width || "100%").attr("height", attrs.height || "100%");
+          svg = d3.select($el[0]).append('svg').attr('class', "d3").attr("width", $attrs.width || "100%").attr("height", $attrs.height || "100%");
           this.width = function() {
             return svg[0][0].scrollWidth;
           };
@@ -389,8 +383,6 @@
           this.getChart = function() {
             return chart;
           };
-          scales = {};
-          elements = [];
           this.addScale = function(name, scale) {
             return scales[name] = scale;
           };
@@ -401,7 +393,11 @@
             return elements.push(el);
           };
           debounce = null;
-          redraw = function() {
+          this.redraw = function(data) {
+            var _this = this;
+            if (data == null) {
+              data = $scope.$eval(binding);
+            }
             if (debounce) {
               $timeout.cancel(debounce);
             }
@@ -409,17 +405,18 @@
               var element, name, scale, _i, _len, _results;
               for (name in scales) {
                 scale = scales[name];
-                scale.redraw();
+                scale.redraw(data);
               }
               _results = [];
               for (_i = 0, _len = elements.length; _i < _len; _i++) {
                 element = elements[_i];
-                _results.push(element.redraw());
+                _results.push(element.redraw(data));
               }
               return _results;
             }, 200);
           };
-          window.addEventListener('resize', redraw);
+          $window.addEventListener('resize', this.redraw);
+          $scope.$watch(binding, this.redraw, true);
         }
       ]
     };
@@ -471,15 +468,12 @@
           return y(d[options.y]);
         });
         linePath = chartController.getChart().append("path").attr("class", "line");
-        redraw = function() {
-          var data;
-          data = scope.$eval(attrs.data);
+        redraw = function(data) {
           if (!((data != null) && data.length !== 0)) {
             return;
           }
           return linePath.datum(data).transition().duration(500).attr("d", line);
         };
-        scope.$watch(attrs.data, redraw, true);
         return chartController.registerElement({
           redraw: redraw
         });
@@ -516,9 +510,8 @@
           return d[options.amount];
         });
         center = chartController.getChart().append("g").attr("class", "pie");
-        redraw = function() {
-          var arc, data, datum, groups, labelArc, radius, reversedDataMap, _fn, _i, _len;
-          data = scope.$eval(attrs.data);
+        redraw = function(data) {
+          var arc, datum, groups, labelArc, radius, reversedDataMap, _fn, _i, _len;
           if (!((data != null) && data.length !== 0)) {
             return;
           }
@@ -546,7 +539,6 @@
           });
           return center.selectAll(".pie path").data(pie(data)).attr("d", arc);
         };
-        scope.$watch(attrs.data, redraw, true);
         return chartController.registerElement({
           redraw: redraw
         });

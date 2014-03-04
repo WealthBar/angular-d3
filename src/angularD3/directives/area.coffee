@@ -31,8 +31,7 @@ angular.module('ad3').directive 'd3Area', () ->
         .y0((d) -> y(d.y0))
         .y1((d) -> y(d.y + d.y0))
 
-    redraw = ->
-      data = scope.$eval(options.data)
+    redraw = (data) ->
       return unless data? and data.length isnt 0
       columns = options.y if options.y?
       columns = scope.$eval(options.columns) if options.columns?
@@ -64,6 +63,5 @@ angular.module('ad3').directive 'd3Area', () ->
           .duration(500)
           .attr("d", (d) -> areaStacked(d.values))
 
-    scope.$watch options.data, redraw, true
-    scope.$watch options.columns, redraw, true if options.columns?
+    scope.$watch options.columns, chartControlle.redraw(), true if options.columns?
     chartController.registerElement({ redraw: redraw })

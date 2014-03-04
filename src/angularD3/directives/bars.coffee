@@ -9,7 +9,6 @@ angular.module('ad3').directive 'd3Bars', () ->
   require: '^d3Chart'
 
   link: (scope, el, attrs, chartController) ->
-    # todo: DRY this up in line, area and bar directives
     options = angular.extend(defaults(), attrs)
     x = chartController.getScale(options.xscale or options.x)
     y = chartController.getScale(options.yscale or options.y)
@@ -18,8 +17,7 @@ angular.module('ad3').directive 'd3Bars', () ->
     height = chartController.innerHeight()
     width = options.width
 
-    redraw = ->
-      data = scope.$eval(attrs.data)
+    redraw = (data) ->
       return unless data? and data.length isnt 0
       bars = chart.selectAll("rect.bar").data(data)
       bars.exit().transition().duration(500)
@@ -42,5 +40,4 @@ angular.module('ad3').directive 'd3Bars', () ->
         .attr("y", (d) -> y(d[options.y]))
         .attr("height", (d) -> height - y(d[options.y]))
 
-    scope.$watch attrs.data, redraw , true
     chartController.registerElement({ redraw: redraw })

@@ -20,8 +20,7 @@ angular.module('ad3').directive 'd3Arc', () ->
 
     center = chartController.getChart().append("g").attr("class", "arc")
 
-    redraw = ->
-      data = scope.$eval(attrs.data)
+    redraw = (data) ->
       return unless data? and data.length isnt 0
 
       radius = Math.min(chartController.innerWidth(), chartController.innerHeight())/2
@@ -62,5 +61,4 @@ angular.module('ad3').directive 'd3Arc', () ->
         .duration(options.transitionDuration)
         .attrTween("d", arcTween)
 
-    scope.$watch attrs.data, redraw , true
     chartController.registerElement({ redraw: redraw })
