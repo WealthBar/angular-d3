@@ -204,9 +204,9 @@
       priority: 1,
       restrict: 'E',
       require: '^d3Chart',
-      link: function(scope, el, attrs, chartController) {
+      link: function($scope, $el, $attrs, chartController) {
         var axis, axisElement, format, label, options, positionLabel, range, redraw, scale, translation;
-        options = angular.extend(defaults(), attrs);
+        options = angular.extend(defaults(), $attrs);
         range = function() {
           if (options.orientation === 'top' || options.orientation === 'bottom') {
             if (options.reverse != null) {
@@ -255,7 +255,7 @@
           label = axisElement.append("text").attr("class", "axis-label").text(options.label);
         }
         redraw = function(data) {
-          var datum, domainValues;
+          var datum, domainValues, filteredValues, value;
           if (!((data != null) && data.length !== 0)) {
             return;
           }
@@ -263,15 +263,30 @@
           if (label) {
             positionLabel(label.transition().duration(500));
           }
-          domainValues = (function() {
-            var _i, _len, _results;
-            _results = [];
-            for (_i = 0, _len = data.length; _i < _len; _i++) {
-              datum = data[_i];
-              _results.push(new Number(datum[options.name]));
-            }
-            return _results;
-          })();
+          if (options.filter) {
+            filteredValues = $scope.$eval("" + options.filter + "(data)", {
+              data: data
+            });
+            domainValues = (function() {
+              var _i, _len, _results;
+              _results = [];
+              for (_i = 0, _len = filteredValues.length; _i < _len; _i++) {
+                value = filteredValues[_i];
+                _results.push(new Number(value));
+              }
+              return _results;
+            })();
+          } else {
+            domainValues = (function() {
+              var _i, _len, _results;
+              _results = [];
+              for (_i = 0, _len = data.length; _i < _len; _i++) {
+                datum = data[_i];
+                _results.push(new Number(datum[options.name]));
+              }
+              return _results;
+            })();
+          }
           if (options.extent) {
             scale.domain(d3.extent(domainValues));
           } else {
@@ -432,10 +447,20 @@
         restrict: 'E',
         scope: false,
         link: function(scope, el, attrs) {
-          var binding, src;
+          var accessor, binding, callback, src;
           src = attrs.src;
           binding = attrs.data;
-          return scope[binding] = d3.csv(src, attrs.columns.split(','));
+          if (attrs.accessor) {
+            accessor = scope.$eval(attrs.accessor);
+          }
+          if (attrs.callback) {
+            callback = scope.$eval(attrs.callback);
+          }
+          return d3.csv(src, accessor, callback).then(function(rows) {
+            return scope[binding] = rows;
+          }, function() {
+            throw 'Error loading CSV via D3';
+          });
         }
       };
     }
@@ -554,35 +579,31 @@
     var defaults;
     defaults = this.defaults = {};
     this.$get = [
-      '$cacheFactory', '$rootScope', function($cacheFactory, $rootScope) {
+      '$cacheFactory', '$rootScope', '$q', function($cacheFactory, $rootScope, $q) {
         var cache;
         cache = defaults.cache || $cacheFactory('d3Service');
         return {
-          csv: function(src, columns) {
-            var results;
-            results = cache.get(src);
-            if (results) {
-              return results;
+          csv: function(src, accessor, callback) {
+            var cached, deferred;
+            deferred = $q.defer();
+            cached = cache.get(src);
+            if (cached) {
+              return cached;
             }
-            cache.put(src, results = []);
-            d3.csv(src, function(row) {
-              var datum, name, _i, _len;
-              datum = {};
-              for (_i = 0, _len = columns.length; _i < _len; _i++) {
-                name = columns[_i];
-                name = name.trim();
-                datum[name] = row[name];
-              }
-              return datum;
-            }, function(error, rows) {
-              if (error != null) {
-                return cache.remove(src);
-              } else {
-                results.push.apply(results, rows);
-                return $rootScope.$apply();
-              }
+            d3.csv(src, accessor, function(rows) {
+              return $rootScope.$apply(function() {
+                if (callback) {
+                  callback(rows);
+                }
+                if (rows) {
+                  cache.put(src, rows);
+                  return deferred.resolve(rows);
+                } else {
+                  return deferred.reject();
+                }
+              });
             });
-            return results;
+            return deferred.promise;
           }
         };
       }

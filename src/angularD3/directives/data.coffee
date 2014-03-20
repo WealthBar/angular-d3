@@ -4,5 +4,9 @@ angular.module('ad3').directive 'd3Data',['d3Service', (d3) ->
   link: (scope, el, attrs) ->
     src = attrs.src
     binding = attrs.data
-    scope[binding] = d3.csv(src, attrs.columns.split(','))
+    accessor = scope.$eval(attrs.accessor) if attrs.accessor
+    callback = scope.$eval(attrs.callback) if attrs.callback
+    d3.csv(src, accessor, callback).then (rows) ->
+      scope[binding] = rows
+    , -> throw('Error loading CSV via D3')
 ]

@@ -1,27 +1,22 @@
 angular.module('ad3').provider 'd3Service', () ->
   defaults = @defaults = {}
 
-  @$get = ['$cacheFactory', '$rootScope', ($cacheFactory, $rootScope) ->
+  @$get = ['$cacheFactory', '$rootScope', '$q', ($cacheFactory, $rootScope, $q) ->
     cache = defaults.cache or $cacheFactory('d3Service')
 
-    csv: (src, columns) ->
-      results = cache.get(src)
-      return results if results
-      cache.put(src, results = [])
-      d3.csv src,
-        (row)->
-          datum = {}
-          for name in columns
-            name = name.trim()
-            datum[name] = row[name]
-          datum
-        (error, rows) ->
-          if error?
-            cache.remove(src)
+    csv: (src, accessor, callback) ->
+      deferred = $q.defer()
+      cached = cache.get(src)
+      return cached if cached
+      d3.csv src, accessor, (rows) ->
+        $rootScope.$apply ->
+          callback(rows) if callback
+          if rows
+            cache.put(src, rows)
+            deferred.resolve(rows)
           else
-            results.push.apply(results, rows)
-            $rootScope.$apply()
-      results
+            deferred.reject()
+      return deferred.promise
   ]
 
   @
