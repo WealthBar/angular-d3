@@ -491,7 +491,7 @@
         }).y(function(d) {
           return y(d[options.y]);
         });
-        linePath = chartController.getChart().append("path").attr("class", "line");
+        linePath = chartController.getChart().append("path").attr("class", "line line-" + (options.name || options.y)).style("fill", "none").style("stroke", options.stroke);
         redraw = function(data) {
           if (!((data != null) && data.length !== 0)) {
             return;
