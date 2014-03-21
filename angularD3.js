@@ -39,11 +39,10 @@
             return d.value / 100 * 2 * Math.PI;
           });
           labelArc = d3.svg.arc().outerRadius(radius * labelRadius).innerRadius(radius * labelRadius);
-          arcTween = function(b) {
+          arcTween = function(a) {
             var i;
-            i = d3.interpolate({
-              value: 0
-            }, b);
+            i = d3.interpolate(this._current, a);
+            this._current = i(0);
             return function(t) {
               return arc(i(t));
             };
@@ -519,30 +518,52 @@
         innerRadius: 0,
         labelRadius: 0.7,
         transition: "cubic-in-out",
-        transitionDuration: 1000
+        transitionDuration: 800,
+        colors: 'category10'
       };
     };
     return {
       restrict: 'E',
       require: '^d3Chart',
       link: function(scope, el, attrs, chartController) {
-        var center, chart, innerRadius, labelRadius, options, pie, redraw;
+        var center, chart, colors, innerRadius, labelRadius, options, pie, redraw, _current;
         options = angular.extend(defaults(), attrs);
         chart = chartController.getChart();
         innerRadius = parseFloat(options.innerRadius);
         labelRadius = parseFloat(options.labelRadius);
+        colors = (function() {
+          switch (attrs.colors) {
+            case 'category20':
+              return d3.scale.category20();
+            case 'category20b':
+              return d3.scale.category20b();
+            case 'category20c':
+              return d3.scale.category20c();
+            default:
+              return d3.scale.category10();
+          }
+        })();
         pie = d3.layout.pie().sort(null).value(function(d) {
           return d[options.amount];
         });
         center = chartController.getChart().append("g").attr("class", "pie");
+        _current = null;
         redraw = function(data) {
-          var arc, datum, groups, labelArc, radius, reversedDataMap, _fn, _i, _len;
+          var arc, arcTween, datum, label, labelArc, radius, reversedDataMap, slice, _fn, _i, _len;
           if (!((data != null) && data.length !== 0)) {
             return;
           }
           radius = Math.min(chartController.innerWidth(), chartController.innerHeight()) / 2;
           center.attr("transform", "translate(" + radius + "," + radius + ")");
           arc = d3.svg.arc().outerRadius(radius).innerRadius(radius * innerRadius);
+          arcTween = function(a) {
+            var i;
+            i = d3.interpolate(this._current, a);
+            this._current = i(0);
+            return function(t) {
+              return arc(i(t));
+            };
+          };
           labelArc = d3.svg.arc().outerRadius(radius * labelRadius).innerRadius(radius * labelRadius);
           reversedDataMap = {};
           _fn = function(datum) {
@@ -552,17 +573,24 @@
             datum = data[_i];
             _fn(datum);
           }
-          groups = center.selectAll(".pie").data(pie(data)).enter().append("g");
-          groups.attr("class", function(d, i) {
+          slice = center.selectAll(".pie").data(pie(data));
+          slice.enter().append("path").attr("class", function(d, i) {
             return "pie pie-" + i;
-          }).append("path");
-          groups.append("text");
-          center.selectAll(".pie text").data(pie(data)).attr("transform", function(d) {
+          }).style('fill', function(d, i) {
+            return colors(i);
+          }).attr("d", arc).each(function(d) {
+            return this._current = d;
+          });
+          slice.exit().remove();
+          slice.transition().ease(options.transition).duration(options.transitionDuration).attrTween("d", arcTween);
+          label = center.selectAll("text").data(pie(data));
+          label.enter().append("text").attr("dy", "0.35em").style("text-anchor", "middle").attr("transform", function(d) {
             return "translate(" + labelArc.centroid(d) + ")";
-          }).attr("dy", "0.35em").style("text-anchor", "middle").text(function(d) {
+          });
+          label.exit().remove();
+          return label.transition().ease(options.transition).duration(options.transitionDuration).text(function(d) {
             return reversedDataMap[d.value];
           });
-          return center.selectAll(".pie path").data(pie(data)).attr("d", arc);
         };
         return chartController.registerElement({
           redraw: redraw

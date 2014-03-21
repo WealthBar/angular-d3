@@ -5,7 +5,8 @@ angular.module('ad3').directive 'd3Pie', () ->
     innerRadius: 0
     labelRadius: 0.7
     transition: "cubic-in-out"
-    transitionDuration: 1000
+    transitionDuration: 800
+    colors: 'category10'
 
   restrict: 'E'
 
@@ -18,11 +19,22 @@ angular.module('ad3').directive 'd3Pie', () ->
     innerRadius = parseFloat(options.innerRadius)
     labelRadius = parseFloat(options.labelRadius)
 
+    colors = switch attrs.colors
+      when 'category20'
+        d3.scale.category20()
+      when 'category20b'
+        d3.scale.category20b()
+      when 'category20c'
+        d3.scale.category20c()
+      else
+        d3.scale.category10()
+
     pie = d3.layout.pie().sort(null)
-      .value((d) ->
-        d[options.amount])
+      .value((d) -> d[options.amount])
 
     center = chartController.getChart().append("g").attr("class", "pie")
+
+    _current = null
 
     redraw = (data) ->
       return unless data? and data.length isnt 0
@@ -35,6 +47,11 @@ angular.module('ad3').directive 'd3Pie', () ->
         .outerRadius(radius)
         .innerRadius(radius * innerRadius)
 
+      arcTween = (a) ->
+        i = d3.interpolate(@_current, a)
+        @_current = i(0)
+        (t) -> arc(i(t))
+
       labelArc = d3.svg.arc()
         .outerRadius(radius * labelRadius)
         .innerRadius(radius * labelRadius)
@@ -44,20 +61,33 @@ angular.module('ad3').directive 'd3Pie', () ->
         do (datum) ->
           reversedDataMap[datum[options.amount]] = datum[options.value]
 
-      groups = center.selectAll(".pie").data(pie(data))
-        .enter().append("g")
+      slice = center.selectAll(".pie").data(pie(data))
 
-      groups.attr("class", (d,i) ->  "pie pie-#{i}")
-        .append("path")
+      slice.enter().append("path")
+        .attr("class", (d,i) ->  "pie pie-#{i}")
+        .style('fill', (d,i) -> colors(i))
+        .attr("d", arc)
+        .each((d) -> @_current = d)
 
-      groups.append("text")
+      slice.exit().remove()
 
-      center.selectAll(".pie text").data(pie(data))
-        .attr("transform", (d) -> "translate(" + labelArc.centroid(d) + ")")
+      slice.transition()
+        .ease(options.transition)
+        .duration(options.transitionDuration)
+        .attrTween("d", arcTween)
+
+      label = center.selectAll("text").data(pie(data))
+
+      label.enter().append("text")
         .attr("dy", "0.35em")
         .style("text-anchor", "middle")
-        .text((d) -> reversedDataMap[d.value])
+        .attr("transform", (d) -> "translate(" + labelArc.centroid(d) + ")")
 
-      center.selectAll(".pie path").data(pie(data)).attr("d", arc)
+      label.exit().remove()
+
+      label.transition()
+        .ease(options.transition)
+        .duration(options.transitionDuration)
+        .text((d) -> reversedDataMap[d.value])
 
     chartController.registerElement({ redraw: redraw })

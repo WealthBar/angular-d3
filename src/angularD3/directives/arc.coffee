@@ -37,8 +37,9 @@ angular.module('ad3').directive 'd3Arc', () ->
         .outerRadius(radius * labelRadius)
         .innerRadius(radius * labelRadius)
 
-      arcTween = (b) ->
-        i = d3.interpolate({value: 0}, b)
+      arcTween = (a) ->
+        i = d3.interpolate(@_current, a)
+        @_current = i(0)
         (t) -> arc(i(t))
 
       path = center.selectAll("path")
@@ -46,9 +47,9 @@ angular.module('ad3').directive 'd3Arc', () ->
 
       path.enter().append("path")
         .transition()
-          .ease(options.transition)
-          .duration(options.transitionDuration)
-          .attrTween("d", arcTween)
+        .ease(options.transition)
+        .duration(options.transitionDuration)
+        .attrTween("d", arcTween)
 
       path.enter().append("text")
         .attr("class", "arc-label")
