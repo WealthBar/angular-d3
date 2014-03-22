@@ -7,6 +7,7 @@ angular.module('ad3').directive 'd3Pie', () ->
     transition: "cubic-in-out"
     transitionDuration: 800
     colors: 'category10'
+    minOffset: 12
 
   restrict: 'E'
 
@@ -79,15 +80,56 @@ angular.module('ad3').directive 'd3Pie', () ->
       label = center.selectAll("text").data(pie(data))
 
       label.enter().append("text")
-        .attr("dy", "0.35em")
         .style("text-anchor", "middle")
-        .attr("transform", (d) -> "translate(" + labelArc.centroid(d) + ")")
+        .attr("class", (d,i) -> "pie-label pie-label-{i}")
 
       label.exit().remove()
+
+      label.text((d) -> reversedDataMap[d.value])
+
+      prevbb = null
+      padding = +options.minOffset
+      getPosition = (d, i) ->
+        # Basic collision adjustment, doesn't always quite work.
+        # Adapted from: http://stackoverflow.com/a/20645255/235243
+        position = labelArc.centroid(d)
+
+        # Get position relative to previous position
+        relativePosition = [position[0], position[1]]
+        if @_position
+          relativePosition[0] -= @_position[0]
+          relativePosition[1] -= @_position[1]
+
+        # Translate and pad the bounding rectangle for collision detection
+        thisbb = _.transform @getBoundingClientRect(), (r, v, k) ->
+          switch k
+            when 'left'
+              r[k] = v - padding + relativePosition[0]
+            when 'top'
+              r[k] = v - padding + relativePosition[1]
+            when 'right'
+              r[k] = v + padding + relativePosition[0]
+            when 'bottom'
+              r[k] = v + padding + relativePosition[1]
+
+        if prevbb and !(thisbb.right < prevbb.left || thisbb.left > prevbb.right || thisbb.bottom < prevbb.top || thisbb.top > prevbb.bottom)
+          ctx = thisbb.left + (thisbb.right - thisbb.left)/2
+          cty = thisbb.top + (thisbb.bottom - thisbb.top)/2
+          cpx = prevbb.left + (prevbb.right - prevbb.left)/2
+          cpy = prevbb.top + (prevbb.bottom - prevbb.top)/2
+          offset = Math.sqrt(Math.pow(ctx - cpx, 2) + Math.pow(cty - cpy, 2))/2
+          offsetArc = d3.svg.arc()
+            .outerRadius(radius * labelRadius + offset)
+            .innerRadius(radius * labelRadius + offset)
+          position = offsetArc.centroid(d)
+
+        @_position = position
+        prevbb = thisbb
+        "translate(#{position})"
 
       label.transition()
         .ease(options.transition)
         .duration(options.transitionDuration)
-        .text((d) -> reversedDataMap[d.value])
+        .attr("transform", getPosition)
 
     chartController.registerElement({ redraw: redraw })
