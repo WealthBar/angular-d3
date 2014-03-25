@@ -653,7 +653,10 @@
             deferred = $q.defer();
             cached = cache.get(src);
             if (cached) {
-              return cached;
+              if (callback) {
+                callback(rows);
+              }
+              deferred.resolve(cached);
             }
             d3.csv(src, accessor, function(rows) {
               return $rootScope.$apply(function() {

@@ -7,7 +7,9 @@ angular.module('ad3').provider 'd3Service', () ->
     csv: (src, accessor, callback) ->
       deferred = $q.defer()
       cached = cache.get(src)
-      return cached if cached
+      if cached
+        callback(rows) if callback
+        deferred.resolve(cached)
       d3.csv src, accessor, (rows) ->
         $rootScope.$apply ->
           callback(rows) if callback
