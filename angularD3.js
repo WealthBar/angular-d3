@@ -380,12 +380,12 @@
             bottom: 10,
             left: 10
           };
-          svg = d3.select($el[0]).append('svg').attr('class', "d3").attr("width", $attrs.width || "100%").attr("height", $attrs.height || "100%");
+          svg = d3.select($el[0]).append('svg').attr('class', "d3").attr("width", "100%").attr("height", "100%");
           this.width = function() {
-            return svg[0][0].scrollWidth;
+            return $el[0].scrollWidth;
           };
           this.height = function() {
-            return svg[0][0].scrollHeight;
+            return $el[0].scrollHeight;
           };
           this.innerWidth = function() {
             return this.width() - this.margin.left - this.margin.right;

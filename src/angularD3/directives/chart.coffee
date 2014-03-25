@@ -9,11 +9,11 @@ angular.module('ad3').directive 'd3Chart', ->
 
     @margin = $scope.$eval($attrs.margin) or { top: 10, right: 10, bottom: 10, left: 10 }
     svg = d3.select($el[0]).append('svg').attr('class', "d3")
-      .attr("width", $attrs.width or "100%")
-      .attr("height", $attrs.height or "100%")
+      .attr("width", "100%")
+      .attr("height", "100%")
 
-    @width = ->  svg[0][0].scrollWidth
-    @height = -> svg[0][0].scrollHeight
+    @width = -> $el[0].scrollWidth
+    @height = -> $el[0].scrollHeight
     @innerWidth = -> @width() - @margin.left - @margin.right
     @innerHeight = -> @height() - @margin.top - @margin.bottom
 
