@@ -43,7 +43,7 @@ angular.module('ad3').directive 'd3Arc', () ->
         (t) -> arc(i(t))
 
       path = center.selectAll("path")
-        .data([{"value":data[options.amount]}])
+        .data([{"value":data[options.value]}])
 
       path.enter().append("path")
         .transition()

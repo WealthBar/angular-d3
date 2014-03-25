@@ -519,38 +519,38 @@
         labelRadius: 0.7,
         transition: "cubic-in-out",
         transitionDuration: 800,
-        colors: 'category10',
-        minOffset: 12
+        minOffset: 12,
+        value: 'value'
       };
     };
     return {
       restrict: 'E',
       require: '^d3Chart',
       link: function(scope, el, attrs, chartController) {
-        var center, chart, colors, innerRadius, labelRadius, options, pie, redraw, _current;
+        var center, chart, colorScale, innerRadius, labelRadius, options, pie, redraw, _current;
         options = angular.extend(defaults(), attrs);
         chart = chartController.getChart();
         innerRadius = parseFloat(options.innerRadius);
         labelRadius = parseFloat(options.labelRadius);
-        colors = (function() {
-          switch (attrs.colors) {
-            case 'category20':
-              return d3.scale.category20();
-            case 'category20b':
-              return d3.scale.category20b();
-            case 'category20c':
-              return d3.scale.category20c();
-            default:
-              return d3.scale.category10();
-          }
-        })();
+        if (attrs.colors) {
+          colorScale = (function() {
+            switch (attrs.colors) {
+              case 'category20':
+                return d3.scale.category20();
+              case 'category20b':
+                return d3.scale.category20b();
+              case 'category20c':
+                return d3.scale.category20c();
+            }
+          })();
+        }
         pie = d3.layout.pie().sort(null).value(function(d) {
-          return d[options.amount];
+          return d[options.value];
         });
         center = chartController.getChart().append("g").attr("class", "pie");
         _current = null;
         redraw = function(data) {
-          var arc, arcTween, datum, getPosition, label, labelArc, padding, prevbb, radius, reversedDataMap, slice, _fn, _i, _len;
+          var arc, arcTween, getPosition, label, labelArc, padding, prevbb, radius, slice;
           if (!((data != null) && data.length !== 0)) {
             return;
           }
@@ -566,68 +566,71 @@
             };
           };
           labelArc = d3.svg.arc().outerRadius(radius * labelRadius).innerRadius(radius * labelRadius);
-          reversedDataMap = {};
-          _fn = function(datum) {
-            return reversedDataMap[datum[options.amount]] = datum[options.value];
-          };
-          for (_i = 0, _len = data.length; _i < _len; _i++) {
-            datum = data[_i];
-            _fn(datum);
-          }
           slice = center.selectAll(".pie").data(pie(data));
           slice.enter().append("path").attr("class", function(d, i) {
             return "pie pie-" + i;
-          }).style('fill', function(d, i) {
-            return colors(i);
           }).attr("d", arc).each(function(d) {
             return this._current = d;
           });
-          slice.exit().remove();
-          slice.transition().ease(options.transition).duration(options.transitionDuration).attrTween("d", arcTween);
-          label = center.selectAll("text").data(pie(data));
-          label.enter().append("text").style("text-anchor", "middle").attr("class", function(d, i) {
-            return "pie-label pie-label-{i}";
-          });
-          label.exit().remove();
-          label.text(function(d) {
-            return reversedDataMap[d.value];
-          });
-          prevbb = null;
-          padding = +options.minOffset;
-          getPosition = function(d, i) {
-            var cpx, cpy, ctx, cty, offset, offsetArc, position, relativePosition, thisbb;
-            position = labelArc.centroid(d);
-            relativePosition = [position[0], position[1]];
-            if (this._position) {
-              relativePosition[0] -= this._position[0];
-              relativePosition[1] -= this._position[1];
-            }
-            thisbb = _.transform(this.getBoundingClientRect(), function(r, v, k) {
-              switch (k) {
-                case 'left':
-                  return r[k] = v - padding + relativePosition[0];
-                case 'top':
-                  return r[k] = v - padding + relativePosition[1];
-                case 'right':
-                  return r[k] = v + padding + relativePosition[0];
-                case 'bottom':
-                  return r[k] = v + padding + relativePosition[1];
+          if (attrs.color) {
+            slice.style('fill', function(d, i) {
+              if (colorScale) {
+                return colorScale(i);
+              } else {
+                return d[attrs.color];
               }
             });
-            if (prevbb && !(thisbb.right < prevbb.left || thisbb.left > prevbb.right || thisbb.bottom < prevbb.top || thisbb.top > prevbb.bottom)) {
-              ctx = thisbb.left + (thisbb.right - thisbb.left) / 2;
-              cty = thisbb.top + (thisbb.bottom - thisbb.top) / 2;
-              cpx = prevbb.left + (prevbb.right - prevbb.left) / 2;
-              cpy = prevbb.top + (prevbb.bottom - prevbb.top) / 2;
-              offset = Math.sqrt(Math.pow(ctx - cpx, 2) + Math.pow(cty - cpy, 2)) / 2;
-              offsetArc = d3.svg.arc().outerRadius(radius * labelRadius + offset).innerRadius(radius * labelRadius + offset);
-              position = offsetArc.centroid(d);
-            }
-            this._position = position;
-            prevbb = thisbb;
-            return "translate(" + position + ")";
-          };
-          return label.transition().ease(options.transition).duration(options.transitionDuration).attr("transform", getPosition);
+          }
+          slice.exit().remove();
+          slice.transition().ease(options.transition).duration(options.transitionDuration).attrTween("d", arcTween);
+          if (options.label) {
+            prevbb = null;
+            padding = +options.minOffset;
+            getPosition = function(d, i) {
+              var cpx, cpy, ctx, cty, offset, offsetArc, position, relativePosition, thisbb;
+              position = labelArc.centroid(d);
+              if (options.avoidCollisions) {
+                relativePosition = [position[0], position[1]];
+                if (this._position) {
+                  relativePosition[0] -= this._position[0];
+                  relativePosition[1] -= this._position[1];
+                }
+                thisbb = _.transform(this.getBoundingClientRect(), function(r, v, k) {
+                  switch (k) {
+                    case 'left':
+                      return r[k] = v - padding + relativePosition[0];
+                    case 'top':
+                      return r[k] = v - padding + relativePosition[1];
+                    case 'right':
+                      return r[k] = v + padding + relativePosition[0];
+                    case 'bottom':
+                      return r[k] = v + padding + relativePosition[1];
+                  }
+                });
+                if (prevbb && !(thisbb.right < prevbb.left || thisbb.left > prevbb.right || thisbb.bottom < prevbb.top || thisbb.top > prevbb.bottom)) {
+                  ctx = thisbb.left + (thisbb.right - thisbb.left) / 2;
+                  cty = thisbb.top + (thisbb.bottom - thisbb.top) / 2;
+                  cpx = prevbb.left + (prevbb.right - prevbb.left) / 2;
+                  cpy = prevbb.top + (prevbb.bottom - prevbb.top) / 2;
+                  offset = Math.sqrt(Math.pow(ctx - cpx, 2) + Math.pow(cty - cpy, 2)) / 2;
+                  offsetArc = d3.svg.arc().outerRadius(radius * labelRadius + offset).innerRadius(radius * labelRadius + offset);
+                  position = offsetArc.centroid(d);
+                }
+                this._position = position;
+                prevbb = thisbb;
+              }
+              return "translate(" + position + ")";
+            };
+            label = center.selectAll("text").data(pie(data));
+            label.enter().append("text").style("text-anchor", "middle").attr("class", function(d, i) {
+              return "pie-label pie-label-" + i;
+            });
+            label.exit().remove();
+            label.text(function(d, i) {
+              return data[i][options.label];
+            });
+            return label.transition().ease(options.transition).duration(options.transitionDuration).attr("transform", getPosition);
+          }
         };
         return chartController.registerElement({
           redraw: redraw

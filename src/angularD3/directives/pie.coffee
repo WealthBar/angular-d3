@@ -6,8 +6,8 @@ angular.module('ad3').directive 'd3Pie', () ->
     labelRadius: 0.7
     transition: "cubic-in-out"
     transitionDuration: 800
-    colors: 'category10'
     minOffset: 12
+    value: 'value'
 
   restrict: 'E'
 
@@ -20,18 +20,17 @@ angular.module('ad3').directive 'd3Pie', () ->
     innerRadius = parseFloat(options.innerRadius)
     labelRadius = parseFloat(options.labelRadius)
 
-    colors = switch attrs.colors
-      when 'category20'
-        d3.scale.category20()
-      when 'category20b'
-        d3.scale.category20b()
-      when 'category20c'
-        d3.scale.category20c()
-      else
-        d3.scale.category10()
+    if attrs.colors
+      colorScale = switch attrs.colors
+        when 'category20'
+          d3.scale.category20()
+        when 'category20b'
+          d3.scale.category20b()
+        when 'category20c'
+          d3.scale.category20c()
 
     pie = d3.layout.pie().sort(null)
-      .value((d) -> d[options.amount])
+      .value((d) -> d[options.value])
 
     center = chartController.getChart().append("g").attr("class", "pie")
 
@@ -57,18 +56,14 @@ angular.module('ad3').directive 'd3Pie', () ->
         .outerRadius(radius * labelRadius)
         .innerRadius(radius * labelRadius)
 
-      reversedDataMap = {}
-      for datum in data
-        do (datum) ->
-          reversedDataMap[datum[options.amount]] = datum[options.value]
-
       slice = center.selectAll(".pie").data(pie(data))
 
       slice.enter().append("path")
         .attr("class", (d,i) ->  "pie pie-#{i}")
-        .style('fill', (d,i) -> colors(i))
         .attr("d", arc)
         .each((d) -> @_current = d)
+
+      slice.style('fill', (d,i) -> if colorScale then colorScale(i) else d[attrs.color]) if attrs.color
 
       slice.exit().remove()
 
@@ -77,59 +72,62 @@ angular.module('ad3').directive 'd3Pie', () ->
         .duration(options.transitionDuration)
         .attrTween("d", arcTween)
 
-      label = center.selectAll("text").data(pie(data))
+      if options.label
+        prevbb = null
+        padding = +options.minOffset
+        getPosition = (d, i) ->
+          position = labelArc.centroid(d)
 
-      label.enter().append("text")
-        .style("text-anchor", "middle")
-        .attr("class", (d,i) -> "pie-label pie-label-{i}")
+          if options.avoidCollisions
+            # Basic collision adjustment, doesn't seem to quite work all the time.
+            # Adapted from: http://stackoverflow.com/a/20645255/235243
 
-      label.exit().remove()
+            relativePosition = [position[0], position[1]]
+            if @_position
+              relativePosition[0] -= @_position[0]
+              relativePosition[1] -= @_position[1]
 
-      label.text((d) -> reversedDataMap[d.value])
+            # Translate and pad the bounding rectangle for collision detection
+            thisbb = _.transform @getBoundingClientRect(), (r, v, k) ->
+              switch k
+                when 'left'
+                  r[k] = v - padding + relativePosition[0]
+                when 'top'
+                  r[k] = v - padding + relativePosition[1]
+                when 'right'
+                  r[k] = v + padding + relativePosition[0]
+                when 'bottom'
+                  r[k] = v + padding + relativePosition[1]
 
-      prevbb = null
-      padding = +options.minOffset
-      getPosition = (d, i) ->
-        # Basic collision adjustment, doesn't always quite work.
-        # Adapted from: http://stackoverflow.com/a/20645255/235243
-        position = labelArc.centroid(d)
+            if prevbb and !(thisbb.right < prevbb.left || thisbb.left > prevbb.right || thisbb.bottom < prevbb.top || thisbb.top > prevbb.bottom)
+              ctx = thisbb.left + (thisbb.right - thisbb.left)/2
+              cty = thisbb.top + (thisbb.bottom - thisbb.top)/2
+              cpx = prevbb.left + (prevbb.right - prevbb.left)/2
+              cpy = prevbb.top + (prevbb.bottom - prevbb.top)/2
+              offset = Math.sqrt(Math.pow(ctx - cpx, 2) + Math.pow(cty - cpy, 2))/2
+              offsetArc = d3.svg.arc()
+                .outerRadius(radius * labelRadius + offset)
+                .innerRadius(radius * labelRadius + offset)
+              position = offsetArc.centroid(d)
 
-        # Get position relative to previous position
-        relativePosition = [position[0], position[1]]
-        if @_position
-          relativePosition[0] -= @_position[0]
-          relativePosition[1] -= @_position[1]
+            @_position = position
+            prevbb = thisbb
 
-        # Translate and pad the bounding rectangle for collision detection
-        thisbb = _.transform @getBoundingClientRect(), (r, v, k) ->
-          switch k
-            when 'left'
-              r[k] = v - padding + relativePosition[0]
-            when 'top'
-              r[k] = v - padding + relativePosition[1]
-            when 'right'
-              r[k] = v + padding + relativePosition[0]
-            when 'bottom'
-              r[k] = v + padding + relativePosition[1]
+          "translate(#{position})"
 
-        if prevbb and !(thisbb.right < prevbb.left || thisbb.left > prevbb.right || thisbb.bottom < prevbb.top || thisbb.top > prevbb.bottom)
-          ctx = thisbb.left + (thisbb.right - thisbb.left)/2
-          cty = thisbb.top + (thisbb.bottom - thisbb.top)/2
-          cpx = prevbb.left + (prevbb.right - prevbb.left)/2
-          cpy = prevbb.top + (prevbb.bottom - prevbb.top)/2
-          offset = Math.sqrt(Math.pow(ctx - cpx, 2) + Math.pow(cty - cpy, 2))/2
-          offsetArc = d3.svg.arc()
-            .outerRadius(radius * labelRadius + offset)
-            .innerRadius(radius * labelRadius + offset)
-          position = offsetArc.centroid(d)
+        label = center.selectAll("text").data(pie(data))
 
-        @_position = position
-        prevbb = thisbb
-        "translate(#{position})"
+        label.enter().append("text")
+          .style("text-anchor", "middle")
+          .attr("class", (d,i) -> "pie-label pie-label-#{i}")
 
-      label.transition()
-        .ease(options.transition)
-        .duration(options.transitionDuration)
-        .attr("transform", getPosition)
+        label.exit().remove()
+
+        label.text((d,i) -> data[i][options.label])
+
+        label.transition()
+          .ease(options.transition)
+          .duration(options.transitionDuration)
+          .attr("transform", getPosition)
 
     chartController.registerElement({ redraw: redraw })

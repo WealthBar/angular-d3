@@ -30,10 +30,10 @@
     <d3-data src="data/data.csv" data="line" columns="year, savings, total, optimal"></d3-data>
     <div class="row">
       <div d3-chart data="pie" class="col-sm-6" height="400">
-        <d3-pie value="age" amount="population"></d3-pie>
+        <d3-pie label="age" value="population"></d3-pie>
       </div>
       <div d3-chart data="pie" class="col-sm-6" height="400">
-        <d3-pie inner-radius="0.5" label-radius="0.8" value="age" amount="population"></d3-pie>
+        <d3-pie inner-radius="0.5" label-radius="0.8" label="age" value="population"></d3-pie>
       </div>
     </div>
   </section>
@@ -42,10 +42,10 @@
     <h1>Arc Charts</h1>
     <div class="row">
       <div d3-chart data="arcs.arc1" class="col-sm-6 simple-arc1" height="400">
-        <d3-arc inner-radius="0.5" label="text" amount="value" transition="bounce" transition-duration="1000"></d3-arc>
+        <d3-arc inner-radius="0.5" label="text" value="value" transition="bounce" transition-duration="1000"></d3-arc>
       </div>
       <div d3-chart data="arcs.arc2" class="col-sm-6 simple-arc2" height="400">
-        <d3-arc inner-radius="0.5" label="text" amount="value"></d3-arc>
+        <d3-arc inner-radius="0.5" label="text" value="value"></d3-arc>
       </div>
     </div>
   </section>
