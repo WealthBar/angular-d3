@@ -49,7 +49,7 @@
           };
           path = center.selectAll("path").data([
             {
-              "value": data[options.amount]
+              "value": data[options.value]
             }
           ]);
           path.enter().append("path").transition().ease(options.transition).duration(options.transitionDuration).attrTween("d", arcTween);
@@ -407,11 +407,10 @@
             return elements.push(el);
           };
           debounce = null;
-          this.redraw = function(data) {
-            var _this = this;
-            if (data == null) {
-              data = $scope.$eval(binding);
-            }
+          this.redraw = function() {
+            var data,
+              _this = this;
+            data = $scope.$eval(binding);
             if (debounce) {
               $timeout.cancel(debounce);
             }

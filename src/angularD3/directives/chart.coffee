@@ -27,8 +27,8 @@ angular.module('ad3').directive 'd3Chart', ->
     @registerElement = (el) -> elements.push el
 
     debounce = null
-    @redraw = (data) ->
-      data ?= $scope.$eval(binding)
+    @redraw = ->
+      data = $scope.$eval(binding)
       $timeout.cancel(debounce) if debounce
       debounce = $timeout =>
         for name, scale of scales
