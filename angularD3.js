@@ -412,10 +412,11 @@
               _this = this;
             data = $scope.$eval(binding);
             if (debounce) {
-              $timeout.cancel(debounce);
+              return;
             }
             return debounce = $timeout(function() {
               var element, name, scale, _i, _len, _results;
+              debounce = null;
               for (name in scales) {
                 scale = scales[name];
                 scale.redraw(data);
@@ -426,7 +427,7 @@
                 _results.push(element.redraw(data));
               }
               return _results;
-            }, 200);
+            }, $attrs.updateInterval || 200);
           };
           $window.addEventListener('resize', this.redraw);
           $scope.$watch(binding, this.redraw, true);
