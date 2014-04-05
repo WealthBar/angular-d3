@@ -21,7 +21,6 @@ angular.module('ad3').directive 'd3Chart', ->
       .attr("transform", "translate(" + @margin.left + "," + @margin.top + ")")
 
     @getChart = () -> chart
-
     @addScale = (name, scale) -> scales[name] = scale
     @getScale = (name) -> scales[name].scale
     @registerElement = (el) -> elements.push el
@@ -29,13 +28,14 @@ angular.module('ad3').directive 'd3Chart', ->
     debounce = null
     @redraw = ->
       data = $scope.$eval(binding)
-      $timeout.cancel(debounce) if debounce
+      return if debounce
       debounce = $timeout =>
+        debounce = null
         for name, scale of scales
           scale.redraw(data)
         for element in elements
           element.redraw(data)
-      , 200
+      , $attrs.updateInterval or 200
     $window.addEventListener 'resize', @redraw
     $scope.$watch binding, @redraw, true
 
