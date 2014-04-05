@@ -2,7 +2,6 @@ angular.module('ad3').directive 'd3Axis', ->
   defaults = ->
     orientation: 'bottom'
     ticks: '5'
-    format: null
     extent: false
 
   priority: 1
@@ -41,7 +40,7 @@ angular.module('ad3').directive 'd3Axis', ->
     axis = d3.svg.axis().scale(scale).orient(options.orientation)
       .ticks(options.ticks)
 
-    if options.format
+    if options.format?
       format = d3.format(options.format)
       axis.tickFormat(format)
 

@@ -63,7 +63,7 @@ angular.module('ad3').directive 'd3Pie', () ->
         .attr("d", arc)
         .each((d) -> @_current = d)
 
-      slice.style('fill', (d,i) -> if colorScale then colorScale(i) else d[attrs.color]) if attrs.color
+      slice.style('fill', (d,i) -> if colorScale then colorScale(i) else d[attrs.color]) if attrs.colors
 
       slice.exit().remove()
 

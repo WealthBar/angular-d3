@@ -1,11 +1,11 @@
 <div ng-controller="MainCtrl">
-  <d3-data src="data/data.csv" data="line" columns="year, savings, total, optimal"></d3-data>
-  <d3-data src="data/donutData.csv" data="pie" columns="age,population"></d3-data>
+  <d3-data src="data/data.csv" data="line" accessor="parseValues" callback="log"></d3-data>
+  <d3-data src="data/donutData.csv" data="pie" accessor="parseValues" callback="log"></d3-data>
 
   <section id="graphs" class="well">
     <h1>Basic Graphs</h1>
     <p>Basic line, area and bar charts can be composed together in the same chart.</p>
-    <div d3-chart data="line" height="400" margin="{ top: 40, right: 60, bottom: 40, left: 60}">
+    <div d3-chart data="line" margin="{ top: 40, right: 60, bottom: 40, left: 60}">
       <d3-axis name="year" label="Year" extent="true" orientation="bottom" ticks="5"></d3-axis>
       <d3-axis name="savings" label="Deposits" orientation="left" ticks="5"></d3-axis>
       <d3-axis name="total" label="Savings" orientation="right" ticks="5"></d3-axis>
@@ -18,7 +18,7 @@
   <section id="stacked" class="well">
     <h1>Stacked Areas</h1>
     <p>Area charts can be stacked by specifying multiple y propeties</p>
-    <div data="line" d3-chart height="400" margin="{ top: 20, right: 80, bottom: 40, left: 20}">
+    <div data="line" d3-chart margin="{ top: 20, right: 80, bottom: 40, left: 20}">
       <d3-axis name="year" label="Year" extent="true" orientation="bottom" ticks="5"></d3-axis>
       <d3-axis name="total" filter="stackedSum" label="Savings" orientation="right" ticks="5"></d3-axis>
       <d3-area x="year" yscale="total" y="savings, total, optimal"></d3-area>
@@ -27,13 +27,12 @@
 
   <section id="pie-charts" class="well">
     <h1>Pie and Donut Charts</h1>
-    <d3-data src="data/data.csv" data="line" columns="year, savings, total, optimal"></d3-data>
     <div class="row">
-      <div d3-chart data="pie" class="col-sm-6" height="400">
-        <d3-pie label="age" value="population"></d3-pie>
+      <div d3-chart data="pie" class="col-sm-6" margin="{left: 30, right: 30, bottom: 30, top: 30}">
+        <d3-pie label="age" value="population" colors="category20"></d3-pie>
       </div>
-      <div d3-chart data="pie" class="col-sm-6" height="400">
-        <d3-pie inner-radius="0.5" label-radius="0.8" label="age" value="population"></d3-pie>
+      <div d3-chart data="pie" class="col-sm-6" margin="{left: 30, right: 30, bottom: 30, top: 30}">
+        <d3-pie inner-radius="0.5" label-radius="0.8" label="age" value="population" colors="category20"></d3-pie>
       </div>
     </div>
   </section>
@@ -41,11 +40,11 @@
   <section id="arc-charts" class="well">
     <h1>Arc Charts</h1>
     <div class="row">
-      <div d3-chart data="arcs.arc1" class="col-sm-6 simple-arc1" height="400">
-        <d3-arc inner-radius="0.5" label="text" value="value" transition="bounce" transition-duration="1000"></d3-arc>
+      <div d3-chart data="arcs.arc1" class="col-sm-6 simple-arc1" margin="{left: 30, right: 30, bottom: 30, top: 30}">
+        <d3-arc inner-radius="0.5" transition="bounce" transition-duration="1000"></d3-arc>
       </div>
-      <div d3-chart data="arcs.arc2" class="col-sm-6 simple-arc2" height="400">
-        <d3-arc inner-radius="0.5" label="text" value="value"></d3-arc>
+      <div d3-chart data="arcs.arc2" class="col-sm-6 simple-arc2" margin="{left: 30, right: 30, bottom: 30, top: 30}">
+        <d3-arc inner-radius="0.5"></d3-arc>
       </div>
     </div>
   </section>

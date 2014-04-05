@@ -6,6 +6,8 @@ angular.module('ad3').directive 'd3Arc', () ->
     labelRadius: 0
     transition: "cubic-in-out"
     transitionDuration: 1000
+    value: 'value'
+    label: 'label'
 
   restrict: 'E'
 
@@ -19,6 +21,11 @@ angular.module('ad3').directive 'd3Arc', () ->
     labelRadius = parseFloat(options.labelRadius)
 
     center = chartController.getChart().append("g").attr("class", "arc")
+    arcPath = center.append("path")
+    arcLabel = center.append("text")
+      .attr("class", "arc-label")
+      .attr("dy", "0.35em")
+      .style("text-anchor", "middle")
 
     redraw = (data) ->
       return unless data? and data.length isnt 0
@@ -31,35 +38,24 @@ angular.module('ad3').directive 'd3Arc', () ->
         .outerRadius(radius)
         .innerRadius(radius * innerRadius)
         .startAngle(0)
-        .endAngle( (d) -> d.value/100 * 2 * Math.PI )
+        .endAngle((d) -> d/100 * 2 * Math.PI)
+
+      arcTween = (d) ->
+        @_current ?= 0
+        i = d3.interpolate(@_current, d)
+        @_current = d
+        (t) -> arc(i(t))
 
       labelArc = d3.svg.arc()
         .outerRadius(radius * labelRadius)
         .innerRadius(radius * labelRadius)
 
-      arcTween = (a) ->
-        i = d3.interpolate(@_current, a)
-        @_current = i(0)
-        (t) -> arc(i(t))
-
-      path = center.selectAll("path")
-        .data([{"value":data[options.value]}])
-
-      path.enter().append("path")
+      arcPath.datum(data[options.value])
         .transition()
         .ease(options.transition)
         .duration(options.transitionDuration)
         .attrTween("d", arcTween)
 
-      path.enter().append("text")
-        .attr("class", "arc-label")
-        .attr("dy", "0.35em")
-        .style("text-anchor", "middle")
-        .text(data[options.label])
-
-      path.transition()
-        .ease(options.transition)
-        .duration(options.transitionDuration)
-        .attrTween("d", arcTween)
+      arcLabel.text(data[options.label])
 
     chartController.registerElement({ redraw: redraw })

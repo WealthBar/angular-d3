@@ -15,46 +15,47 @@
         innerRadius: 0,
         labelRadius: 0,
         transition: "cubic-in-out",
-        transitionDuration: 1000
+        transitionDuration: 1000,
+        value: 'value',
+        label: 'label'
       };
     };
     return {
       restrict: 'E',
       require: '^d3Chart',
       link: function(scope, el, attrs, chartController) {
-        var center, chart, innerRadius, labelRadius, options, redraw;
+        var arcLabel, arcPath, center, chart, innerRadius, labelRadius, options, redraw;
         options = angular.extend(defaults(), attrs);
         chart = chartController.getChart();
         innerRadius = parseFloat(options.innerRadius);
         labelRadius = parseFloat(options.labelRadius);
         center = chartController.getChart().append("g").attr("class", "arc");
+        arcPath = center.append("path");
+        arcLabel = center.append("text").attr("class", "arc-label").attr("dy", "0.35em").style("text-anchor", "middle");
         redraw = function(data) {
-          var arc, arcTween, labelArc, path, radius;
+          var arc, arcTween, labelArc, radius;
           if (!((data != null) && data.length !== 0)) {
             return;
           }
           radius = Math.min(chartController.innerWidth(), chartController.innerHeight()) / 2;
           center.attr("transform", "translate(" + radius + "," + radius + ")");
           arc = d3.svg.arc().outerRadius(radius).innerRadius(radius * innerRadius).startAngle(0).endAngle(function(d) {
-            return d.value / 100 * 2 * Math.PI;
+            return d / 100 * 2 * Math.PI;
           });
-          labelArc = d3.svg.arc().outerRadius(radius * labelRadius).innerRadius(radius * labelRadius);
-          arcTween = function(a) {
+          arcTween = function(d) {
             var i;
-            i = d3.interpolate(this._current, a);
-            this._current = i(0);
+            if (this._current == null) {
+              this._current = 0;
+            }
+            i = d3.interpolate(this._current, d);
+            this._current = d;
             return function(t) {
               return arc(i(t));
             };
           };
-          path = center.selectAll("path").data([
-            {
-              "value": data[options.value]
-            }
-          ]);
-          path.enter().append("path").transition().ease(options.transition).duration(options.transitionDuration).attrTween("d", arcTween);
-          path.enter().append("text").attr("class", "arc-label").attr("dy", "0.35em").style("text-anchor", "middle").text(data[options.label]);
-          return path.transition().ease(options.transition).duration(options.transitionDuration).attrTween("d", arcTween);
+          labelArc = d3.svg.arc().outerRadius(radius * labelRadius).innerRadius(radius * labelRadius);
+          arcPath.datum(data[options.value]).transition().ease(options.transition).duration(options.transitionDuration).attrTween("d", arcTween);
+          return arcLabel.text(data[options.label]);
         };
         return chartController.registerElement({
           redraw: redraw
@@ -195,7 +196,6 @@
       return {
         orientation: 'bottom',
         ticks: '5',
-        format: null,
         extent: false
       };
     };
@@ -234,7 +234,7 @@
         };
         scale = d3.scale.linear();
         axis = d3.svg.axis().scale(scale).orient(options.orientation).ticks(options.ticks);
-        if (options.format) {
+        if (options.format != null) {
           format = d3.format(options.format);
           axis.tickFormat(format);
         }
@@ -571,7 +571,7 @@
           }).attr("d", arc).each(function(d) {
             return this._current = d;
           });
-          if (attrs.color) {
+          if (attrs.colors) {
             slice.style('fill', function(d, i) {
               if (colorScale) {
                 return colorScale(i);
