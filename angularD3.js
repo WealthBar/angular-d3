@@ -408,15 +408,14 @@
           };
           debounce = null;
           this.redraw = function() {
-            var data,
-              _this = this;
-            data = $scope.$eval(binding);
+            var _this = this;
             if (debounce) {
               return;
             }
             return debounce = $timeout(function() {
-              var element, name, scale, _i, _len, _results;
+              var data, element, name, scale, _i, _len, _results;
               debounce = null;
+              data = $scope.$eval(binding);
               for (name in scales) {
                 scale = scales[name];
                 scale.redraw(data);
