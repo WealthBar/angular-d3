@@ -3,6 +3,14 @@
 A set of AngularJS directives that provides a declarative syntax for building
 common charts using D3.
 
+## Installing
+
+AngularD3 is available via Bower as `angularD3`
+
+```
+bower install angularD3
+```
+
 ## Project Goals
 
 This provides an AngularJS module called `ad3` which in turn provides a
