@@ -15,19 +15,27 @@ bower install angularD3
 
 This provides an AngularJS module called `ad3` which in turn provides a
 declarative HTML syntax for using D3 with AngularJS. The syntax has been
-inspired in part by [this blog post][radian] however since that project is not
-currently open source I've begun work on building my own.
+inspired in part by [Radian](https://github.com/openbrainsrc/Radian) however
+at the time of starting this Radian was not available as an OSS project.
 
-The first goal of this project is to create a simple reusable set of D3
-directives that are sufficiently complete to be able to put together flexible
-charts of nearly any type. It is also intended to be extensible by providing a
-d3ChartController similar to ngModelController so it is easy to create
-additional custom chart elements.
+The goals of AngularD3 are:
 
-This project is meant to provide enough flexibility to allow for anything d3 is
-capable of with no limitations, but still provide convenience, re-usability and
-declarative functionality. Essentially creating simple graphs should be simple
-yet doing complex customizable things should be possible.
+- Provide a simple declarative syntax for common D3 graphs and charts
+- An extensible core allowing for almost anything possible D3 to be expressed with a custom directive. You are able to both extend the existing chart visuals as well as create entirely new ones. One example might be adding special elements/labels that have their positions bound to data points based on the chart axes.
+- Designed the "Angular Way (tm)" using similar style to extensibility and directive communication used by Angular directives like form and input. AngularD3 provides a `d3Chart` directive which provides `d3ChartController` analagously to `ngFormController` 
+- 100% stylable via CSS, with some added D3 'sugar' like allowing the use of the built in color scales with pie charts or being able to bind to a color scale from data.
+- The ability to create custom directives that can both extend existing chart layouts as well as create new ones.
+
+The overall goal of this project is to create a basic set of D3
+directives that are sufficiently complete for flexible
+charts of most common types. To start: Bar, Line, Area, Pie, Arc. Additional 
+chart elements, can be added either to enhance existing chart types or to create 
+new ones simply by requiring `d3ChartController`.
+
+AngularD3 is designed to provide enough flexibility to allow you to extend it with
+custom directives to do anything you could conceive of with D3 with no limitations, but 
+still provide a convenient set of default functionality. Creating most simple graphs 
+should be built in, while unlimited customization is still possible with relative ease.
 
 If you have ideas and are interested in lending a hand, please open an issue,
 submit a pull request or just ping me
@@ -62,13 +70,13 @@ The directives are meant to be used to compost charts like so:
 ```
 
 The `d3-chart` directive will first append `<svg class="d3"><g></g></svg>` to
-itself and then each inner directives will attach their own d3 powered elements
-to that. The `d3ChartController` provides access to its `<g></g>` element via
+itself and then each inner directives will attach their own elements, using D3,
+from there. The `d3ChartController` provides access to its root `<g></g>` element via
 `getChart()` so that child directives can append themselves.
 
 The `d3-data` directive provides a way of declaratively binding data, but this
-is entirely optional and it simply is a convenient way to bind data to your
-current scope.
+is entirely optional and it simply is a convenient way to bind a CSV data from
+any url directly to your current scope.
 
 Documentation will be forthcoming as things develop but for now you will have
 to rely on a quick reading of the code.
@@ -103,7 +111,7 @@ sources and support D3's built in parsers for CSV, TSV, etc.
 - [ ] Mouse and touch overlay support
 - [ ] Scatter and Bubble plots
 - [ ] Bullet charts
-- [ ] Stacked area charts
+- [x] Stacked area charts
 
 If you have any other ideas for me, or feel like contributing to help add any
 of this missing functionality, I encourage you to submit a pull request.
