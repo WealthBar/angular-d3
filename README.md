@@ -107,3 +107,7 @@ sources and support D3's built in parsers for CSV, TSV, etc.
 
 If you have any other ideas for me, or feel like contributing to help add any
 of this missing functionality, I encourage you to submit a pull request.
+
+## License
+
+Angular-D3 is free software under the [MIT licence](http://opensource.org/licenses/MIT) and may be redistributed under the terms specified in the MIT-LICENSE file.
