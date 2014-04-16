@@ -370,7 +370,8 @@
       scope: true,
       controller: [
         '$scope', '$element', '$attrs', '$window', '$timeout', function($scope, $el, $attrs, $window, $timeout) {
-          var binding, chart, debounce, elements, scales, svg;
+          var binding, chart, debounce, elements, scales, svg,
+            _this = this;
           scales = $scope.scales = {};
           elements = $scope.elements = [];
           binding = $scope.binding = $attrs.data;
@@ -382,16 +383,16 @@
           };
           svg = d3.select($el[0]).append('svg').attr('class', "d3").attr("width", "100%").attr("height", "100%");
           this.width = function() {
-            return $el[0].scrollWidth;
+            return $el[0].offsetWidth;
           };
           this.height = function() {
-            return $el[0].scrollHeight;
+            return $el[0].offsetHeight;
           };
           this.innerWidth = function() {
-            return this.width() - this.margin.left - this.margin.right;
+            return _this.width() - _this.margin.left - _this.margin.right;
           };
           this.innerHeight = function() {
-            return this.height() - this.margin.top - this.margin.bottom;
+            return _this.height() - _this.margin.top - _this.margin.bottom;
           };
           chart = svg.append("g").attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
           this.getChart = function() {
