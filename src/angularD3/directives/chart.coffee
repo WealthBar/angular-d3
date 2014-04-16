@@ -12,10 +12,11 @@ angular.module('ad3').directive 'd3Chart', ->
       .attr("width", "100%")
       .attr("height", "100%")
 
-    @width = -> $el[0].scrollWidth
-    @height = -> $el[0].scrollHeight
-    @innerWidth = -> @width() - @margin.left - @margin.right
-    @innerHeight = -> @height() - @margin.top - @margin.bottom
+    # Used to calculated widths based on SVG margins
+    @width = -> $el[0].offsetWidth
+    @height = -> $el[0].offsetHeight
+    @innerWidth = => @width() - @margin.left - @margin.right
+    @innerHeight = => @height() - @margin.top - @margin.bottom
 
     chart = svg.append("g")
       .attr("transform", "translate(" + @margin.left + "," + @margin.top + ")")
