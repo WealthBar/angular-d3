@@ -1,4 +1,4 @@
-angular.module('ad3').directive 'd3Area', () ->
+angular.module('ad3').directive 'd3Area', ->
   defaults = -> {}
 
   restrict: 'E'
@@ -36,7 +36,9 @@ angular.module('ad3').directive 'd3Area', () ->
       columns = options.y if options.y?
       columns = scope.$eval(options.columns) if options.columns?
       return unless columns?
-      columns = columns.split(',').map((c) -> c.trim())
+      if angular.isString columns
+        columns = columns.split(',').map((c) -> c.trim())
+
       if columns.length is 1
         chart = chartController.getChart().select("path.area")
         unless chart[0][0]
@@ -56,7 +58,10 @@ angular.module('ad3').directive 'd3Area', () ->
         stackedData = stack(temp)
         charts = chartController.getChart().selectAll('.area-stacked')
         if charts[0].length is 0
-          charts = charts.data(stackedData).enter().append("path").attr("class", (d) -> "area area-stacked #{d.name}")
+          charts = charts.data(stackedData)
+            .enter()
+            .append("path")
+            .attr("class", (d) -> "area area-stacked #{d.name}")
         else
           charts = charts.data(stackedData)
         charts.transition()

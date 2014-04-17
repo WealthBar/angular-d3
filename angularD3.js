@@ -123,9 +123,11 @@
           if (columns == null) {
             return;
           }
-          columns = columns.split(',').map(function(c) {
-            return c.trim();
-          });
+          if (angular.isString(columns)) {
+            columns = columns.split(',').map(function(c) {
+              return c.trim();
+            });
+          }
           if (columns.length === 1) {
             chart = chartController.getChart().select("path.area");
             if (!chart[0][0]) {
