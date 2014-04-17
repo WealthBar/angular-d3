@@ -177,7 +177,7 @@
           }
         };
         if (options.columns != null) {
-          scope.$watch(options.columns, chartControlle.redraw(), true);
+          scope.$watch(options.columns, chartController.redraw(), true);
         }
         return chartController.registerElement({
           redraw: redraw
