@@ -39,7 +39,7 @@ angular.module('ad3').directive 'd3Chart', ->
           element.redraw(data)
       , $attrs.updateInterval or 200
     $window.addEventListener 'resize', @redraw
-    if options.watch is 'deep'
+    if $attrs.watch is 'deep'
       $scope.$watch binding, @redraw, true
     else
       $scope.$watch binding, @redraw

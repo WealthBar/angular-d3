@@ -432,7 +432,7 @@
             }, $attrs.updateInterval || 200);
           };
           $window.addEventListener('resize', this.redraw);
-          if (options.watch === 'deep') {
+          if ($attrs.watch === 'deep') {
             $scope.$watch(binding, this.redraw, true);
           } else {
             $scope.$watch(binding, this.redraw);
