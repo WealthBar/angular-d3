@@ -2,7 +2,8 @@ angular.module('ad3').directive 'd3Chart', ->
   restrict: 'EA'
   scope: true
 
-  controller: ['$scope', '$element', '$attrs', '$window', '$timeout', ($scope, $el, $attrs, $window, $timeout) ->
+  controller: ['$scope', '$element', '$attrs', '$window', '$timeout',
+  ($scope, $el, $attrs, $window, $timeout) ->
     scales = $scope.scales = {}
     elements = $scope.elements = []
     binding = $scope.binding = $attrs.data
@@ -21,7 +22,7 @@ angular.module('ad3').directive 'd3Chart', ->
     chart = svg.append("g")
       .attr("transform", "translate(" + @margin.left + "," + @margin.top + ")")
 
-    @getChart = () -> chart
+    @getChart = -> chart
     @addScale = (name, scale) -> scales[name] = scale
     @getScale = (name) -> scales[name].scale
     @registerElement = (el) -> elements.push el
@@ -38,7 +39,10 @@ angular.module('ad3').directive 'd3Chart', ->
           element.redraw(data)
       , $attrs.updateInterval or 200
     $window.addEventListener 'resize', @redraw
-    $scope.$watch binding, @redraw, true
+    if options.watch is 'deep'
+      $scope.$watch binding, @redraw, true
+    else
+      $scope.$watch binding, @redraw
 
     return
   ]
