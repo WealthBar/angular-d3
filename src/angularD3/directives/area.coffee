@@ -51,8 +51,8 @@ angular.module('ad3').directive 'd3Area', ->
         temp = for name in columns
           name: name
           values: for value in data
-            x: Number(value[options.x])
-            y: Number(value[name])
+            x: value[options.x]
+            y: value[name]
         stack = d3.layout.stack().values((d) -> d.values)
         stack.offset(options.offset) if options.offset?
         stackedData = stack(temp)

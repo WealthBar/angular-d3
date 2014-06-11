@@ -44,6 +44,12 @@ angular.module('ad3').directive 'd3Axis', ->
       format = d3.format(options.format)
       axis.tickFormat(format)
 
+    if options.timeFormat?
+      format = d3.time.format(options.timeFormat)
+      axis.tickFormat((value) ->
+        format(new Date(value))
+      )
+
     positionLabel = (label) ->
       if options.orientation is 'bottom'
         label.attr("x", "#{chartController.innerWidth() / 2}")
@@ -69,17 +75,17 @@ angular.module('ad3').directive 'd3Axis', ->
       .attr("class", "axis axis-#{options.orientation} axis-#{options.name}")
       .attr("transform", translation())
 
-    label = axisElement.append("text").attr("class", "axis-label").text(options.label) if options.label
+    if options.label
+      label = axisElement.append("text").attr("class", "axis-label").text(options.label)
 
     redraw = (data) ->
       return unless data? and data.length isnt 0
       scale.range(range())
       positionLabel(label.transition().duration(500)) if label
       if options.filter
-        filteredValues = $scope.$eval("#{options.filter}(data)", { data: data })
-        domainValues = (new Number(value) for value in filteredValues)
+        domainValues = $scope.$eval("#{options.filter}(data)", { data: data })
       else
-        domainValues = (new Number(datum[options.name]) for datum in data)
+        domainValues = (datum[options.name] for datum in data)
       if options.extent
         scale.domain d3.extent domainValues
       else

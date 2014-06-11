@@ -148,8 +148,8 @@
                     for (_j = 0, _len1 = data.length; _j < _len1; _j++) {
                       value = data[_j];
                       _results1.push({
-                        x: Number(value[options.x]),
-                        y: Number(value[name])
+                        x: value[options.x],
+                        y: value[name]
                       });
                     }
                     return _results1;
@@ -240,6 +240,12 @@
           format = d3.format(options.format);
           axis.tickFormat(format);
         }
+        if (options.timeFormat != null) {
+          format = d3.time.format(options.timeFormat);
+          axis.tickFormat(function(value) {
+            return format(new Date(value));
+          });
+        }
         positionLabel = function(label) {
           if (options.orientation === 'bottom') {
             return label.attr("x", "" + (chartController.innerWidth() / 2)).attr("dy", "" + chartController.margin.bottom).attr("style", "text-anchor: middle;");
@@ -256,7 +262,7 @@
           label = axisElement.append("text").attr("class", "axis-label").text(options.label);
         }
         redraw = function(data) {
-          var datum, domainValues, filteredValues, value;
+          var datum, domainValues;
           if (!((data != null) && data.length !== 0)) {
             return;
           }
@@ -265,25 +271,16 @@
             positionLabel(label.transition().duration(500));
           }
           if (options.filter) {
-            filteredValues = $scope.$eval("" + options.filter + "(data)", {
+            domainValues = $scope.$eval("" + options.filter + "(data)", {
               data: data
             });
-            domainValues = (function() {
-              var _i, _len, _results;
-              _results = [];
-              for (_i = 0, _len = filteredValues.length; _i < _len; _i++) {
-                value = filteredValues[_i];
-                _results.push(new Number(value));
-              }
-              return _results;
-            })();
           } else {
             domainValues = (function() {
               var _i, _len, _results;
               _results = [];
               for (_i = 0, _len = data.length; _i < _len; _i++) {
                 datum = data[_i];
-                _results.push(new Number(datum[options.name]));
+                _results.push(datum[options.name]);
               }
               return _results;
             })();

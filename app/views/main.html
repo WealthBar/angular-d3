@@ -6,12 +6,12 @@
     <h1>Basic Graphs</h1>
     <p>Basic line, area and bar charts can be composed together in the same chart.</p>
     <div d3-chart data="line" margin="{ top: 40, right: 60, bottom: 40, left: 60}">
-      <d3-axis name="year" label="Year" extent="true" orientation="bottom" ticks="5"></d3-axis>
+      <d3-axis name="date" label="Date" extent="true" orientation="bottom" ticks="5" time-format="%Y-%m-%d"></d3-axis>
       <d3-axis name="savings" label="Deposits" orientation="left" ticks="5"></d3-axis>
       <d3-axis name="total" label="Savings" orientation="right" ticks="5"></d3-axis>
-      <d3-line x="year" y="optimal" yscale="total"></d3-line>
-      <d3-area x="year" y="total"></d3-area>
-      <d3-bars x="year" y="savings"></d3-bars>
+      <d3-line x="date" y="optimal" yscale="total"></d3-line>
+      <d3-area x="date" y="total"></d3-area>
+      <d3-bars x="date" y="savings"></d3-bars>
     </div>
   </section>
 
@@ -19,9 +19,9 @@
     <h1>Stacked Areas</h1>
     <p>Area charts can be stacked by specifying multiple y propeties</p>
     <div data="line" d3-chart margin="{ top: 20, right: 80, bottom: 40, left: 20}">
-      <d3-axis name="year" label="Year" extent="true" orientation="bottom" ticks="5"></d3-axis>
+      <d3-axis name="date" label="Date" extent="true" orientation="bottom" ticks="5" time-format="%Y-%m-%d"></d3-axis>
       <d3-axis name="total" filter="stackedSum" label="Savings" orientation="right" ticks="5"></d3-axis>
-      <d3-area x="year" yscale="total" y="savings, total, optimal"></d3-area>
+      <d3-area x="date" yscale="total" y="savings, total, optimal"></d3-area>
     </div>
   </section>
 
