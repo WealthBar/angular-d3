@@ -1,39 +1,38 @@
 <div ng-controller="MainCtrl">
-  <d3-data src="data/data.csv" data="line" columns="year, savings, total, optimal"></d3-data>
-  <d3-data src="data/donutData.csv" data="pie" columns="age,population"></d3-data>
+  <d3-data src="data/data.csv" data="line" accessor="parseValues" callback="log"></d3-data>
+  <d3-data src="data/donutData.csv" data="pie" accessor="parseValues" callback="log"></d3-data>
 
   <section id="graphs" class="well">
     <h1>Basic Graphs</h1>
     <p>Basic line, area and bar charts can be composed together in the same chart.</p>
-    <div d3-chart="">
-      <d3-axis data="line" name="year" label="Year" extent="true" orientation="bottom" ticks="5"></d3-axis>
-      <d3-axis data="line" name="savings" label="Deposits" orientation="left" ticks="5"></d3-axis>
-      <d3-axis data="line" name="total" label="Savings" orientation="right" ticks="5"></d3-axis>
-      <d3-line data="line" x="year" y="optimal" yscale="total"></d3-line>
-      <d3-area data="line" x="year" y="total"></d3-area>
-      <d3-bars data="line" x="year" y="savings"></d3-bars>
+    <div d3-chart="" data="line" margin="{ top: 40, right: 60, bottom: 40, left: 60}">
+      <d3-axis name="date" label="Date" extent="true" orientation="bottom" ticks="5" time-format="%Y-%m-%d"></d3-axis>
+      <d3-axis name="savings" label="Deposits" orientation="left" ticks="5"></d3-axis>
+      <d3-axis name="total" label="Savings" orientation="right" ticks="5"></d3-axis>
+      <d3-line x="date" y="optimal" yscale="total"></d3-line>
+      <d3-area x="date" y="total"></d3-area>
+      <d3-bars x="date" y="savings"></d3-bars>
     </div>
   </section>
 
-  <section id="stacked-area" class="well">
+  <section id="stacked" class="well">
     <h1>Stacked Areas</h1>
     <p>Area charts can be stacked by specifying multiple y propeties</p>
-    <div d3-chart="">
-      <d3-axis data="line" name="year" label="Year" extent="true" orientation="bottom" ticks="5"></d3-axis>
-      <d3-axis data="stackedSum()" name="total" label="Savings" orientation="right" ticks="5"></d3-axis>
-      <d3-area data="line" x="year" yscale="total" y="savings, total, optimal"></d3-area>
+    <div data="line" d3-chart="" margin="{ top: 20, right: 80, bottom: 40, left: 20}">
+      <d3-axis name="date" label="Date" extent="true" orientation="bottom" ticks="5" time-format="%Y-%m-%d"></d3-axis>
+      <d3-axis name="total" filter="stackedSum" label="Savings" orientation="right" ticks="5"></d3-axis>
+      <d3-area x="date" yscale="total" y="savings, total, optimal"></d3-area>
     </div>
   </section>
 
   <section id="pie-charts" class="well">
     <h1>Pie and Donut Charts</h1>
-    <d3-data src="data/data.csv" data="line" columns="year, savings, total, optimal"></d3-data>
     <div class="row">
-      <div d3-chart="" height="320" class="col-md-6">
-        <d3-pie data="pie" value="age" amount="population"></d3-pie>
+      <div d3-chart="" data="pie" class="col-sm-6" margin="{left: 30, right: 30, bottom: 30, top: 30}">
+        <d3-pie label="age" value="population" colors="category20"></d3-pie>
       </div>
-      <div d3-chart="" height="320" class="col-md-6">
-        <d3-pie inner-radius="0.5" label-radius="0.8" data="pie" value="age" amount="population"></d3-pie>
+      <div d3-chart="" data="pie" class="col-sm-6" margin="{left: 30, right: 30, bottom: 30, top: 30}">
+        <d3-pie inner-radius="0.5" label-radius="0.8" label="age" value="population" colors="category20"></d3-pie>
       </div>
     </div>
   </section>
@@ -41,11 +40,11 @@
   <section id="arc-charts" class="well">
     <h1>Arc Charts</h1>
     <div class="row">
-      <div d3-chart="" height="320" class="col-md-6 simple-arc1">
-        <d3-arc inner-radius="0.5" data="{{ {percentVal:60, text:'60%'}  }}" label="text" amount="percentVal" transition="bounce" transition-duration="1000"></d3-arc>
+      <div d3-chart="" data="arcs.arc1" class="col-sm-6 simple-arc1" margin="{left: 30, right: 30, bottom: 30, top: 30}">
+        <d3-arc inner-radius="0.5" transition="bounce" transition-duration="1000"></d3-arc>
       </div>
-      <div d3-chart="" height="320" class="col-md-6 simple-arc2">
-        <d3-arc inner-radius="0.5" data="{{ {percentVal:90, text:'90%'}  }}" label="text" amount="percentVal"></d3-arc>
+      <div d3-chart="" data="arcs.arc2" class="col-sm-6 simple-arc2" margin="{left: 30, right: 30, bottom: 30, top: 30}">
+        <d3-arc inner-radius="0.5"></d3-arc>
       </div>
     </div>
   </section>

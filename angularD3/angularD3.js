@@ -15,52 +15,51 @@
         innerRadius: 0,
         labelRadius: 0,
         transition: "cubic-in-out",
-        transitionDuration: 1000
+        transitionDuration: 1000,
+        value: 'value',
+        label: 'label'
       };
     };
     return {
       restrict: 'E',
       require: '^d3Chart',
       link: function(scope, el, attrs, chartController) {
-        var arc, arcTween, center, chart, draw, height, innerRadius, labelArc, labelRadius, options, radius, width;
+        var arcLabel, arcPath, center, chart, innerRadius, labelRadius, options, redraw;
         options = angular.extend(defaults(), attrs);
         chart = chartController.getChart();
-        height = chartController.innerHeight();
-        width = chartController.innerWidth();
         innerRadius = parseFloat(options.innerRadius);
         labelRadius = parseFloat(options.labelRadius);
-        radius = Math.min(width, height) / 2;
-        arc = d3.svg.arc().outerRadius(radius).innerRadius(radius * innerRadius).startAngle(0).endAngle(function(d) {
-          return d.value / 100 * 2 * Math.PI;
-        });
-        labelArc = d3.svg.arc().outerRadius(radius * labelRadius).innerRadius(radius * labelRadius);
-        width = chartController.innerWidth();
-        height = chartController.innerHeight();
-        center = chartController.getChart().append("svg:g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
-        arcTween = function(b) {
-          var i;
-          i = d3.interpolate({
-            value: 0
-          }, b);
-          return function(t) {
-            return arc(i(t));
-          };
-        };
-        draw = function(data, old, scope) {
-          var path;
-          if (data == null) {
+        center = chartController.getChart().append("g").attr("class", "arc");
+        arcPath = center.append("path");
+        arcLabel = center.append("text").attr("class", "arc-label").attr("dy", "0.35em").style("text-anchor", "middle");
+        redraw = function(data) {
+          var arc, arcTween, labelArc, radius;
+          if (!((data != null) && data.length !== 0)) {
             return;
           }
-          path = center.selectAll("path").data([
-            {
-              "value": data[options.amount]
+          radius = Math.min(chartController.innerWidth(), chartController.innerHeight()) / 2;
+          center.attr("transform", "translate(" + radius + "," + radius + ")");
+          arc = d3.svg.arc().outerRadius(radius).innerRadius(radius * innerRadius).startAngle(0).endAngle(function(d) {
+            return d / 100 * 2 * Math.PI;
+          });
+          arcTween = function(d) {
+            var i;
+            if (this._current == null) {
+              this._current = 0;
             }
-          ]);
-          path.enter().append("path").attr("class", "arc").transition().ease(options.transition).duration(options.transitionDuration).attrTween("d", arcTween);
-          path.transition().ease(options.transition).duration(options.transitionDuration).attrTween("d", arcTween);
-          return path.enter().append("text").attr("dy", "0.35em").style("text-anchor", "middle").text(data[options.label]);
+            i = d3.interpolate(this._current, d);
+            this._current = d;
+            return function(t) {
+              return arc(i(t));
+            };
+          };
+          labelArc = d3.svg.arc().outerRadius(radius * labelRadius).innerRadius(radius * labelRadius);
+          arcPath.datum(data[options.value]).transition().ease(options.transition).duration(options.transitionDuration).attrTween("d", arcTween);
+          return arcLabel.text(data[options.label]);
         };
-        return scope.$watch(attrs.data, draw, true);
+        return chartController.registerElement({
+          redraw: redraw
+        });
       }
     };
   });
@@ -72,43 +71,69 @@
   angular.module('ad3').directive('d3Area', function() {
     var defaults;
     defaults = function() {
-      return {
-        x: 0,
-        y: 1
-      };
+      return {};
     };
     return {
       restrict: 'E',
       require: '^d3Chart',
       link: function(scope, el, attrs, chartController) {
-        var area, areaStacked, areaStart, draw, height, options, x, y;
+        var area, areaStacked, height, options, redraw, x, y;
         options = angular.extend(defaults(), attrs);
         x = chartController.getScale(options.xscale || options.x);
         y = chartController.getScale(options.yscale || options.y);
         height = chartController.innerHeight();
-        areaStart = d3.svg.area().x(function(d) {
-          return x(d[options.x]);
-        }).y0(height).y1(height);
-        area = d3.svg.area().x(function(d) {
-          return x(d[options.x]);
-        }).y0(height).y1(function(d) {
-          return y(d[options.y]);
-        });
-        areaStacked = d3.svg.area().x(function(d) {
-          return x(d.x);
-        }).y0(function(d) {
-          return y(d.y0);
-        }).y1(function(d) {
-          return y(d.y + d.y0);
-        });
-        draw = function(data) {
-          var columns, name, stack, stackedData, temp, value;
+        if (options.vertical) {
+          area = d3.svg.area().y(function(d) {
+            return x(d[options.x]);
+          }).x0(0).x1(function(d) {
+            return y(d[options.y]);
+          });
+          areaStacked = d3.svg.area().y(function(d) {
+            return x(d.x);
+          }).x0(function(d) {
+            return y(d.y0);
+          }).x1(function(d) {
+            return y(d.y + d.y0);
+          });
+        } else {
+          area = d3.svg.area().x(function(d) {
+            return x(d[options.x]);
+          }).y0(height).y1(function(d) {
+            return y(d[options.y]);
+          });
+          areaStacked = d3.svg.area().x(function(d) {
+            return x(d.x);
+          }).y0(function(d) {
+            return y(d.y0);
+          }).y1(function(d) {
+            return y(d.y + d.y0);
+          });
+        }
+        redraw = function(data) {
+          var chart, charts, columns, name, stack, stackedData, temp, value;
           if (!((data != null) && data.length !== 0)) {
             return;
           }
-          columns = options.y.split(',');
+          if (options.y != null) {
+            columns = options.y;
+          }
+          if (options.columns != null) {
+            columns = scope.$eval(options.columns);
+          }
+          if (columns == null) {
+            return;
+          }
+          if (angular.isString(columns)) {
+            columns = columns.split(',').map(function(c) {
+              return c.trim();
+            });
+          }
           if (columns.length === 1) {
-            return chartController.getChart().append("path").attr("class", "area").datum(data).attr("d", areaStart).transition().duration(500).attr("d", area);
+            chart = chartController.getChart().select("path.area");
+            if (!chart[0][0]) {
+              chart = chartController.getChart().append("path").attr("class", "area");
+            }
+            return chart.datum(data).transition().duration(500).attr("d", area);
           } else {
             temp = (function() {
               var _i, _len, _results;
@@ -123,8 +148,8 @@
                     for (_j = 0, _len1 = data.length; _j < _len1; _j++) {
                       value = data[_j];
                       _results1.push({
-                        x: Number(value[options.x]),
-                        y: Number(value[name.trim()])
+                        x: value[options.x],
+                        y: value[name]
                       });
                     }
                     return _results1;
@@ -140,14 +165,25 @@
               stack.offset(options.offset);
             }
             stackedData = stack(temp);
-            return chartController.getChart().selectAll('.area-stacked').data(stackedData).enter().append("path").attr("class", function(d) {
-              return "area area-stacked " + d.name;
-            }).attr("d", function(d) {
+            charts = chartController.getChart().selectAll('.area-stacked');
+            if (charts[0].length === 0) {
+              charts = charts.data(stackedData).enter().append("path").attr("class", function(d) {
+                return "area area-stacked " + d.name;
+              });
+            } else {
+              charts = charts.data(stackedData);
+            }
+            return charts.transition().duration(500).attr("d", function(d) {
               return areaStacked(d.values);
             });
           }
         };
-        return scope.$watch(attrs.data, draw, true);
+        if (options.columns != null) {
+          scope.$watch(options.columns, chartController.redraw(), true);
+        }
+        return chartController.registerElement({
+          redraw: redraw
+        });
       }
     };
   });
@@ -161,9 +197,7 @@
     defaults = function() {
       return {
         orientation: 'bottom',
-        label: 'axis',
         ticks: '5',
-        format: null,
         extent: false
       };
     };
@@ -171,14 +205,22 @@
       priority: 1,
       restrict: 'E',
       require: '^d3Chart',
-      link: function(scope, el, attrs, chartController) {
-        var axis, format, label, options, positionLabel, range, scale, translation, update, xAxis;
-        options = angular.extend(defaults(), attrs);
+      link: function($scope, $el, $attrs, chartController) {
+        var axis, axisElement, format, label, options, positionLabel, range, redraw, scale, translation;
+        options = angular.extend(defaults(), $attrs);
         range = function() {
           if (options.orientation === 'top' || options.orientation === 'bottom') {
-            return [0, chartController.innerWidth()];
+            if (options.reverse != null) {
+              return [chartController.innerWidth(), 0];
+            } else {
+              return [0, chartController.innerWidth()];
+            }
           } else {
-            return [chartController.innerHeight(), 0];
+            if (options.reverse != null) {
+              return [0, chartController.innerHeight()];
+            } else {
+              return [chartController.innerHeight(), 0];
+            }
           }
         };
         translation = function() {
@@ -193,51 +235,69 @@
           }
         };
         scale = d3.scale.linear();
-        scale.range(range());
-        chartController.addScale(options.name, scale);
-        update = function(data) {
+        axis = d3.svg.axis().scale(scale).orient(options.orientation).ticks(options.ticks);
+        if (options.format != null) {
+          format = d3.format(options.format);
+          axis.tickFormat(format);
+        }
+        if (options.timeFormat != null) {
+          format = d3.time.format(options.timeFormat);
+          axis.tickFormat(function(value) {
+            return format(new Date(value));
+          });
+        }
+        positionLabel = function(label) {
+          if (options.orientation === 'bottom') {
+            return label.attr("x", "" + (chartController.innerWidth() / 2)).attr("dy", "" + chartController.margin.bottom).attr("style", "text-anchor: middle;");
+          } else if (options.orientation === 'top') {
+            return label.attr("x", "" + (chartController.innerWidth() / 2)).attr("dy", "" + (-chartController.margin.top)).attr("style", "text-anchor: middle;");
+          } else if (options.orientation === 'left') {
+            return label.attr("x", "-" + (chartController.innerHeight() / 2)).attr("y", "" + (-chartController.margin.left + 18)).attr("style", "text-anchor: middle;").attr("transform", "rotate(-90)");
+          } else if (options.orientation === 'right') {
+            return label.attr("x", "" + (chartController.innerHeight() / 2)).attr("dy", "" + (-chartController.margin.right + 18)).attr("style", "text-anchor: middle;").attr("transform", "rotate(90)");
+          }
+        };
+        axisElement = chartController.getChart().append("g").attr("class", "axis axis-" + options.orientation + " axis-" + options.name).attr("transform", translation());
+        if (options.label) {
+          label = axisElement.append("text").attr("class", "axis-label").text(options.label);
+        }
+        redraw = function(data) {
           var datum, domainValues;
-          if (data == null) {
+          if (!((data != null) && data.length !== 0)) {
             return;
           }
-          domainValues = (function() {
-            var _i, _len, _results;
-            _results = [];
-            for (_i = 0, _len = data.length; _i < _len; _i++) {
-              datum = data[_i];
-              _results.push(new Number(datum[options.name]));
-            }
-            return _results;
-          })();
+          scale.range(range());
+          if (label) {
+            positionLabel(label.transition().duration(500));
+          }
+          if (options.filter) {
+            domainValues = $scope.$eval("" + options.filter + "(data)", {
+              data: data
+            });
+          } else {
+            domainValues = (function() {
+              var _i, _len, _results;
+              _results = [];
+              for (_i = 0, _len = data.length; _i < _len; _i++) {
+                datum = data[_i];
+                _results.push(datum[options.name]);
+              }
+              return _results;
+            })();
+          }
           if (options.extent) {
             scale.domain(d3.extent(domainValues));
           } else {
             scale.domain([0, d3.max(domainValues)]);
           }
-          axis.call(xAxis);
-          axis.selectAll('line').attr("style", "fill: none; stroke-width: 2px; stroke: #303030;");
-          return axis.selectAll('path').attr("style", "fill: none; stroke-width: 2px; stroke: #303030;");
+          axisElement.transition().duration(500).attr("transform", translation()).call(axis);
+          axisElement.selectAll('line').attr("style", "fill: none; stroke-width: 2px; stroke: #303030;");
+          return axisElement.selectAll('path').attr("style", "fill: none; stroke-width: 2px; stroke: #303030;");
         };
-        scope.$watch(options.data, update, true);
-        xAxis = d3.svg.axis().scale(scale).orient(options.orientation).ticks(options.ticks);
-        if (options.format) {
-          format = d3.format(options.format);
-          xAxis.tickFormat(format);
-        }
-        axis = chartController.getChart().append("g").attr("class", "axis axis-" + options.orientation).attr("transform", translation());
-        positionLabel = function(label) {
-          if (options.orientation === 'bottom') {
-            return label.attr("x", "" + (chartController.innerWidth() / 2)).attr("dy", "2.5em").attr("style", "text-anchor: middle;");
-          } else if (options.orientation === 'top') {
-            return label.attr("x", "" + (chartController.innerWidth() / 2)).attr("dy", "-1.5em").attr("style", "text-anchor: middle;");
-          } else if (options.orientation === 'left') {
-            return label.attr("dy", "-2.5em").attr("x", "-" + (chartController.innerHeight() / 2)).attr("style", "text-anchor: middle;").attr("transform", "rotate(-90)");
-          } else if (options.orientation === 'right') {
-            return label.attr("dy", "-2.5em").attr("x", "" + (chartController.innerHeight() / 2)).attr("style", "text-anchor: middle;").attr("transform", "rotate(90)");
-          }
-        };
-        label = axis.append("text").attr("class", "axis-label").text(options.label);
-        return positionLabel(label);
+        return chartController.addScale(options.name, {
+          scale: scale,
+          redraw: redraw
+        });
       }
     };
   });
@@ -259,16 +319,16 @@
       restrict: 'E',
       require: '^d3Chart',
       link: function(scope, el, attrs, chartController) {
-        var chart, draw, height, options, width, x, y;
+        var chart, height, options, redraw, width, x, y;
         options = angular.extend(defaults(), attrs);
         x = chartController.getScale(options.xscale || options.x);
         y = chartController.getScale(options.yscale || options.y);
         chart = chartController.getChart();
         height = chartController.innerHeight();
         width = options.width;
-        draw = function(data, old, scope) {
+        redraw = function(data) {
           var bars;
-          if (data == null) {
+          if (!((data != null) && data.length !== 0)) {
             return;
           }
           bars = chart.selectAll("rect.bar").data(data);
@@ -292,7 +352,9 @@
             return height - y(d[options.y]);
           });
         };
-        return scope.$watch(attrs.data, draw, true);
+        return chartController.registerElement({
+          redraw: redraw
+        });
       }
     };
   });
@@ -302,49 +364,76 @@
 //@ sourceMappingURL=chart.map
 (function() {
   angular.module('ad3').directive('d3Chart', function() {
-    var defaults;
-    defaults = function() {
-      return {
-        width: '100%',
-        height: '480'
-      };
-    };
     return {
       restrict: 'EA',
+      scope: true,
       controller: [
-        '$scope', '$element', '$attrs', function(scope, el, attrs) {
-          var chart, margin, options, scales, svg;
-          options = angular.extend(defaults(), attrs);
-          margin = {
-            top: 40,
-            right: 60,
-            bottom: 40,
-            left: 60
+        '$scope', '$element', '$attrs', '$window', '$timeout', function($scope, $el, $attrs, $window, $timeout) {
+          var binding, chart, debounce, elements, scales, svg,
+            _this = this;
+          scales = $scope.scales = {};
+          elements = $scope.elements = [];
+          binding = $scope.binding = $attrs.data;
+          this.margin = $scope.$eval($attrs.margin) || {
+            top: 10,
+            right: 10,
+            bottom: 10,
+            left: 10
           };
-          svg = d3.select(el[0]).append('svg').attr('class', "d3").attr("width", options.width).attr("height", options.height);
-          chart = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+          svg = d3.select($el[0]).append('svg').attr('class', "d3").attr("width", "100%").attr("height", "100%");
           this.width = function() {
-            return svg[0][0].offsetWidth;
+            return $el[0].offsetWidth;
           };
           this.height = function() {
-            return svg[0][0].offsetHeight;
+            return $el[0].offsetHeight;
           };
           this.innerWidth = function() {
-            return this.width() - margin.left - margin.right;
+            return _this.width() - _this.margin.left - _this.margin.right;
           };
           this.innerHeight = function() {
-            return this.height() - margin.top - margin.bottom;
+            return _this.height() - _this.margin.top - _this.margin.bottom;
           };
+          chart = svg.append("g").attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
           this.getChart = function() {
             return chart;
           };
-          scales = {};
           this.addScale = function(name, scale) {
             return scales[name] = scale;
           };
           this.getScale = function(name) {
-            return scales[name];
+            return scales[name].scale;
           };
+          this.registerElement = function(el) {
+            return elements.push(el);
+          };
+          debounce = null;
+          this.redraw = function() {
+            var _this = this;
+            if (debounce) {
+              return;
+            }
+            return debounce = $timeout(function() {
+              var data, element, name, scale, _i, _len, _results;
+              debounce = null;
+              data = $scope.$eval(binding);
+              for (name in scales) {
+                scale = scales[name];
+                scale.redraw(data);
+              }
+              _results = [];
+              for (_i = 0, _len = elements.length; _i < _len; _i++) {
+                element = elements[_i];
+                _results.push(element.redraw(data));
+              }
+              return _results;
+            }, $attrs.updateInterval || 200);
+          };
+          $window.addEventListener('resize', this.redraw);
+          if ($attrs.watch === 'deep') {
+            $scope.$watch(binding, this.redraw, true);
+          } else {
+            $scope.$watch(binding, this.redraw);
+          }
         }
       ]
     };
@@ -360,11 +449,20 @@
         restrict: 'E',
         scope: false,
         link: function(scope, el, attrs) {
-          var binding, src;
+          var accessor, binding, callback, src;
           src = attrs.src;
           binding = attrs.data;
-          scope[binding] = d3.csv(src, attrs.columns.split(','));
-          return console.log('data loaded');
+          if (attrs.accessor) {
+            accessor = scope.$eval(attrs.accessor);
+          }
+          if (attrs.callback) {
+            callback = scope.$eval(attrs.callback);
+          }
+          return d3.csv(src, accessor, callback).then(function(rows) {
+            return scope[binding] = rows;
+          }, function() {
+            throw 'Error loading CSV via D3';
+          });
         }
       };
     }
@@ -386,26 +484,26 @@
       restrict: 'E',
       require: '^d3Chart',
       link: function(scope, el, attrs, chartController) {
-        var draw, height, line, lineStart, options, x, y;
+        var height, line, linePath, options, redraw, x, y;
         options = angular.extend(defaults(), attrs);
         x = chartController.getScale(options.xscale || options.x);
         y = chartController.getScale(options.yscale || options.y);
         height = chartController.innerHeight();
-        lineStart = d3.svg.line().x(function(d) {
-          return x(d[options.x]);
-        }).y(height);
         line = d3.svg.line().x(function(d) {
           return x(d[options.x]);
         }).y(function(d) {
           return y(d[options.y]);
         });
-        draw = function(data, old, scope) {
-          if (data == null) {
+        linePath = chartController.getChart().append("path").attr("class", "line line-" + (options.name || options.y)).style("fill", "none").style("stroke", options.stroke);
+        redraw = function(data) {
+          if (!((data != null) && data.length !== 0)) {
             return;
           }
-          return chartController.getChart().append("path").attr("class", "line").datum(data).attr("d", lineStart).transition().duration(500).attr("d", line);
+          return linePath.datum(data).transition().duration(500).attr("d", line);
         };
-        return scope.$watch(attrs.data, draw, true);
+        return chartController.registerElement({
+          redraw: redraw
+        });
       }
     };
   });
@@ -421,53 +519,125 @@
         x: 0,
         y: 1,
         innerRadius: 0,
-        labelRadius: 0.7
+        labelRadius: 0.7,
+        transition: "cubic-in-out",
+        transitionDuration: 800,
+        minOffset: 12,
+        value: 'value'
       };
     };
     return {
       restrict: 'E',
       require: '^d3Chart',
       link: function(scope, el, attrs, chartController) {
-        var arc, center, chart, draw, height, innerRadius, labelArc, labelRadius, options, pie, radius, width;
+        var center, chart, colorScale, innerRadius, labelRadius, options, pie, redraw, _current;
         options = angular.extend(defaults(), attrs);
         chart = chartController.getChart();
-        height = chartController.innerHeight();
-        width = chartController.innerWidth();
         innerRadius = parseFloat(options.innerRadius);
         labelRadius = parseFloat(options.labelRadius);
-        radius = Math.min(width, height) / 2;
-        arc = d3.svg.arc().outerRadius(radius).innerRadius(radius * innerRadius);
-        labelArc = d3.svg.arc().outerRadius(radius * labelRadius).innerRadius(radius * labelRadius);
+        if (attrs.colors) {
+          colorScale = (function() {
+            switch (attrs.colors) {
+              case 'category20':
+                return d3.scale.category20();
+              case 'category20b':
+                return d3.scale.category20b();
+              case 'category20c':
+                return d3.scale.category20c();
+            }
+          })();
+        }
         pie = d3.layout.pie().sort(null).value(function(d) {
-          return d[options.amount];
+          return d[options.value];
         });
-        width = chartController.innerWidth();
-        height = chartController.innerHeight();
-        center = chartController.getChart().append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
-        draw = function(data, old, scope) {
-          var datum, g, reversedDataMap, _fn, _i, _len;
-          if (data == null) {
+        center = chartController.getChart().append("g").attr("class", "pie");
+        _current = null;
+        redraw = function(data) {
+          var arc, arcTween, getPosition, label, labelArc, padding, prevbb, radius, slice;
+          if (!((data != null) && data.length !== 0)) {
             return;
           }
-          reversedDataMap = {};
-          _fn = function(datum) {
-            return reversedDataMap[datum[options.amount]] = datum[options.value];
+          radius = Math.min(chartController.innerWidth(), chartController.innerHeight()) / 2;
+          center.attr("transform", "translate(" + radius + "," + radius + ")");
+          arc = d3.svg.arc().outerRadius(radius).innerRadius(radius * innerRadius);
+          arcTween = function(a) {
+            var i;
+            i = d3.interpolate(this._current, a);
+            this._current = i(0);
+            return function(t) {
+              return arc(i(t));
+            };
           };
-          for (_i = 0, _len = data.length; _i < _len; _i++) {
-            datum = data[_i];
-            _fn(datum);
+          labelArc = d3.svg.arc().outerRadius(radius * labelRadius).innerRadius(radius * labelRadius);
+          slice = center.selectAll(".pie").data(pie(data));
+          slice.enter().append("path").attr("class", function(d, i) {
+            return "pie pie-" + i;
+          }).attr("d", arc).each(function(d) {
+            return this._current = d;
+          });
+          if (attrs.colors) {
+            slice.style('fill', function(d, i) {
+              if (colorScale) {
+                return colorScale(i);
+              } else {
+                return d[attrs.color];
+              }
+            });
           }
-          g = center.selectAll(".arc").data(pie(data)).enter().append("g").attr("class", function(d, i) {
-            return "arc arc-" + i;
-          });
-          g.append("path").attr("d", arc);
-          return g.append("text").attr("transform", function(d) {
-            return "translate(" + labelArc.centroid(d) + ")";
-          }).attr("dy", "0.35em").style("text-anchor", "middle").text(function(d) {
-            return reversedDataMap[d.value];
-          });
+          slice.exit().remove();
+          slice.transition().ease(options.transition).duration(options.transitionDuration).attrTween("d", arcTween);
+          if (options.label) {
+            prevbb = null;
+            padding = +options.minOffset;
+            getPosition = function(d, i) {
+              var cpx, cpy, ctx, cty, offset, offsetArc, position, relativePosition, thisbb;
+              position = labelArc.centroid(d);
+              if (options.avoidCollisions) {
+                relativePosition = [position[0], position[1]];
+                if (this._position) {
+                  relativePosition[0] -= this._position[0];
+                  relativePosition[1] -= this._position[1];
+                }
+                thisbb = _.transform(this.getBoundingClientRect(), function(r, v, k) {
+                  switch (k) {
+                    case 'left':
+                      return r[k] = v - padding + relativePosition[0];
+                    case 'top':
+                      return r[k] = v - padding + relativePosition[1];
+                    case 'right':
+                      return r[k] = v + padding + relativePosition[0];
+                    case 'bottom':
+                      return r[k] = v + padding + relativePosition[1];
+                  }
+                });
+                if (prevbb && !(thisbb.right < prevbb.left || thisbb.left > prevbb.right || thisbb.bottom < prevbb.top || thisbb.top > prevbb.bottom)) {
+                  ctx = thisbb.left + (thisbb.right - thisbb.left) / 2;
+                  cty = thisbb.top + (thisbb.bottom - thisbb.top) / 2;
+                  cpx = prevbb.left + (prevbb.right - prevbb.left) / 2;
+                  cpy = prevbb.top + (prevbb.bottom - prevbb.top) / 2;
+                  offset = Math.sqrt(Math.pow(ctx - cpx, 2) + Math.pow(cty - cpy, 2)) / 2;
+                  offsetArc = d3.svg.arc().outerRadius(radius * labelRadius + offset).innerRadius(radius * labelRadius + offset);
+                  position = offsetArc.centroid(d);
+                }
+                this._position = position;
+                prevbb = thisbb;
+              }
+              return "translate(" + position + ")";
+            };
+            label = center.selectAll("text").data(pie(data));
+            label.enter().append("text").style("text-anchor", "middle").attr("class", function(d, i) {
+              return "pie-label pie-label-" + i;
+            });
+            label.exit().remove();
+            label.text(function(d, i) {
+              return data[i][options.label];
+            });
+            return label.transition().ease(options.transition).duration(options.transitionDuration).attr("transform", getPosition);
+          }
         };
-        return scope.$watch(attrs.data, draw, true);
+        return chartController.registerElement({
+          redraw: redraw
+        });
       }
     };
   });
@@ -480,35 +650,34 @@
     var defaults;
     defaults = this.defaults = {};
     this.$get = [
-      '$cacheFactory', '$rootScope', function($cacheFactory, $rootScope) {
+      '$cacheFactory', '$rootScope', '$q', function($cacheFactory, $rootScope, $q) {
         var cache;
         cache = defaults.cache || $cacheFactory('d3Service');
         return {
-          csv: function(src, columns) {
-            var results;
-            results = cache.get(src);
-            if (results) {
-              return results;
+          csv: function(src, accessor, callback) {
+            var cached, deferred;
+            deferred = $q.defer();
+            cached = cache.get(src);
+            if (cached) {
+              if (callback) {
+                callback(rows);
+              }
+              deferred.resolve(cached);
             }
-            cache.put(src, results = []);
-            d3.csv(src, function(row) {
-              var datum, name, _i, _len;
-              datum = {};
-              for (_i = 0, _len = columns.length; _i < _len; _i++) {
-                name = columns[_i];
-                name = name.trim();
-                datum[name] = row[name];
-              }
-              return datum;
-            }, function(error, rows) {
-              if (error != null) {
-                return cache.remove(src);
-              } else {
-                results.push.apply(results, rows);
-                return $rootScope.$apply();
-              }
+            d3.csv(src, accessor, function(rows) {
+              return $rootScope.$apply(function() {
+                if (callback) {
+                  callback(rows);
+                }
+                if (rows) {
+                  cache.put(src, rows);
+                  return deferred.resolve(rows);
+                } else {
+                  return deferred.reject();
+                }
+              });
             });
-            return results;
+            return deferred.promise;
           }
         };
       }
