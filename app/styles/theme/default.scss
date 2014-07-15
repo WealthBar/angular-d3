@@ -7,9 +7,14 @@ $black: #222a2b;
 /* Axis */
 
 .d3 .axis {
-  line { fill: none; stroke-width: 2px; stroke: $black; }
-  path { fill: none; stroke-width: 2px; stroke: $black; }
-  text { fill: $black };
+  line { fill: none; stroke-width: 1px; stroke: $black; }
+  path { fill: none; stroke-width: 1px; stroke: $black; }
+  text { fill: $black; }
+}
+
+.d3 .grid {
+  line { fill: none; stroke-width: 1px; stroke: grey; }
+  text { display: none; }
 }
 
 /* Area Chart */

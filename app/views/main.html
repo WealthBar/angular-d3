@@ -19,8 +19,8 @@
     <h1>Stacked Areas</h1>
     <p>Area charts can be stacked by specifying multiple y propeties</p>
     <div data="line" d3-chart margin="{ top: 20, right: 80, bottom: 40, left: 20}">
-      <d3-axis name="date" label="Date" extent="true" orientation="bottom" ticks="5" time-format="%Y-%m-%d"></d3-axis>
-      <d3-axis name="total" filter="stackedSum" label="Savings" orientation="right" ticks="5"></d3-axis>
+      <d3-axis grid="true" name="date" label="Date" extent="true" orientation="bottom" ticks="5" time-format="%Y-%m-%d"></d3-axis>
+      <d3-axis grid="true" name="total" filter="stackedSum" label="Savings" orientation="right" ticks="5"></d3-axis>
       <d3-area x="date" yscale="total" y="savings, total, optimal"></d3-area>
     </div>
   </section>

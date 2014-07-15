@@ -206,7 +206,7 @@
       restrict: 'E',
       require: '^d3Chart',
       link: function($scope, $el, $attrs, chartController) {
-        var axis, axisElement, format, label, options, positionLabel, range, redraw, scale, translation;
+        var axis, axisElement, drawGrid, format, grid, label, options, positionLabel, range, redraw, scale, translation;
         options = angular.extend(defaults(), $attrs);
         range = function() {
           if (options.orientation === 'top' || options.orientation === 'bottom') {
@@ -257,9 +257,23 @@
             return label.attr("x", "" + (chartController.innerHeight() / 2)).attr("dy", "" + (-chartController.margin.right + 18)).attr("style", "text-anchor: middle;").attr("transform", "rotate(90)");
           }
         };
+        drawGrid = function(grid, axis) {
+          if (options.orientation === 'bottom') {
+            return grid.call(axis.tickSize(chartController.innerHeight(), 0, 0).tickFormat(''));
+          } else if (options.orientation === 'top') {
+            return grid.attr("transform", "translate(0, " + (chartController.innerHeight()) + ")").call(axis.tickSize(chartController.innerHeight(), 0, 0).tickFormat(''));
+          } else if (options.orientation === 'left') {
+            return grid.attr("transform", "translate(" + (chartController.innerWidth()) + ", 0)").call(axis.tickSize(chartController.innerWidth(), 0, 0).tickFormat(''));
+          } else if (options.orientation === 'right') {
+            return grid.call(axis.tickSize(chartController.innerWidth(), 0, 0).tickFormat(''));
+          }
+        };
         axisElement = chartController.getChart().append("g").attr("class", "axis axis-" + options.orientation + " axis-" + options.name).attr("transform", translation());
         if (options.label) {
           label = axisElement.append("text").attr("class", "axis-label").text(options.label);
+        }
+        if (options.grid) {
+          grid = chartController.getChart().append("g").attr("class", "grid");
         }
         redraw = function(data) {
           var datum, domainValues;
@@ -287,12 +301,15 @@
           }
           if (options.extent) {
             scale.domain(d3.extent(domainValues));
+          } else if (options.domain) {
+            scale.domain([0, d3.max(domainValues)]);
           } else {
             scale.domain([0, d3.max(domainValues)]);
           }
           axisElement.transition().duration(500).attr("transform", translation()).call(axis);
-          axisElement.selectAll('line').attr("style", "fill: none; stroke-width: 2px; stroke: #303030;");
-          return axisElement.selectAll('path').attr("style", "fill: none; stroke-width: 2px; stroke: #303030;");
+          if (grid != null) {
+            return drawGrid(grid.transition().duration(500), axis);
+          }
         };
         return chartController.addScale(options.name, {
           scale: scale,

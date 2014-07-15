@@ -70,6 +70,26 @@ angular.module('ad3').directive 'd3Axis', ->
           .attr("style", "text-anchor: middle;")
           .attr("transform", "rotate(90)")
 
+    drawGrid = (grid, axis) ->
+      if options.orientation is 'bottom'
+        grid.call(axis.tickSize(chartController.innerHeight(), 0, 0)
+          .tickFormat('')
+        )
+      else if options.orientation is 'top'
+        grid.attr("transform", "translate(0, #{chartController.innerHeight()})")
+          .call(axis.tickSize(chartController.innerHeight(), 0, 0)
+          .tickFormat('')
+        )
+      else if options.orientation is 'left'
+        grid.attr("transform", "translate(#{chartController.innerWidth()}, 0)")
+          .call(axis.tickSize(chartController.innerWidth(), 0, 0)
+          .tickFormat('')
+        )
+      else if options.orientation is 'right'
+        grid.call(axis.tickSize(chartController.innerWidth(), 0, 0)
+          .tickFormat('')
+        )
+
     # Append x-axis to chart
     axisElement = chartController.getChart().append("g")
       .attr("class", "axis axis-#{options.orientation} axis-#{options.name}")
@@ -77,6 +97,9 @@ angular.module('ad3').directive 'd3Axis', ->
 
     if options.label
       label = axisElement.append("text").attr("class", "axis-label").text(options.label)
+
+    if options.grid
+      grid = chartController.getChart().append("g").attr("class", "grid")
 
     redraw = (data) ->
       return unless data? and data.length isnt 0
@@ -88,12 +111,13 @@ angular.module('ad3').directive 'd3Axis', ->
         domainValues = (datum[options.name] for datum in data)
       if options.extent
         scale.domain d3.extent domainValues
+      else if options.domain
+        scale.domain [0, d3.max domainValues]
       else
         scale.domain [0, d3.max domainValues]
       axisElement.transition().duration(500)
         .attr("transform", translation())
         .call(axis)
-      axisElement.selectAll('line').attr("style", "fill: none; stroke-width: 2px; stroke: #303030;")
-      axisElement.selectAll('path').attr("style", "fill: none; stroke-width: 2px; stroke: #303030;")
+      drawGrid(grid.transition().duration(500), axis) if grid?
 
     chartController.addScale(options.name, { scale: scale, redraw: redraw })
