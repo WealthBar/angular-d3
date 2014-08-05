@@ -77,11 +77,10 @@
       restrict: 'E',
       require: '^d3Chart',
       link: function(scope, el, attrs, chartController) {
-        var area, areaStacked, height, options, redraw, x, y;
+        var area, areaStacked, options, redraw, x, y;
         options = angular.extend(defaults(), attrs);
         x = chartController.getScale(options.xscale || options.x);
         y = chartController.getScale(options.yscale || options.y);
-        height = chartController.innerHeight();
         if (options.vertical) {
           area = d3.svg.area().y(function(d) {
             return x(d[options.x]);
@@ -98,7 +97,7 @@
         } else {
           area = d3.svg.area().x(function(d) {
             return x(d[options.x]);
-          }).y0(height).y1(function(d) {
+          }).y0(chartController.innerHeight).y1(function(d) {
             return y(d[options.y]);
           });
           areaStacked = d3.svg.area().x(function(d) {

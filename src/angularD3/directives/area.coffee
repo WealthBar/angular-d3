@@ -10,7 +10,6 @@ angular.module('ad3').directive 'd3Area', ->
     options = angular.extend(defaults(), attrs)
     x = chartController.getScale(options.xscale or options.x)
     y = chartController.getScale(options.yscale or options.y)
-    height = chartController.innerHeight()
 
     if options.vertical
       area = d3.svg.area()
@@ -24,7 +23,7 @@ angular.module('ad3').directive 'd3Area', ->
     else
       area = d3.svg.area()
         .x((d) -> x(d[options.x]))
-        .y0(height)
+        .y0(chartController.innerHeight)
         .y1((d) -> y(d[options.y]))
       areaStacked = d3.svg.area()
         .x((d) -> x(d.x))
