@@ -38,34 +38,25 @@ angular.module('ad3').directive 'd3Area', ->
       if angular.isString columns
         columns = columns.split(',').map((c) -> c.trim())
 
-      if columns.length is 1
-        chart = chartController.getChart().select("path.area")
-        unless chart[0][0]
-          chart = chartController.getChart().append("path").attr("class", "area")
-        chart.datum(data)
-          .transition()
-          .duration(500)
-          .attr("d", area)
+      mappedData = for name in columns
+        name: name
+        values: for value in data
+          x: value[options.x]
+          y: value[name]
+      stack = d3.layout.stack().values((d) -> d.values)
+      stack.offset(options.offset) if options.offset?
+      stackedData = stack(mappedData)
+      charts = chartController.getChart().selectAll('.area-stacked')
+      if charts[0].length is 0
+        charts = charts.data(stackedData)
+          .enter()
+          .append("path")
+          .attr("class", (d) -> "area area-stacked #{d.name}")
       else
-        temp = for name in columns
-          name: name
-          values: for value in data
-            x: value[options.x]
-            y: value[name]
-        stack = d3.layout.stack().values((d) -> d.values)
-        stack.offset(options.offset) if options.offset?
-        stackedData = stack(temp)
-        charts = chartController.getChart().selectAll('.area-stacked')
-        if charts[0].length is 0
-          charts = charts.data(stackedData)
-            .enter()
-            .append("path")
-            .attr("class", (d) -> "area area-stacked #{d.name}")
-        else
-          charts = charts.data(stackedData)
-        charts.transition()
-          .duration(500)
-          .attr("d", (d) -> areaStacked(d.values))
+        charts = charts.data(stackedData)
+      charts.transition()
+        .duration(500)
+        .attr("d", (d) -> areaStacked(d.values))
 
     scope.$watch options.columns, chartController.redraw(), true if options.columns?
     chartController.registerElement({ redraw: redraw })

@@ -109,7 +109,7 @@
           });
         }
         redraw = function(data) {
-          var chart, charts, columns, name, stack, stackedData, temp, value;
+          var charts, columns, mappedData, name, stack, stackedData, value;
           if (!((data != null) && data.length !== 0)) {
             return;
           }
@@ -127,55 +127,47 @@
               return c.trim();
             });
           }
-          if (columns.length === 1) {
-            chart = chartController.getChart().select("path.area");
-            if (!chart[0][0]) {
-              chart = chartController.getChart().append("path").attr("class", "area");
-            }
-            return chart.datum(data).transition().duration(500).attr("d", area);
-          } else {
-            temp = (function() {
-              var _i, _len, _results;
-              _results = [];
-              for (_i = 0, _len = columns.length; _i < _len; _i++) {
-                name = columns[_i];
-                _results.push({
-                  name: name,
-                  values: (function() {
-                    var _j, _len1, _results1;
-                    _results1 = [];
-                    for (_j = 0, _len1 = data.length; _j < _len1; _j++) {
-                      value = data[_j];
-                      _results1.push({
-                        x: value[options.x],
-                        y: value[name]
-                      });
-                    }
-                    return _results1;
-                  })()
-                });
-              }
-              return _results;
-            })();
-            stack = d3.layout.stack().values(function(d) {
-              return d.values;
-            });
-            if (options.offset != null) {
-              stack.offset(options.offset);
-            }
-            stackedData = stack(temp);
-            charts = chartController.getChart().selectAll('.area-stacked');
-            if (charts[0].length === 0) {
-              charts = charts.data(stackedData).enter().append("path").attr("class", function(d) {
-                return "area area-stacked " + d.name;
+          mappedData = (function() {
+            var _i, _len, _results;
+            _results = [];
+            for (_i = 0, _len = columns.length; _i < _len; _i++) {
+              name = columns[_i];
+              _results.push({
+                name: name,
+                values: (function() {
+                  var _j, _len1, _results1;
+                  _results1 = [];
+                  for (_j = 0, _len1 = data.length; _j < _len1; _j++) {
+                    value = data[_j];
+                    _results1.push({
+                      x: value[options.x],
+                      y: value[name]
+                    });
+                  }
+                  return _results1;
+                })()
               });
-            } else {
-              charts = charts.data(stackedData);
             }
-            return charts.transition().duration(500).attr("d", function(d) {
-              return areaStacked(d.values);
-            });
+            return _results;
+          })();
+          stack = d3.layout.stack().values(function(d) {
+            return d.values;
+          });
+          if (options.offset != null) {
+            stack.offset(options.offset);
           }
+          stackedData = stack(mappedData);
+          charts = chartController.getChart().selectAll('.area-stacked');
+          if (charts[0].length === 0) {
+            charts = charts.data(stackedData).enter().append("path").attr("class", function(d) {
+              return "area area-stacked " + d.name;
+            });
+          } else {
+            charts = charts.data(stackedData);
+          }
+          return charts.transition().duration(500).attr("d", function(d) {
+            return areaStacked(d.values);
+          });
         };
         if (options.columns != null) {
           scope.$watch(options.columns, chartController.redraw(), true);
