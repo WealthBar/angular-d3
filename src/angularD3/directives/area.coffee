@@ -47,14 +47,16 @@ angular.module('ad3').directive 'd3Area', ->
       stack = d3.layout.stack().values((d) -> d.values)
       stack.offset(options.offset) if options.offset?
       stackedData = stack(mappedData)
-      charts = chartController.getChart().selectAll('.area-stacked').data(stackedData)
-      charts.enter()
-        .append("path")
-        .attr("class", (d) -> "area area-stacked #{d.name}")
+
+      charts = chartController.getChart().selectAll('path.area').data(stackedData)
+      charts.enter().append("path")
+      charts.attr("class", (d) -> "area #{d.name}")
         .transition()
         .duration(500)
         .attr("d", (d) -> areaStacked(d.values))
-      charts.exit().remove()
+      charts.exit()
+        .attr("d", (d) -> areaStacked(d.values))
+        .remove()
 
     scope.$watch options.columns, chartController.redraw, true if options.columns?
     chartController.registerElement({ redraw: redraw })
