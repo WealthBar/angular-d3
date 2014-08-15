@@ -33,7 +33,8 @@ angular.module('ad3').directive 'd3Area', ->
     redraw = (data) ->
       return unless data? and data.length isnt 0
       columns = options.y if options.y?
-      columns = scope.$eval(options.columns) if options.columns?
+      if options.columns?
+        columns = scope.$eval(options.columns)
       return unless columns?
       if angular.isString columns
         columns = columns.split(',').map((c) -> c.trim())
@@ -46,17 +47,14 @@ angular.module('ad3').directive 'd3Area', ->
       stack = d3.layout.stack().values((d) -> d.values)
       stack.offset(options.offset) if options.offset?
       stackedData = stack(mappedData)
-      charts = chartController.getChart().selectAll('.area-stacked')
-      if charts[0].length is 0
-        charts = charts.data(stackedData)
-          .enter()
-          .append("path")
-          .attr("class", (d) -> "area area-stacked #{d.name}")
-      else
-        charts = charts.data(stackedData)
-      charts.transition()
+      charts = chartController.getChart().selectAll('.area-stacked').data(stackedData)
+      charts.enter()
+        .append("path")
+        .attr("class", (d) -> "area area-stacked #{d.name}")
+        .transition()
         .duration(500)
         .attr("d", (d) -> areaStacked(d.values))
+      charts.exit().remove()
 
-    scope.$watch options.columns, chartController.redraw(), true if options.columns?
+    scope.$watch options.columns, chartController.redraw, true if options.columns?
     chartController.registerElement({ redraw: redraw })

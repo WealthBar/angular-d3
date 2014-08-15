@@ -157,20 +157,16 @@
             stack.offset(options.offset);
           }
           stackedData = stack(mappedData);
-          charts = chartController.getChart().selectAll('.area-stacked');
-          if (charts[0].length === 0) {
-            charts = charts.data(stackedData).enter().append("path").attr("class", function(d) {
-              return "area area-stacked " + d.name;
-            });
-          } else {
-            charts = charts.data(stackedData);
-          }
-          return charts.transition().duration(500).attr("d", function(d) {
+          charts = chartController.getChart().selectAll('.area-stacked').data(stackedData);
+          charts.enter().append("path").attr("class", function(d) {
+            return "area area-stacked " + d.name;
+          }).transition().duration(500).attr("d", function(d) {
             return areaStacked(d.values);
           });
+          return charts.exit().remove();
         };
         if (options.columns != null) {
-          scope.$watch(options.columns, chartController.redraw(), true);
+          scope.$watch(options.columns, chartController.redraw, true);
         }
         return chartController.registerElement({
           redraw: redraw

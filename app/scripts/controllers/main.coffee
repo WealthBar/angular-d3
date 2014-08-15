@@ -8,16 +8,20 @@ angular.module('angularD3App').controller 'MainCtrl', ($scope, $interval) ->
 
   $interval ->
     val = Math.random() * 100
-    $scope.arcs.arc1.value = val
-    $scope.arcs.arc1.label = "#{val.toFixed(0)}%"
+    $scope.arcs.arc1 = { value: val, label: "#{val.toFixed(0)}%" }
   , 1000 * 2
 
   $interval ->
     val = Math.random() * 100
-    $scope.arcs.arc2.value = val
-    $scope.arcs.arc2.label = "#{val.toFixed(0)}%"
+    $scope.arcs.arc2 = { value: val, label: "#{val.toFixed(0)}%" }
   , 1000 * 2.5
 
+  $interval ->
+    if $scope.columns.length == 3
+      $scope.columns = ['savings', 'optimal']
+    else
+      $scope.columns = ['savings', 'total', 'optimal']
+  , 1000 * 2.5
 
   $scope.stackedSum = (data) ->
     return unless data? and data.length isnt 0
@@ -35,3 +39,5 @@ angular.module('angularD3App').controller 'MainCtrl', ($scope, $interval) ->
 
   $scope.log = (data) ->
     console.log(data)
+
+  $scope.columns = ['savings', 'total', 'optimal']
