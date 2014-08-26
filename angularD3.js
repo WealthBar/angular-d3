@@ -127,6 +127,9 @@
               return c.trim();
             });
           }
+          if (columns.length === 0) {
+            return;
+          }
           mappedData = (function() {
             var _i, _len, _results;
             _results = [];

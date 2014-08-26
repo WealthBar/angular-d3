@@ -38,6 +38,7 @@ angular.module('ad3').directive 'd3Area', ->
       return unless columns?
       if angular.isString columns
         columns = columns.split(',').map((c) -> c.trim())
+      return if columns.length is 0
 
       mappedData = for name in columns
         name: name
