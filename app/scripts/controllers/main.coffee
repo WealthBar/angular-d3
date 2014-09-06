@@ -41,3 +41,5 @@ angular.module('angularD3App').controller 'MainCtrl', ($scope, $interval) ->
     console.log(data)
 
   $scope.columns = ['savings', 'total', 'optimal']
+
+  $scope.tickValues = [200, 400, 600, 800]

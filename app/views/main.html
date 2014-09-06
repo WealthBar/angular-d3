@@ -7,8 +7,8 @@
     <p>Basic line, area and bar charts can be composed together in the same chart.</p>
     <div d3-chart data="line" margin="{ top: 40, right: 60, bottom: 40, left: 60}">
       <d3-axis name="date" label="Date" extent="true" orientation="bottom" ticks="5" time-format="%Y-%m-%d"></d3-axis>
-      <d3-axis name="savings" label="Deposits" orientation="left" ticks="5"></d3-axis>
-      <d3-axis name="total" label="Savings" orientation="right" ticks="5"></d3-axis>
+      <d3-axis name="savings" label="Deposits" orientation="left" ticks="3"></d3-axis>
+      <d3-axis name="total" label="Savings" orientation="right" tick-values="tickValues"></d3-axis>
       <d3-line x="date" y="optimal" yscale="total"></d3-line>
       <d3-area x="date" y="total"></d3-area>
       <d3-bars x="date" y="savings"></d3-bars>

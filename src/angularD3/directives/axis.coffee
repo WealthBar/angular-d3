@@ -38,7 +38,11 @@ angular.module('ad3').directive 'd3Axis', ->
     scale = d3.scale.linear()
 
     getAxis = ->
-      axis = d3.svg.axis().scale(scale).orient(options.orientation).ticks(options.ticks)
+      axis = d3.svg.axis().scale(scale).orient(options.orientation)
+      if options.ticks
+        axis.ticks(options.ticks)
+      if options.tickValues
+        axis.tickValues($scope.$eval(options.tickValues))
       if options.format?
         format = d3.format(options.format)
         axis.tickFormat(format)
