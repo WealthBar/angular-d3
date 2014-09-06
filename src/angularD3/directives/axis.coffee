@@ -37,18 +37,15 @@ angular.module('ad3').directive 'd3Axis', ->
 
     scale = d3.scale.linear()
 
-    axis = d3.svg.axis().scale(scale).orient(options.orientation)
-      .ticks(options.ticks)
-
-    if options.format?
-      format = d3.format(options.format)
-      axis.tickFormat(format)
-
-    if options.timeFormat?
-      format = d3.time.format(options.timeFormat)
-      axis.tickFormat((value) ->
-        format(new Date(value))
-      )
+    getAxis = ->
+      axis = d3.svg.axis().scale(scale).orient(options.orientation).ticks(options.ticks)
+      if options.format?
+        format = d3.format(options.format)
+        axis.tickFormat(format)
+      if options.timeFormat?
+        format = d3.time.format(options.timeFormat)
+        axis.tickFormat((value) -> format(new Date(value)))
+      axis
 
     positionLabel = (label) ->
       if options.orientation is 'bottom'
@@ -70,23 +67,23 @@ angular.module('ad3').directive 'd3Axis', ->
           .attr("style", "text-anchor: middle;")
           .attr("transform", "rotate(90)")
 
-    drawGrid = (grid, axis) ->
+    drawGrid = (grid) ->
       if options.orientation is 'bottom'
-        grid.call(axis.tickSize(chartController.innerHeight(), 0, 0)
+        grid.call(getAxis().tickSize(chartController.innerHeight(), 0, 0)
           .tickFormat('')
         )
       else if options.orientation is 'top'
         grid.attr("transform", "translate(0, #{chartController.innerHeight()})")
-          .call(axis.tickSize(chartController.innerHeight(), 0, 0)
+          .call(getAxis().tickSize(chartController.innerHeight(), 0, 0)
           .tickFormat('')
         )
       else if options.orientation is 'left'
         grid.attr("transform", "translate(#{chartController.innerWidth()}, 0)")
-          .call(axis.tickSize(chartController.innerWidth(), 0, 0)
+          .call(getAxis().tickSize(chartController.innerWidth(), 0, 0)
           .tickFormat('')
         )
       else if options.orientation is 'right'
-        grid.call(axis.tickSize(chartController.innerWidth(), 0, 0)
+        grid.call(getAxis().tickSize(chartController.innerWidth(), 0, 0)
           .tickFormat('')
         )
 
@@ -99,7 +96,8 @@ angular.module('ad3').directive 'd3Axis', ->
       label = axisElement.append("text").attr("class", "axis-label").text(options.label)
 
     if options.grid
-      grid = chartController.getChart().append("g").attr("class", "grid")
+      grid = chartController.getChart().append("g")
+        .attr("class", "axis-grid axis-grid-#{options.name}")
 
     redraw = (data) ->
       return unless data? and data.length isnt 0
@@ -117,7 +115,7 @@ angular.module('ad3').directive 'd3Axis', ->
         scale.domain [0, d3.max domainValues]
       axisElement.transition().duration(500)
         .attr("transform", translation())
-        .call(axis)
-      drawGrid(grid.transition().duration(500), axis) if grid?
+        .call(getAxis())
+      drawGrid(grid.transition().duration(500)) if grid?
 
     chartController.addScale(options.name, { scale: scale, redraw: redraw })
