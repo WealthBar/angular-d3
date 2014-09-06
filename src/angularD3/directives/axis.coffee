@@ -123,3 +123,4 @@ angular.module('ad3').directive 'd3Axis', ->
       drawGrid(grid.transition().duration(500)) if grid?
 
     chartController.addScale(options.name, { scale: scale, redraw: redraw })
+    $scope.$watch options.tickValues, chartController.redraw, true if options.tickValues?
