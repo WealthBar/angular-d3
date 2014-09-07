@@ -1,6 +1,6 @@
 {
   "name": "angular-d3",
-  "version": "0.0.17",
+  "version": "0.0.18",
   "dependencies": {},
   "devDependencies": {
     "grunt": "~0.4.1",
