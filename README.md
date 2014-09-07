@@ -53,6 +53,8 @@ of beautiful friendship.
 - d3-area - Define an area graph
 - d3-line - Defines a line graph
 - d3-bars - Defines a set of bars for a bar chart
+- d3-gradient - Support for dynamically generating SVG gradients with data
+- d3-include - Supports including arbitrary SVG with the chart
 
 The directives are meant to be used to compost charts like so:
 
