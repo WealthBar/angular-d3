@@ -48,4 +48,3 @@ angular.module('angularD3App').controller 'MainCtrl', ($scope, $interval) ->
     { offset: '0%', color: '#098aae', opacity: 0.6 },
     { offset: '100%', color: '#684684', opacity: 0.9 }
   ]
-
