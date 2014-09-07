@@ -36,3 +36,8 @@ footer {
     z-index: 2;
   }
 }
+
+#graphs {
+  .d3 .area { fill: url(#gradient); }
+}
+

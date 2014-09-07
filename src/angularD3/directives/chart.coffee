@@ -22,6 +22,7 @@ angular.module('ad3').directive 'd3Chart', ->
     chart = svg.append("g")
       .attr("transform", "translate(" + @margin.left + "," + @margin.top + ")")
 
+    @getSvg = -> svg
     @getChart = -> chart
     @addScale = (name, scale) -> scales[name] = scale
     @getScale = (name) -> scales[name].scale
