@@ -32,7 +32,7 @@ angular.module('angularD3App').controller 'MainCtrl', ($scope, $interval) ->
     for k, v of row
       # http://stackoverflow.com/a/1830844/235243
       if k is 'date'
-        row[k] = new Date(v)
+        row[k] = new Date(v.trim())
       else if !isNaN(parseFloat(v)) && isFinite(v)
         row[k] = +v
     row
