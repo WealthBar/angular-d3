@@ -77,11 +77,10 @@
       restrict: 'E',
       require: '^d3Chart',
       link: function(scope, el, attrs, chartController) {
-        var area, areaStacked, height, options, redraw, x, y;
+        var area, areaStacked, options, redraw, x, y;
         options = angular.extend(defaults(), attrs);
         x = chartController.getScale(options.xscale || options.x);
         y = chartController.getScale(options.yscale || options.y);
-        height = chartController.innerHeight();
         if (options.vertical) {
           area = d3.svg.area().y(function(d) {
             return x(d[options.x]);
@@ -98,7 +97,7 @@
         } else {
           area = d3.svg.area().x(function(d) {
             return x(d[options.x]);
-          }).y0(height).y1(function(d) {
+          }).y0(chartController.innerHeight).y1(function(d) {
             return y(d[options.y]);
           });
           areaStacked = d3.svg.area().x(function(d) {
@@ -110,7 +109,7 @@
           });
         }
         redraw = function(data) {
-          var chart, charts, columns, name, stack, stackedData, temp, value;
+          var charts, columns, mappedData, name, stack, stackedData, value;
           if (!((data != null) && data.length !== 0)) {
             return;
           }
@@ -128,58 +127,52 @@
               return c.trim();
             });
           }
-          if (columns.length === 1) {
-            chart = chartController.getChart().select("path.area");
-            if (!chart[0][0]) {
-              chart = chartController.getChart().append("path").attr("class", "area");
-            }
-            return chart.datum(data).transition().duration(500).attr("d", area);
-          } else {
-            temp = (function() {
-              var _i, _len, _results;
-              _results = [];
-              for (_i = 0, _len = columns.length; _i < _len; _i++) {
-                name = columns[_i];
-                _results.push({
-                  name: name,
-                  values: (function() {
-                    var _j, _len1, _results1;
-                    _results1 = [];
-                    for (_j = 0, _len1 = data.length; _j < _len1; _j++) {
-                      value = data[_j];
-                      _results1.push({
-                        x: value[options.x],
-                        y: value[name]
-                      });
-                    }
-                    return _results1;
-                  })()
-                });
-              }
-              return _results;
-            })();
-            stack = d3.layout.stack().values(function(d) {
-              return d.values;
-            });
-            if (options.offset != null) {
-              stack.offset(options.offset);
-            }
-            stackedData = stack(temp);
-            charts = chartController.getChart().selectAll('.area-stacked');
-            if (charts[0].length === 0) {
-              charts = charts.data(stackedData).enter().append("path").attr("class", function(d) {
-                return "area area-stacked " + d.name;
-              });
-            } else {
-              charts = charts.data(stackedData);
-            }
-            return charts.transition().duration(500).attr("d", function(d) {
-              return areaStacked(d.values);
-            });
+          if (columns.length === 0) {
+            return;
           }
+          mappedData = (function() {
+            var _i, _len, _results;
+            _results = [];
+            for (_i = 0, _len = columns.length; _i < _len; _i++) {
+              name = columns[_i];
+              _results.push({
+                name: name,
+                values: (function() {
+                  var _j, _len1, _results1;
+                  _results1 = [];
+                  for (_j = 0, _len1 = data.length; _j < _len1; _j++) {
+                    value = data[_j];
+                    _results1.push({
+                      x: value[options.x],
+                      y: value[name]
+                    });
+                  }
+                  return _results1;
+                })()
+              });
+            }
+            return _results;
+          })();
+          stack = d3.layout.stack().values(function(d) {
+            return d.values;
+          });
+          if (options.offset != null) {
+            stack.offset(options.offset);
+          }
+          stackedData = stack(mappedData);
+          charts = chartController.getChart().selectAll('path.area').data(stackedData);
+          charts.enter().append("path");
+          charts.attr("class", function(d) {
+            return "area " + d.name;
+          }).transition().duration(500).attr("d", function(d) {
+            return areaStacked(d.values);
+          });
+          return charts.exit().attr("d", function(d) {
+            return areaStacked(d.values);
+          }).remove();
         };
         if (options.columns != null) {
-          scope.$watch(options.columns, chartController.redraw(), true);
+          scope.$watch(options.columns, chartController.redraw, true);
         }
         return chartController.registerElement({
           redraw: redraw
@@ -206,7 +199,7 @@
       restrict: 'E',
       require: '^d3Chart',
       link: function($scope, $el, $attrs, chartController) {
-        var axis, axisElement, format, label, options, positionLabel, range, redraw, scale, translation;
+        var axisElement, drawGrid, getAxis, grid, label, options, positionLabel, range, redraw, scale, translation;
         options = angular.extend(defaults(), $attrs);
         range = function() {
           if (options.orientation === 'top' || options.orientation === 'bottom') {
@@ -235,17 +228,27 @@
           }
         };
         scale = d3.scale.linear();
-        axis = d3.svg.axis().scale(scale).orient(options.orientation).ticks(options.ticks);
-        if (options.format != null) {
-          format = d3.format(options.format);
-          axis.tickFormat(format);
-        }
-        if (options.timeFormat != null) {
-          format = d3.time.format(options.timeFormat);
-          axis.tickFormat(function(value) {
-            return format(new Date(value));
-          });
-        }
+        getAxis = function() {
+          var axis, format;
+          axis = d3.svg.axis().scale(scale).orient(options.orientation);
+          if (options.ticks) {
+            axis.ticks(options.ticks);
+          }
+          if (options.tickValues) {
+            axis.tickValues($scope.$eval(options.tickValues));
+          }
+          if (options.format != null) {
+            format = d3.format(options.format);
+            axis.tickFormat(format);
+          }
+          if (options.timeFormat != null) {
+            format = d3.time.format(options.timeFormat);
+            axis.tickFormat(function(value) {
+              return format(new Date(value));
+            });
+          }
+          return axis;
+        };
         positionLabel = function(label) {
           if (options.orientation === 'bottom') {
             return label.attr("x", "" + (chartController.innerWidth() / 2)).attr("dy", "" + chartController.margin.bottom).attr("style", "text-anchor: middle;");
@@ -257,9 +260,23 @@
             return label.attr("x", "" + (chartController.innerHeight() / 2)).attr("dy", "" + (-chartController.margin.right + 18)).attr("style", "text-anchor: middle;").attr("transform", "rotate(90)");
           }
         };
+        drawGrid = function(grid) {
+          if (options.orientation === 'bottom') {
+            return grid.call(getAxis().tickSize(chartController.innerHeight(), 0, 0).tickFormat(''));
+          } else if (options.orientation === 'top') {
+            return grid.attr("transform", "translate(0, " + (chartController.innerHeight()) + ")").call(getAxis().tickSize(chartController.innerHeight(), 0, 0).tickFormat(''));
+          } else if (options.orientation === 'left') {
+            return grid.attr("transform", "translate(" + (chartController.innerWidth()) + ", 0)").call(getAxis().tickSize(chartController.innerWidth(), 0, 0).tickFormat(''));
+          } else if (options.orientation === 'right') {
+            return grid.call(getAxis().tickSize(chartController.innerWidth(), 0, 0).tickFormat(''));
+          }
+        };
         axisElement = chartController.getChart().append("g").attr("class", "axis axis-" + options.orientation + " axis-" + options.name).attr("transform", translation());
         if (options.label) {
           label = axisElement.append("text").attr("class", "axis-label").text(options.label);
+        }
+        if (options.grid) {
+          grid = chartController.getChart().append("g").attr("class", "axis-grid axis-grid-" + options.name);
         }
         redraw = function(data) {
           var datum, domainValues;
@@ -287,17 +304,23 @@
           }
           if (options.extent) {
             scale.domain(d3.extent(domainValues));
+          } else if (options.domain) {
+            scale.domain([0, d3.max(domainValues)]);
           } else {
             scale.domain([0, d3.max(domainValues)]);
           }
-          axisElement.transition().duration(500).attr("transform", translation()).call(axis);
-          axisElement.selectAll('line').attr("style", "fill: none; stroke-width: 2px; stroke: #303030;");
-          return axisElement.selectAll('path').attr("style", "fill: none; stroke-width: 2px; stroke: #303030;");
+          axisElement.transition().duration(500).attr("transform", translation()).call(getAxis());
+          if (grid != null) {
+            return drawGrid(grid.transition().duration(500));
+          }
         };
-        return chartController.addScale(options.name, {
+        chartController.addScale(options.name, {
           scale: scale,
           redraw: redraw
         });
+        if (options.tickValues != null) {
+          return $scope.$watch(options.tickValues, chartController.redraw, true);
+        }
       }
     };
   });
@@ -394,6 +417,9 @@
             return _this.height() - _this.margin.top - _this.margin.bottom;
           };
           chart = svg.append("g").attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
+          this.getSvg = function() {
+            return svg;
+          };
           this.getChart = function() {
             return chart;
           };
@@ -467,6 +493,73 @@
       };
     }
   ]);
+
+}).call(this);
+
+//@ sourceMappingURL=gradient.map
+(function() {
+  angular.module('ad3').directive('d3Gradient', function() {
+    var defaults;
+    defaults = {
+      transition: 500
+    };
+    return {
+      restrict: 'E',
+      require: '^d3Chart',
+      link: function($scope, $el, $attrs, chartController) {
+        var gradient, svg, transition;
+        svg = chartController.getSvg();
+        gradient = svg.append("defs").append("linearGradient").attr("id", $attrs.id);
+        ['x1', 'x2', 'y1', 'y2'].forEach(function(attr) {
+          return $attrs.$observe(attr, function(val) {
+            return gradient.attr(attr, val);
+          });
+        });
+        transition = defaults.transition;
+        $attrs.$observe('transition', function(val) {
+          if (val != null) {
+            return transition = val;
+          }
+        });
+        return $scope.$watch($attrs.stops, function(stops) {
+          if (stops == null) {
+            return;
+          }
+          stops = gradient.selectAll('stop').data(stops);
+          stops.enter().append('stop');
+          stops.transition().duration(transition).attr('offset', function(d) {
+            return d.offset;
+          }).attr('stop-color', function(d) {
+            return d.color;
+          }).attr('stop-opacity', function(d) {
+            if (d.opacity != null) {
+              return d.opacity;
+            } else {
+              return 1;
+            }
+          });
+          return stops.exit().remove();
+        });
+      }
+    };
+  });
+
+}).call(this);
+
+//@ sourceMappingURL=include.map
+(function() {
+  angular.module('ad3').directive('d3Include', function() {
+    return {
+      restrict: 'E',
+      require: '^d3Chart',
+      link: function($scope, $el, $attrs, chartController) {
+        var chart, includes;
+        chart = chartController.getChart();
+        includes = chart.append('g').attr('class', 'includes');
+        return includes.html($el.html());
+      }
+    };
+  });
 
 }).call(this);
 
