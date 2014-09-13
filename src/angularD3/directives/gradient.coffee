@@ -7,9 +7,9 @@ angular.module('ad3').directive 'd3Gradient', ->
   link: ($scope, $el, $attrs, chartController) ->
     svg = chartController.getSvg()
 
-    gradient = svg.append("defs")
+    gradient = svg.insert("defs", 'g')
       .append("linearGradient")
-      .attr("id", $attrs.id)
+      .attr("id", $attrs.ref)
 
     ['x1', 'x2', 'y1', 'y2'].forEach (attr) ->
       $attrs.$observe attr, (val) -> gradient.attr(attr, val)
@@ -21,8 +21,7 @@ angular.module('ad3').directive 'd3Gradient', ->
       return unless stops?
       stops = gradient.selectAll('stop').data(stops)
       stops.enter().append('stop')
-      stops.transition().duration(transition)
-        .attr('offset', (d) -> d.offset)
+      stops.attr('offset', (d) -> d.offset)
         .attr('stop-color', (d) -> d.color)
         .attr('stop-opacity', (d) -> if d.opacity? then d.opacity else 1)
       stops.exit().remove()

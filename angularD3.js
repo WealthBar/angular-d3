@@ -509,7 +509,7 @@
       link: function($scope, $el, $attrs, chartController) {
         var gradient, svg, transition;
         svg = chartController.getSvg();
-        gradient = svg.append("defs").append("linearGradient").attr("id", $attrs.id);
+        gradient = svg.insert("defs", 'g').append("linearGradient").attr("id", $attrs.ref);
         ['x1', 'x2', 'y1', 'y2'].forEach(function(attr) {
           return $attrs.$observe(attr, function(val) {
             return gradient.attr(attr, val);
@@ -527,7 +527,7 @@
           }
           stops = gradient.selectAll('stop').data(stops);
           stops.enter().append('stop');
-          stops.transition().duration(transition).attr('offset', function(d) {
+          stops.attr('offset', function(d) {
             return d.offset;
           }).attr('stop-color', function(d) {
             return d.color;
