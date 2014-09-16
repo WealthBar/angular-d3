@@ -13,18 +13,18 @@ angular.module('ad3').directive 'd3Area', ->
 
     if options.vertical
       area = d3.svg.area()
-        .y((d) -> x(d[options.x]))
+        .y((d) -> x(d.x))
         .x0(0)
-        .x1((d) -> y(d[options.y]))
+        .x1((d) -> y(d.y))
       areaStacked = d3.svg.area()
         .y((d) -> x(d.x))
         .x0((d) -> y(d.y0))
         .x1((d) -> y(d.y + d.y0))
     else
       area = d3.svg.area()
-        .x((d) -> x(d[options.x]))
+        .x((d) -> x(d.x))
         .y0(chartController.innerHeight)
-        .y1((d) -> y(d[options.y]))
+        .y1((d) -> y(d.y))
       areaStacked = d3.svg.area()
         .x((d) -> x(d.x))
         .y0((d) -> y(d.y0))
@@ -54,9 +54,9 @@ angular.module('ad3').directive 'd3Area', ->
       charts.attr("class", (d) -> "area #{d.name}")
         .transition()
         .duration(500)
-        .attr("d", (d) -> areaStacked(d.values))
+        .attr("d", (d,i) -> if i is 0 then area(d.values) else areaStacked(d.values))
       charts.exit()
-        .attr("d", (d) -> areaStacked(d.values))
+        .attr("d", (d,i) -> if i is 0 then area(d.values) else areaStacked(d.values))
         .remove()
 
     scope.$watch options.columns, chartController.redraw, true if options.columns?

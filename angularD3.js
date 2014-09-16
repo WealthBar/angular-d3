@@ -83,9 +83,9 @@
         y = chartController.getScale(options.yscale || options.y);
         if (options.vertical) {
           area = d3.svg.area().y(function(d) {
-            return x(d[options.x]);
+            return x(d.x);
           }).x0(0).x1(function(d) {
-            return y(d[options.y]);
+            return y(d.y);
           });
           areaStacked = d3.svg.area().y(function(d) {
             return x(d.x);
@@ -96,9 +96,9 @@
           });
         } else {
           area = d3.svg.area().x(function(d) {
-            return x(d[options.x]);
+            return x(d.x);
           }).y0(chartController.innerHeight).y1(function(d) {
-            return y(d[options.y]);
+            return y(d.y);
           });
           areaStacked = d3.svg.area().x(function(d) {
             return x(d.x);
@@ -164,11 +164,19 @@
           charts.enter().append("path");
           charts.attr("class", function(d) {
             return "area " + d.name;
-          }).transition().duration(500).attr("d", function(d) {
-            return areaStacked(d.values);
+          }).transition().duration(500).attr("d", function(d, i) {
+            if (i === 0) {
+              return area(d.values);
+            } else {
+              return areaStacked(d.values);
+            }
           });
-          return charts.exit().attr("d", function(d) {
-            return areaStacked(d.values);
+          return charts.exit().attr("d", function(d, i) {
+            if (i === 0) {
+              return area(d.values);
+            } else {
+              return areaStacked(d.values);
+            }
           }).remove();
         };
         if (options.columns != null) {
