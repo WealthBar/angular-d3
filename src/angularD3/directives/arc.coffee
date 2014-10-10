@@ -1,4 +1,4 @@
-angular.module('ad3').directive 'd3Arc', () ->
+angular.module('ad3').directive 'd3Arc', ->
   defaults = ->
     x: 0
     y: 1
@@ -20,14 +20,17 @@ angular.module('ad3').directive 'd3Arc', () ->
     innerRadius = parseFloat(options.innerRadius)
     labelRadius = parseFloat(options.labelRadius)
 
-    center = chartController.getChart().append("g").attr("class", "arc")
-    arcPath = center.append("path")
-    arcLabel = center.append("text")
-      .attr("class", "arc-label")
-      .attr("dy", "0.35em")
-      .style("text-anchor", "middle")
-
+    center = null
+    arcPath = null
+    arcLabel = null
     redraw = (data) ->
+      center ||= chartController.getChart().append("g").attr("class", "arc")
+      arcPath ||= center.append("path")
+      arcLabel ||= center.append("text")
+        .attr("class", "arc-label")
+        .attr("dy", "0.35em")
+        .style("text-anchor", "middle")
+
       return unless data? and data.length isnt 0
 
       radius = Math.min(chartController.innerWidth(), chartController.innerHeight())/2
@@ -58,4 +61,4 @@ angular.module('ad3').directive 'd3Arc', () ->
 
       arcLabel.text(data[options.label])
 
-    chartController.registerElement({ redraw: redraw })
+    chartController.registerElement(redraw, options.order)

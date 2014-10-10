@@ -2,7 +2,6 @@ angular.module('ad3').directive 'd3Area', ->
   defaults = -> {}
 
   restrict: 'E'
-
   require: '^d3Chart'
 
   link: (scope, el, attrs, chartController) ->
@@ -30,7 +29,10 @@ angular.module('ad3').directive 'd3Area', ->
         .y0((d) -> y(d.y0))
         .y1((d) -> y(d.y + d.y0))
 
+    areaElement = null
     redraw = (data) ->
+      areaElement ||= chartController.getChart().append("g")
+        .attr("class", "area")
       return unless data? and data.length isnt 0
       columns = options.y if options.y?
       if options.columns?
@@ -49,7 +51,7 @@ angular.module('ad3').directive 'd3Area', ->
       stack.offset(options.offset) if options.offset?
       stackedData = stack(mappedData)
 
-      charts = chartController.getChart().selectAll('path.area').data(stackedData)
+      charts = areaElement.selectAll('path.area').data(stackedData)
       charts.enter().append("path")
       charts.attr("class", (d) -> "area #{d.name}")
         .transition()
@@ -60,4 +62,4 @@ angular.module('ad3').directive 'd3Area', ->
         .remove()
 
     scope.$watch options.columns, chartController.redraw, true if options.columns?
-    chartController.registerElement({ redraw: redraw })
+    chartController.registerElement(redraw, options.order)

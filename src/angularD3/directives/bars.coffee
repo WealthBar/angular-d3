@@ -1,4 +1,4 @@
-angular.module('ad3').directive 'd3Bars', () ->
+angular.module('ad3').directive 'd3Bars', ->
   defaults = ->
     x: 0
     y: 1
@@ -17,9 +17,13 @@ angular.module('ad3').directive 'd3Bars', () ->
     height = chartController.innerHeight()
     width = options.width
 
+    barsElements = null
     redraw = (data) ->
+      console.log('insertBars') unless barsElements
+      barsElements ||= chartController.getChart().append("g")
+        .attr("class", "bars")
       return unless data? and data.length isnt 0
-      bars = chart.selectAll("rect.bar").data(data)
+      bars = barsElements.selectAll("rect.bar").data(data)
       bars.exit().transition().duration(500)
         .attr("y", (d) -> height)
         .attr("height", 0)
@@ -40,4 +44,4 @@ angular.module('ad3').directive 'd3Bars', () ->
         .attr("y", (d) -> y(d[options.y]))
         .attr("height", (d) -> height - y(d[options.y]))
 
-    chartController.registerElement({ redraw: redraw })
+    chartController.registerElement(redraw, options.order)

@@ -24,10 +24,11 @@ angular.module('ad3').directive 'd3Chart', ->
 
     @getSvg = -> svg
     @getChart = -> chart
-    @addScale = (name, scale) -> scales[name] = scale
+    @addScale = (name, scale, update) -> scales[name] = { scale: scale, update: update }
     @getScale = (name) -> scales[name].scale
-    @registerElement = (el) -> elements.push el
+    @registerElement = (el, order = 0) -> elements.push { redraw: el, order: Number(order) }
 
+    sortOrder = (a, b) -> a.order - b.order
     debounce = null
     @redraw = ->
       return if debounce
@@ -35,8 +36,8 @@ angular.module('ad3').directive 'd3Chart', ->
         debounce = null
         data = $scope.$eval(binding)
         for name, scale of scales
-          scale.redraw(data)
-        for element in elements
+          scale.update(data)
+        for element in elements.sort(sortOrder)
           element.redraw(data)
       , $attrs.updateInterval or 200
     $window.addEventListener 'resize', @redraw

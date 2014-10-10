@@ -5,9 +5,7 @@ angular.module('ad3').directive 'd3Axis', ->
     extent: false
 
   priority: 1
-
   restrict: 'E'
-
   require: '^d3Chart'
 
   link: ($scope, $el, $attrs, chartController) ->
@@ -91,22 +89,32 @@ angular.module('ad3').directive 'd3Axis', ->
           .tickFormat('')
         )
 
-    # Append x-axis to chart
-    axisElement = chartController.getChart().append("g")
-      .attr("class", "axis axis-#{options.orientation} axis-#{options.name}")
-      .attr("transform", translation())
-
-    if options.label
-      label = axisElement.append("text").attr("class", "axis-label").text(options.label)
-
-    if options.grid
-      grid = chartController.getChart().append("g")
-        .attr("class", "axis-grid axis-grid-#{options.name}")
+    axisElement = null
+    grid = null
+    label = null
 
     redraw = (data) ->
+      # Append x-axis to chart
+      console.log('insertAxis') unless axisElement
+      axisElement ||= chartController.getChart().append("g")
+        .attr("class", "axis axis-#{options.orientation} axis-#{options.name}")
+        .attr("transform", translation())
+      if options.label
+        label ||= axisElement.append("text").attr("class", "axis-label").text(options.label)
+      if options.grid
+        grid ||= chartController.getChart().append("g")
+          .attr("class", "axis-grid axis-grid-#{options.name}")
+
+      return unless data? and data.length isnt 0
+      positionLabel(label.transition().duration(500)) if label
+      axisElement.transition().duration(500)
+        .attr("transform", translation())
+        .call(getAxis())
+      drawGrid(grid.transition().duration(500)) if grid?
+
+    updateScale = (data) ->
       return unless data? and data.length isnt 0
       scale.range(range())
-      positionLabel(label.transition().duration(500)) if label
       if options.filter
         domainValues = $scope.$eval("#{options.filter}(data)", { data: data })
       else
@@ -117,10 +125,7 @@ angular.module('ad3').directive 'd3Axis', ->
         scale.domain [0, d3.max domainValues]
       else
         scale.domain [0, d3.max domainValues]
-      axisElement.transition().duration(500)
-        .attr("transform", translation())
-        .call(getAxis())
-      drawGrid(grid.transition().duration(500)) if grid?
 
-    chartController.addScale(options.name, { scale: scale, redraw: redraw })
+    chartController.addScale(options.name, scale, updateScale)
+    chartController.registerElement(redraw, options.order)
     $scope.$watch options.tickValues, chartController.redraw, true if options.tickValues?

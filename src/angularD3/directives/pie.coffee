@@ -1,4 +1,4 @@
-angular.module('ad3').directive 'd3Pie', () ->
+angular.module('ad3').directive 'd3Pie', ->
   defaults = ->
     x: 0
     y: 1
@@ -32,11 +32,12 @@ angular.module('ad3').directive 'd3Pie', () ->
     pie = d3.layout.pie().sort(null)
       .value((d) -> d[options.value])
 
-    center = chartController.getChart().append("g").attr("class", "pie")
-
     _current = null
 
+    center = null
     redraw = (data) ->
+      center = chartController.getChart().append("g").attr("class", "pie")
+
       return unless data? and data.length isnt 0
 
       radius = Math.min(chartController.innerWidth(), chartController.innerHeight())/2
@@ -63,7 +64,8 @@ angular.module('ad3').directive 'd3Pie', () ->
         .attr("d", arc)
         .each((d) -> @_current = d)
 
-      slice.style('fill', (d,i) -> if colorScale then colorScale(i) else d[attrs.color]) if attrs.colors
+      slice.style('fill', (d,i) ->
+        if colorScale then colorScale(i) else d[attrs.color]) if attrs.colors
 
       slice.exit().remove()
 
@@ -99,7 +101,11 @@ angular.module('ad3').directive 'd3Pie', () ->
                 when 'bottom'
                   r[k] = v + padding + relativePosition[1]
 
-            if prevbb and !(thisbb.right < prevbb.left || thisbb.left > prevbb.right || thisbb.bottom < prevbb.top || thisbb.top > prevbb.bottom)
+            if prevbb and !(
+              thisbb.right < prevbb.left ||
+              thisbb.left > prevbb.right ||
+              thisbb.bottom < prevbb.top ||
+              thisbb.top > prevbb.bottom)
               ctx = thisbb.left + (thisbb.right - thisbb.left)/2
               cty = thisbb.top + (thisbb.bottom - thisbb.top)/2
               cpx = prevbb.left + (prevbb.right - prevbb.left)/2
@@ -130,4 +136,4 @@ angular.module('ad3').directive 'd3Pie', () ->
           .duration(options.transitionDuration)
           .attr("transform", getPosition)
 
-    chartController.registerElement({ redraw: redraw })
+    chartController.registerElement(redraw, options.order)

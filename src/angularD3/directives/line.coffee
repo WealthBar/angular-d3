@@ -17,16 +17,17 @@ angular.module('ad3').directive 'd3Line', ->
       .x((d) -> x(d[options.x]))
       .y((d) -> y(d[options.y]))
 
-    linePath = chartController.getChart().append("path")
-      .attr("class", "line line-#{options.name or options.y}")
-      .style("fill", "none")
-      .style("stroke", options.stroke)
-
+    linePath = null
     redraw = (data) ->
+      linePath ||= chartController.getChart().append("path")
+        .attr("class", "line line-#{options.name or options.y}")
+        .style("fill", "none")
+        .style("stroke", options.stroke)
+
       return unless data? and data.length isnt 0
       linePath.datum(data)
         .transition()
         .duration(500)
         .attr("d", line)
 
-    chartController.registerElement({ redraw: redraw })
+    chartController.registerElement(redraw, options.order)
