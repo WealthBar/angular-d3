@@ -41,6 +41,10 @@ angular.module('ad3').directive 'd3Axis', ->
         axis.ticks(options.ticks)
       if options.tickValues
         axis.tickValues($scope.$eval(options.tickValues))
+      if options.tickSize
+        tickSize = options.tickSize.split(',')
+        axis.innerTickSize(tickSize[0])
+        axis.outerTickSize(tickSize[1])
       if options.format?
         format = d3.format(options.format)
         axis.tickFormat(format)
@@ -96,7 +100,7 @@ angular.module('ad3').directive 'd3Axis', ->
       if options.tickDx
         tickLabels.attr('dx', options.tickDx)
       if options.tickAnchor
-        tickLabels.style('style', options.tickAnchor")
+        tickLabels.style('text-anchor', options.tickAnchor)
 
     axisElement = null
     grid = null
