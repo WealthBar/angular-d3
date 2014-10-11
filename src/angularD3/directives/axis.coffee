@@ -95,7 +95,6 @@ angular.module('ad3').directive 'd3Axis', ->
 
     redraw = (data) ->
       # Append x-axis to chart
-      console.log('insertAxis') unless axisElement
       axisElement ||= chartController.getChart().append("g")
         .attr("class", "axis axis-#{options.orientation} axis-#{options.name}")
         .attr("transform", translation())
