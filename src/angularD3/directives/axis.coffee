@@ -60,7 +60,7 @@ angular.module('ad3').directive 'd3Axis', ->
           .attr("style", "text-anchor: middle;")
       else if options.orientation is 'left'
         label.attr("x", "-#{chartController.innerHeight() / 2}")
-          .attr("y", "#{-chartController.margin.left + 18}")
+          .attr("dy", "#{-chartController.margin.left + 18}")
           .attr("style", "text-anchor: middle;")
           .attr("transform", "rotate(-90)")
       else if options.orientation is 'right'
@@ -89,6 +89,15 @@ angular.module('ad3').directive 'd3Axis', ->
           .tickFormat('')
         )
 
+    adjustTickLabels = (g) ->
+      tickLabels = g.selectAll('.tick text')
+      if options.tickDy
+        tickLabels.attr('dy', options.tickDy)
+      if options.tickDx
+        tickLabels.attr('dx', options.tickDx)
+      if options.tickAnchor
+        tickLabels.style('style', options.tickAnchor")
+
     axisElement = null
     grid = null
     label = null
@@ -109,7 +118,14 @@ angular.module('ad3').directive 'd3Axis', ->
       axisElement.transition().duration(500)
         .attr("transform", translation())
         .call(getAxis())
+        .selectAll('tick text')
+          .tween("attr.dx", null)
+          .tween("attr.dy", null)
+          .tween("style.text-anchor", null)
+
       drawGrid(grid.transition().duration(500)) if grid?
+      tickLabels = axisElement.selectAll('.tick text')
+      axisElement.call(adjustTickLabels)
 
     updateScale = (data) ->
       return unless data? and data.length isnt 0
