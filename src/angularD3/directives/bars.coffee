@@ -19,7 +19,6 @@ angular.module('ad3').directive 'd3Bars', ->
 
     barsElements = null
     redraw = (data) ->
-      console.log('insertBars') unless barsElements
       barsElements ||= chartController.getChart().append("g")
         .attr("class", "bars")
       return unless data? and data.length isnt 0

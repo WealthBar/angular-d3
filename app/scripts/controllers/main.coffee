@@ -23,9 +23,8 @@ angular.module('angularD3App').controller 'MainCtrl', ($scope, $interval) ->
       $scope.columns = ['savings', 'total', 'optimal']
   , 1000 * 2.5
 
-  $scope.stackedSum = (data) ->
-    return unless data? and data.length isnt 0
-    for value in data
+  $scope.stackDomain = (data) ->
+    values = for value in data
       Number(value.savings) + Number(value.total) + Number(value.optimal)
 
   $scope.parseValues = (row) ->

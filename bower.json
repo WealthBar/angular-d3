@@ -1,6 +1,6 @@
 {
   "name": "angularD3",
-  "version": "0.0.22",
+  "version": "0.0.24",
   "main": "angularD3.js",
   "ignore": [
     ".*",

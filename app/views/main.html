@@ -6,10 +6,10 @@
     <h1>Basic Graphs</h1>
     <p>Basic line, area and bar charts can be composed together in the same chart.</p>
     <div d3-chart data="line" margin="{ top: 40, right: 60, bottom: 40, left: 60}">
-      <d3-axis name="date" label="Date" extent="true" orientation="bottom" ticks="5" time-format="%Y-%m-%d" order="1"></d3-axis>
-      <d3-axis name="savings" label="Deposits" orientation="left" ticks="3" order="1"></d3-axis>
-      <d3-axis name="total" label="Savings" orientation="right" tick-values="tickValues" order="1"></d3-axis>
-      <d3-line x="date" y="optimal" yscale="total" order="2"></d3-line>
+      <d3-axis name="date" label="Date" extent="true" orientation="bottom" ticks="5" time-format="%Y-%m-%d"></d3-axis>
+      <d3-axis name="savings" label="Deposits" orientation="left" ticks="3"></d3-axis>
+      <d3-axis name="total" label="Savings" orientation="right"></d3-axis>
+      <d3-line x="date" y="optimal" yscale="total"></d3-line>
       <d3-area x="date" y="total"></d3-area>
       <d3-bars x="date" y="savings"></d3-bars>
       <d3-gradient x1="0%" x2="100%" y1="0%" y2="100%" stops="gradient" ref='gradient'>
@@ -19,9 +19,16 @@
   <section id="stacked" class="well">
     <h1>Stacked Areas</h1>
     <p>Area charts can be stacked by specifying multiple y propeties</p>
-    <div data="line" d3-chart margin="{ top: 20, right: 80, bottom: 40, left: 20}">
-      <d3-axis grid="true" name="date" label="Date" extent="true" orientation="bottom" ticks="5" time-format="%Y-%m-%d" order="1"></d3-axis>
-      <d3-axis grid="true" name="total" filter="stackedSum" label="Savings" orientation="right" ticks="5" order="1"></d3-axis>
+    <div data="line" d3-chart margin="{ top: 20, right: 30, bottom: 40, left: 20}">
+      <d3-axis grid="true" name="date" label="Date" extent="true" orientation="top"
+        scale="time"
+        tick-dx="0.1em" tick-dy="1.1em" tick-anchor="start" tick-size="0,0"
+        time-format="%b %Y" time-scale="months" time-interval="3"
+        order="1"></d3-axis>
+      <d3-axis grid="true" name="total" filter="stackDomain" orientation="right"
+        label="Savings"
+        format="$,"
+        ticks="4" tick-dx="-0.5em" tick-dy="-0.3em" tick-anchor="end" tick-size="0,0" order="1"></d3-axis>
       <d3-area x="date" yscale="total" columns="columns"></d3-area>
     </div>
   </section>
