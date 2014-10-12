@@ -113,7 +113,7 @@ angular.module('ad3').directive 'd3Axis', ->
         lastTickLabels.attr('dy', options.lastTickDy)
       if options.lastTickDx
         lastTickLabels.attr('dx', options.lastTickDx)
-      if options.listTickAnchor
+      if options.lastTickAnchor
         lastTickLabels.style('text-anchor', options.lastTickAnchor)
       firstTickLabels = d3.select(tickLabels[0][0])
       if options.firstTickDy

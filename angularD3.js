@@ -313,7 +313,7 @@
           if (options.lastTickDx) {
             lastTickLabels.attr('dx', options.lastTickDx);
           }
-          if (options.listTickAnchor) {
+          if (options.lastTickAnchor) {
             lastTickLabels.style('text-anchor', options.lastTickAnchor);
           }
           firstTickLabels = d3.select(tickLabels[0][0]);
