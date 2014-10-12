@@ -208,7 +208,7 @@
       restrict: 'E',
       require: '^d3Chart',
       link: function($scope, $el, $attrs, chartController) {
-        var axisElement, drawGrid, getAxis, grid, label, options, positionLabel, range, redraw, scale, translation, updateScale;
+        var adjustTickLabels, axisElement, drawGrid, getAxis, grid, label, options, positionLabel, range, redraw, scale, translation, updateScale;
         options = angular.extend(defaults(), $attrs);
         range = function() {
           if (options.orientation === 'top' || options.orientation === 'bottom') {
@@ -236,15 +236,29 @@
             return "translate(" + (chartController.innerWidth()) + ", 0)";
           }
         };
-        scale = d3.scale.linear();
+        if (options.scale === 'time') {
+          scale = d3.time.scale();
+        } else if (options.scale) {
+          scale = d3.scale[options.scale]();
+        } else {
+          scale = d3.scale.linear();
+        }
         getAxis = function() {
-          var axis, format;
+          var axis, format, tickSize;
           axis = d3.svg.axis().scale(scale).orient(options.orientation);
           if (options.ticks) {
             axis.ticks(options.ticks);
           }
+          if (options.timeScale) {
+            axis.ticks(d3.time[options.timeScale], options.timeInterval);
+          }
           if (options.tickValues) {
             axis.tickValues($scope.$eval(options.tickValues));
+          }
+          if (options.tickSize) {
+            tickSize = options.tickSize.split(',');
+            axis.innerTickSize(tickSize[0]);
+            axis.outerTickSize(tickSize[1]);
           }
           if (options.format != null) {
             format = d3.format(options.format);
@@ -264,7 +278,7 @@
           } else if (options.orientation === 'top') {
             return label.attr("x", "" + (chartController.innerWidth() / 2)).attr("dy", "" + (-chartController.margin.top)).attr("style", "text-anchor: middle;");
           } else if (options.orientation === 'left') {
-            return label.attr("x", "-" + (chartController.innerHeight() / 2)).attr("y", "" + (-chartController.margin.left + 18)).attr("style", "text-anchor: middle;").attr("transform", "rotate(-90)");
+            return label.attr("x", "-" + (chartController.innerHeight() / 2)).attr("dy", "" + (-chartController.margin.left + 18)).attr("style", "text-anchor: middle;").attr("transform", "rotate(-90)");
           } else if (options.orientation === 'right') {
             return label.attr("x", "" + (chartController.innerHeight() / 2)).attr("dy", "" + (-chartController.margin.right + 18)).attr("style", "text-anchor: middle;").attr("transform", "rotate(90)");
           }
@@ -280,13 +294,44 @@
             return grid.call(getAxis().tickSize(chartController.innerWidth(), 0, 0).tickFormat(''));
           }
         };
+        adjustTickLabels = function(g) {
+          var firstTickLabels, lastTickLabels, tickLabels;
+          tickLabels = g.selectAll('.tick text');
+          if (options.tickDy) {
+            tickLabels.attr('dy', options.tickDy);
+          }
+          if (options.tickDx) {
+            tickLabels.attr('dx', options.tickDx);
+          }
+          if (options.tickAnchor) {
+            tickLabels.style('text-anchor', options.tickAnchor);
+          }
+          lastTickLabels = d3.select(tickLabels[0].slice(-1)[0]);
+          if (options.lastTickDy) {
+            lastTickLabels.attr('dy', options.lastTickDy);
+          }
+          if (options.lastTickDx) {
+            lastTickLabels.attr('dx', options.lastTickDx);
+          }
+          if (options.listTickAnchor) {
+            lastTickLabels.style('text-anchor', options.lastTickAnchor);
+          }
+          firstTickLabels = d3.select(tickLabels[0][0]);
+          if (options.firstTickDy) {
+            firstTickLabels.attr('dy', options.firstTickDy);
+          }
+          if (options.firstTickDx) {
+            firstTickLabels.attr('dx', options.firstTickDx);
+          }
+          if (options.listTickAnchor) {
+            return firstTickLabels.style('text-anchor', options.firstTickAnchor);
+          }
+        };
         axisElement = null;
         grid = null;
         label = null;
         redraw = function(data) {
-          if (!axisElement) {
-            console.log('insertAxis');
-          }
+          var tickLabels;
           axisElement || (axisElement = chartController.getChart().append("g").attr("class", "axis axis-" + options.orientation + " axis-" + options.name).attr("transform", translation()));
           if (options.label) {
             label || (label = axisElement.append("text").attr("class", "axis-label").text(options.label));
@@ -300,10 +345,12 @@
           if (label) {
             positionLabel(label.transition().duration(500));
           }
-          axisElement.transition().duration(500).attr("transform", translation()).call(getAxis());
+          axisElement.transition().duration(500).attr("transform", translation()).call(getAxis()).selectAll('tick text').tween("attr.dx", null).tween("attr.dy", null).tween("style.text-anchor", null);
           if (grid != null) {
-            return drawGrid(grid.transition().duration(500));
+            drawGrid(grid.transition().duration(500));
           }
+          tickLabels = axisElement.selectAll('.tick text');
+          return axisElement.call(adjustTickLabels);
         };
         updateScale = function(data) {
           var datum, domainValues;
@@ -311,6 +358,9 @@
             return;
           }
           scale.range(range());
+          if (options.domain) {
+            data;
+          }
           if (options.filter) {
             domainValues = $scope.$eval("" + options.filter + "(data)", {
               data: data
@@ -328,8 +378,6 @@
           }
           if (options.extent) {
             return scale.domain(d3.extent(domainValues));
-          } else if (options.domain) {
-            return scale.domain([0, d3.max(domainValues)]);
           } else {
             return scale.domain([0, d3.max(domainValues)]);
           }
@@ -370,9 +418,6 @@
         barsElements = null;
         redraw = function(data) {
           var bars;
-          if (!barsElements) {
-            console.log('insertBars');
-          }
           barsElements || (barsElements = chartController.getChart().append("g").attr("class", "bars"));
           if (!((data != null) && data.length !== 0)) {
             return;
