@@ -33,12 +33,19 @@ angular.module('ad3').directive 'd3Axis', ->
       else if options.orientation is 'right'
         "translate(#{chartController.innerWidth()}, 0)"
 
-    scale = d3.scale.linear()
+    if options.scale is 'time'
+      scale = d3.time.scale()
+    else if options.scale
+      scale = d3.scale[options.scale]()
+    else
+      scale = d3.scale.linear()
 
     getAxis = ->
       axis = d3.svg.axis().scale(scale).orient(options.orientation)
       if options.ticks
         axis.ticks(options.ticks)
+      if options.timeScale
+        axis.ticks(d3.time[options.timeScale], options.timeInterval)
       if options.tickValues
         axis.tickValues($scope.$eval(options.tickValues))
       if options.tickSize
@@ -101,6 +108,20 @@ angular.module('ad3').directive 'd3Axis', ->
         tickLabels.attr('dx', options.tickDx)
       if options.tickAnchor
         tickLabels.style('text-anchor', options.tickAnchor)
+      lastTickLabels = d3.select(tickLabels[0].slice(-1)[0])
+      if options.lastTickDy
+        lastTickLabels.attr('dy', options.lastTickDy)
+      if options.lastTickDx
+        lastTickLabels.attr('dx', options.lastTickDx)
+      if options.listTickAnchor
+        lastTickLabels.style('text-anchor', options.lastTickAnchor)
+      firstTickLabels = d3.select(tickLabels[0][0])
+      if options.firstTickDy
+        firstTickLabels.attr('dy', options.firstTickDy)
+      if options.firstTickDx
+        firstTickLabels.attr('dx', options.firstTickDx)
+      if options.listTickAnchor
+        firstTickLabels.style('text-anchor', options.firstTickAnchor)
 
     axisElement = null
     grid = null
@@ -134,14 +155,14 @@ angular.module('ad3').directive 'd3Axis', ->
     updateScale = (data) ->
       return unless data? and data.length isnt 0
       scale.range(range())
+      if options.domain
+        data
       if options.filter
         domainValues = $scope.$eval("#{options.filter}(data)", { data: data })
       else
         domainValues = (datum[options.name] for datum in data)
       if options.extent
         scale.domain d3.extent domainValues
-      else if options.domain
-        scale.domain [0, d3.max domainValues]
       else
         scale.domain [0, d3.max domainValues]
 
