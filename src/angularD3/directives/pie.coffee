@@ -36,11 +36,11 @@ angular.module('ad3').directive 'd3Pie', ->
 
     center = null
     redraw = (data) ->
-      center = chartController.getChart().append("g").attr("class", "pie")
+      center ||= chartController.getChart().append("g").attr("class", "pie")
 
       return unless data? and data.length isnt 0
 
-      radius = Math.min(chartController.innerWidth(), chartController.innerHeight())/2
+      radius = Math.min(chartController.innerWidth, chartController.innerHeight)/2
 
       center.attr("transform", "translate(" + radius + "," + radius + ")")
 

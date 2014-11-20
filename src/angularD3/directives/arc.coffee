@@ -33,7 +33,7 @@ angular.module('ad3').directive 'd3Arc', ->
 
       return unless data? and data.length isnt 0
 
-      radius = Math.min(chartController.innerWidth(), chartController.innerHeight())/2
+      radius = Math.min(chartController.innerWidth, chartController.innerHeight)/2
 
       center.attr("transform", "translate(" + radius  + "," + radius + ")")
 

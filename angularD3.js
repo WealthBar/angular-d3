@@ -40,7 +40,7 @@
           if (!((data != null) && data.length !== 0)) {
             return;
           }
-          radius = Math.min(chartController.innerWidth(), chartController.innerHeight()) / 2;
+          radius = Math.min(chartController.innerWidth, chartController.innerHeight) / 2;
           center.attr("transform", "translate(" + radius + "," + radius + ")");
           arc = d3.svg.arc().outerRadius(radius).innerRadius(radius * innerRadius).startAngle(0).endAngle(function(d) {
             return d / 100 * 2 * Math.PI;
@@ -213,27 +213,27 @@
         range = function() {
           if (options.orientation === 'top' || options.orientation === 'bottom') {
             if (options.reverse != null) {
-              return [chartController.innerWidth(), 0];
+              return [chartController.innerWidth, 0];
             } else {
-              return [0, chartController.innerWidth()];
+              return [0, chartController.innerWidth];
             }
           } else {
             if (options.reverse != null) {
-              return [0, chartController.innerHeight()];
+              return [0, chartController.innerHeight];
             } else {
-              return [chartController.innerHeight(), 0];
+              return [chartController.innerHeight, 0];
             }
           }
         };
         translation = function() {
           if (options.orientation === 'bottom') {
-            return "translate(0, " + (chartController.innerHeight()) + ")";
+            return "translate(0, " + chartController.innerHeight + ")";
           } else if (options.orientation === 'top') {
             return "translate(0, 0)";
           } else if (options.orientation === 'left') {
             return "translate(0, 0)";
           } else if (options.orientation === 'right') {
-            return "translate(" + (chartController.innerWidth()) + ", 0)";
+            return "translate(" + chartController.innerWidth + ", 0)";
           }
         };
         if (options.scale === 'time') {
@@ -274,24 +274,24 @@
         };
         positionLabel = function(label) {
           if (options.orientation === 'bottom') {
-            return label.attr("x", "" + (chartController.innerWidth() / 2)).attr("dy", "" + chartController.margin.bottom).attr("style", "text-anchor: middle;");
+            return label.attr("x", "" + (chartController.innerWidth / 2)).attr("dy", "" + chartController.margin.bottom).attr("style", "text-anchor: middle;");
           } else if (options.orientation === 'top') {
-            return label.attr("x", "" + (chartController.innerWidth() / 2)).attr("dy", "" + (-chartController.margin.top)).attr("style", "text-anchor: middle;");
+            return label.attr("x", "" + (chartController.innerWidth / 2)).attr("dy", "" + (-chartController.margin.top)).attr("style", "text-anchor: middle;");
           } else if (options.orientation === 'left') {
-            return label.attr("x", "-" + (chartController.innerHeight() / 2)).attr("dy", "" + (-chartController.margin.left + 18)).attr("style", "text-anchor: middle;").attr("transform", "rotate(-90)");
+            return label.attr("x", "-" + (chartController.innerHeight / 2)).attr("dy", "" + (-chartController.margin.left + 18)).attr("style", "text-anchor: middle;").attr("transform", "rotate(-90)");
           } else if (options.orientation === 'right') {
-            return label.attr("x", "" + (chartController.innerHeight() / 2)).attr("dy", "" + (-chartController.margin.right + 18)).attr("style", "text-anchor: middle;").attr("transform", "rotate(90)");
+            return label.attr("x", "" + (chartController.innerHeight / 2)).attr("dy", "" + (-chartController.margin.right + 18)).attr("style", "text-anchor: middle;").attr("transform", "rotate(90)");
           }
         };
         drawGrid = function(grid) {
           if (options.orientation === 'bottom') {
-            return grid.call(getAxis().tickSize(chartController.innerHeight(), 0, 0).tickFormat(''));
+            return grid.call(getAxis().tickSize(chartController.innerHeight, 0, 0).tickFormat(''));
           } else if (options.orientation === 'top') {
-            return grid.attr("transform", "translate(0, " + (chartController.innerHeight()) + ")").call(getAxis().tickSize(chartController.innerHeight(), 0, 0).tickFormat(''));
+            return grid.attr("transform", "translate(0, " + chartController.innerHeight + ")").call(getAxis().tickSize(chartController.innerHeight, 0, 0).tickFormat(''));
           } else if (options.orientation === 'left') {
-            return grid.attr("transform", "translate(" + (chartController.innerWidth()) + ", 0)").call(getAxis().tickSize(chartController.innerWidth(), 0, 0).tickFormat(''));
+            return grid.attr("transform", "translate(" + chartController.innerWidth + ", 0)").call(getAxis().tickSize(chartController.innerWidth, 0, 0).tickFormat(''));
           } else if (options.orientation === 'right') {
-            return grid.call(getAxis().tickSize(chartController.innerWidth(), 0, 0).tickFormat(''));
+            return grid.call(getAxis().tickSize(chartController.innerWidth, 0, 0).tickFormat(''));
           }
         };
         adjustTickLabels = function(g) {
@@ -413,7 +413,7 @@
         x = chartController.getScale(options.xscale || options.x);
         y = chartController.getScale(options.yscale || options.y);
         chart = chartController.getChart();
-        height = chartController.innerHeight();
+        height = chartController.innerHeight;
         width = options.width;
         barsElements = null;
         redraw = function(data) {
@@ -458,7 +458,7 @@
       scope: true,
       controller: [
         '$scope', '$element', '$attrs', '$window', '$timeout', function($scope, $el, $attrs, $window, $timeout) {
-          var binding, chart, debounce, elements, scales, sortOrder, svg,
+          var binding, chart, debounce, elements, height, scales, sortOrder, svg, updateSize, width,
             _this = this;
           scales = $scope.scales = {};
           elements = $scope.elements = [];
@@ -470,17 +470,11 @@
             left: 10
           };
           svg = d3.select($el[0]).append('svg').attr('class', "d3").attr("width", "100%").attr("height", "100%");
-          this.width = function() {
+          width = function() {
             return $el[0].offsetWidth;
           };
-          this.height = function() {
+          height = function() {
             return $el[0].offsetHeight;
-          };
-          this.innerWidth = function() {
-            return _this.width() - _this.margin.left - _this.margin.right;
-          };
-          this.innerHeight = function() {
-            return _this.height() - _this.margin.top - _this.margin.bottom;
           };
           chart = svg.append("g").attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
           this.getSvg = function() {
@@ -507,13 +501,21 @@
               order: Number(order)
             });
           };
+          updateSize = function() {
+            if (_this.width !== width() || _this.height !== height()) {
+              _this.width = width();
+              _this.height = height();
+              _this.innerWidth = _this.width - _this.margin.left - _this.margin.right;
+              _this.innerHeight = _this.height - _this.margin.top - _this.margin.bottom;
+              return _this.redraw();
+            }
+          };
           sortOrder = function(a, b) {
             return a.order - b.order;
           };
           debounce = null;
           this.redraw = function() {
-            var _this = this;
-            if (debounce) {
+            if (debounce || _this.width === 0 || _this.height === 0) {
               return;
             }
             return debounce = $timeout(function() {
@@ -533,12 +535,14 @@
               return _results;
             }, $attrs.updateInterval || 200);
           };
-          $window.addEventListener('resize', this.redraw);
+          $window.addEventListener('resize', updateSize);
           if ($attrs.watch === 'deep') {
             $scope.$watch(binding, this.redraw, true);
           } else {
             $scope.$watch(binding, this.redraw);
           }
+          $scope.$watch(updateSize);
+          updateSize();
         }
       ]
     };
@@ -660,7 +664,7 @@
         options = angular.extend(defaults(), attrs);
         x = chartController.getScale(options.xscale || options.x);
         y = chartController.getScale(options.yscale || options.y);
-        height = chartController.innerHeight();
+        height = chartController.innerHeight;
         line = d3.svg.line().x(function(d) {
           return x(d[options.x]);
         }).y(function(d) {
@@ -725,11 +729,11 @@
         center = null;
         redraw = function(data) {
           var arc, arcTween, getPosition, label, labelArc, padding, prevbb, radius, slice;
-          center = chartController.getChart().append("g").attr("class", "pie");
+          center || (center = chartController.getChart().append("g").attr("class", "pie"));
           if (!((data != null) && data.length !== 0)) {
             return;
           }
-          radius = Math.min(chartController.innerWidth(), chartController.innerHeight()) / 2;
+          radius = Math.min(chartController.innerWidth, chartController.innerHeight) / 2;
           center.attr("transform", "translate(" + radius + "," + radius + ")");
           arc = d3.svg.arc().outerRadius(radius).innerRadius(radius * innerRadius);
           arcTween = function(a) {

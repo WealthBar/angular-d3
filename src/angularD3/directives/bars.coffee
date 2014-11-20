@@ -14,7 +14,7 @@ angular.module('ad3').directive 'd3Bars', ->
     y = chartController.getScale(options.yscale or options.y)
 
     chart = chartController.getChart()
-    height = chartController.innerHeight()
+    height = chartController.innerHeight
     width = options.width
 
     barsElements = null

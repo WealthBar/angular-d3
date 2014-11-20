@@ -14,24 +14,24 @@ angular.module('ad3').directive 'd3Axis', ->
     range = ->
       if options.orientation is 'top' or options.orientation is 'bottom'
         if options.reverse?
-          [chartController.innerWidth(), 0]
+          [chartController.innerWidth, 0]
         else
-          [0 ,chartController.innerWidth()]
+          [0 ,chartController.innerWidth]
       else
         if options.reverse?
-          [0, chartController.innerHeight()]
+          [0, chartController.innerHeight]
         else
-          [chartController.innerHeight(), 0]
+          [chartController.innerHeight, 0]
 
     translation = ->
       if options.orientation is 'bottom'
-        "translate(0, #{chartController.innerHeight()})"
+        "translate(0, #{chartController.innerHeight})"
       else if options.orientation is 'top'
         "translate(0, 0)"
       else if options.orientation is 'left'
         "translate(0, 0)"
       else if options.orientation is 'right'
-        "translate(#{chartController.innerWidth()}, 0)"
+        "translate(#{chartController.innerWidth}, 0)"
 
     if options.scale is 'time'
       scale = d3.time.scale()
@@ -62,41 +62,41 @@ angular.module('ad3').directive 'd3Axis', ->
 
     positionLabel = (label) ->
       if options.orientation is 'bottom'
-        label.attr("x", "#{chartController.innerWidth() / 2}")
+        label.attr("x", "#{chartController.innerWidth / 2}")
           .attr("dy", "#{chartController.margin.bottom}")
           .attr("style", "text-anchor: middle;")
       else if options.orientation is 'top'
-        label.attr("x", "#{chartController.innerWidth() / 2}")
+        label.attr("x", "#{chartController.innerWidth / 2}")
           .attr("dy", "#{-chartController.margin.top}")
           .attr("style", "text-anchor: middle;")
       else if options.orientation is 'left'
-        label.attr("x", "-#{chartController.innerHeight() / 2}")
+        label.attr("x", "-#{chartController.innerHeight / 2}")
           .attr("dy", "#{-chartController.margin.left + 18}")
           .attr("style", "text-anchor: middle;")
           .attr("transform", "rotate(-90)")
       else if options.orientation is 'right'
-        label.attr("x", "#{chartController.innerHeight() / 2}")
+        label.attr("x", "#{chartController.innerHeight / 2}")
           .attr("dy", "#{-chartController.margin.right + 18}")
           .attr("style", "text-anchor: middle;")
           .attr("transform", "rotate(90)")
 
     drawGrid = (grid) ->
       if options.orientation is 'bottom'
-        grid.call(getAxis().tickSize(chartController.innerHeight(), 0, 0)
+        grid.call(getAxis().tickSize(chartController.innerHeight, 0, 0)
           .tickFormat('')
         )
       else if options.orientation is 'top'
-        grid.attr("transform", "translate(0, #{chartController.innerHeight()})")
-          .call(getAxis().tickSize(chartController.innerHeight(), 0, 0)
+        grid.attr("transform", "translate(0, #{chartController.innerHeight})")
+          .call(getAxis().tickSize(chartController.innerHeight, 0, 0)
           .tickFormat('')
         )
       else if options.orientation is 'left'
-        grid.attr("transform", "translate(#{chartController.innerWidth()}, 0)")
-          .call(getAxis().tickSize(chartController.innerWidth(), 0, 0)
+        grid.attr("transform", "translate(#{chartController.innerWidth}, 0)")
+          .call(getAxis().tickSize(chartController.innerWidth, 0, 0)
           .tickFormat('')
         )
       else if options.orientation is 'right'
-        grid.call(getAxis().tickSize(chartController.innerWidth(), 0, 0)
+        grid.call(getAxis().tickSize(chartController.innerWidth, 0, 0)
           .tickFormat('')
         )
 

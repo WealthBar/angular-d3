@@ -9,19 +9,19 @@ angular.module('angularD3App').controller 'MainCtrl', ($scope, $interval) ->
   $interval ->
     val = Math.random() * 100
     $scope.arcs.arc1 = { value: val, label: "#{val.toFixed(0)}%" }
-  , 1000 * 2
+  , 1000 * 5
 
   $interval ->
     val = Math.random() * 100
     $scope.arcs.arc2 = { value: val, label: "#{val.toFixed(0)}%" }
-  , 1000 * 2.5
+  , 1000 * 5
 
   $interval ->
     if $scope.columns.length == 3
       $scope.columns = ['savings', 'optimal']
     else
       $scope.columns = ['savings', 'total', 'optimal']
-  , 1000 * 2.5
+  , 1000 * 10
 
   $scope.stackDomain = (data) ->
     values = for value in data
