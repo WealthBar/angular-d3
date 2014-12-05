@@ -98,7 +98,9 @@
         } else {
           area = d3.svg.area().x(function(d) {
             return x(d.x);
-          }).y0(chartController.innerHeight).y1(function(d) {
+          }).y0(function() {
+            return chartController.innerHeight;
+          }).y1(function(d) {
             return y(d.y);
           });
           areaStacked = d3.svg.area().x(function(d) {
@@ -423,24 +425,26 @@
             return;
           }
           bars = barsElements.selectAll("rect.bar").data(data);
-          bars.exit().transition().duration(500).attr("y", function(d) {
-            return height;
+          bars.exit().transition().duration(500).attr("y", function() {
+            return chartController.innerHeight;
           }).attr("height", 0).remove();
           bars.transition().duration(500).attr("x", function(d) {
             return x(d[options.x]) - width / 2;
           }).attr("y", function(d) {
             return y(d[options.y]);
           }).attr("height", function(d) {
-            return height - y(d[options.y]);
+            return chartController.innerHeight - y(d[options.y]);
           }).attr("width", width);
           return bars.enter().append("rect").attr("class", function(d, i) {
             return "bar bar-" + i;
           }).attr("x", function(d) {
             return x(d[options.x]) - width / 2;
-          }).attr("width", width).attr("y", height).attr("height", 0).transition().duration(500).attr("y", function(d) {
+          }).attr("width", width).attr("y", function() {
+            return chartController.innerHeight;
+          }).attr("height", 0).transition().duration(500).attr("y", function(d) {
             return y(d[options.y]);
           }).attr("height", function(d) {
-            return height - y(d[options.y]);
+            return chartController.innerHeight - y(d[options.y]);
           });
         };
         return chartController.registerElement(redraw, options.order);
@@ -660,11 +664,10 @@
       restrict: 'E',
       require: '^d3Chart',
       link: function(scope, el, attrs, chartController) {
-        var height, line, linePath, options, redraw, x, y;
+        var line, linePath, options, redraw, x, y;
         options = angular.extend(defaults(), attrs);
         x = chartController.getScale(options.xscale || options.x);
         y = chartController.getScale(options.yscale || options.y);
-        height = chartController.innerHeight;
         line = d3.svg.line().x(function(d) {
           return x(d[options.x]);
         }).y(function(d) {

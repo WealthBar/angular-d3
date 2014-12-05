@@ -11,7 +11,6 @@ angular.module('ad3').directive 'd3Line', ->
     options = angular.extend(defaults(), attrs)
     x = chartController.getScale(options.xscale or options.x)
     y = chartController.getScale(options.yscale or options.y)
-    height = chartController.innerHeight
 
     line = d3.svg.line()
       .x((d) -> x(d[options.x]))

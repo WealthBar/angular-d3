@@ -22,7 +22,7 @@ angular.module('ad3').directive 'd3Area', ->
     else
       area = d3.svg.area()
         .x((d) -> x(d.x))
-        .y0(chartController.innerHeight)
+        .y0(-> chartController.innerHeight)
         .y1((d) -> y(d.y))
       areaStacked = d3.svg.area()
         .x((d) -> x(d.x))
