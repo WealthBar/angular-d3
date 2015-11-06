@@ -3,10 +3,12 @@ angular.module('ad3').directive 'd3Area', ->
 
   restrict: 'E'
   require: '^d3Chart'
+  scope:
+    columns: '='
 
-  link: (scope, el, attrs, chartController) ->
+  link: ($scope, $el, $attrs, chartController) ->
     # todo: DRY this up in line, area and bar directives
-    options = angular.extend(defaults(), attrs)
+    options = angular.extend(defaults(), $attrs)
     x = chartController.getScale(options.xscale or options.x)
     y = chartController.getScale(options.yscale or options.y)
 
@@ -35,8 +37,8 @@ angular.module('ad3').directive 'd3Area', ->
         .attr("class", "area")
       return unless data? and data.length isnt 0
       columns = options.y if options.y?
-      if options.columns?
-        columns = scope.$eval(options.columns)
+      if $scope.columns?
+        columns = $scope.columns
       return unless columns?
       if angular.isString columns
         columns = columns.split(',').map((c) -> c.trim())
@@ -61,5 +63,5 @@ angular.module('ad3').directive 'd3Area', ->
         .attr("d", (d,i) -> if i is 0 then area(d.values) else areaStacked(d.values))
         .remove()
 
-    scope.$watch options.columns, chartController.redraw, true if options.columns?
+    $scope.$watch options.columns, chartController.redraw, true if options.columns?
     chartController.registerElement(redraw, options.order)

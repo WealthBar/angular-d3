@@ -7,6 +7,10 @@ angular.module('ad3').directive 'd3Axis', ->
   priority: 1
   restrict: 'E'
   require: '^d3Chart'
+  scope:
+    customFormat: '='
+    filter: '='
+    tickValues: '='
 
   link: ($scope, $el, $attrs, chartController) ->
     options = angular.extend(defaults(), $attrs)
@@ -46,8 +50,8 @@ angular.module('ad3').directive 'd3Axis', ->
         axis.ticks(options.ticks)
       if options.timeScale
         axis.ticks(d3.time[options.timeScale], options.timeInterval)
-      if options.tickValues
-        axis.tickValues($scope.$eval(options.tickValues))
+      if $scope.tickValues
+        axis.tickValues($scope.tickValues)
       if options.tickSize
         tickSize = options.tickSize.split(',')
         axis.innerTickSize(tickSize[0])
@@ -55,6 +59,9 @@ angular.module('ad3').directive 'd3Axis', ->
       if options.format?
         format = d3.format(options.format)
         axis.tickFormat(format)
+      if $scope.customFormat?
+        format = d3.format(options.format)
+        axis.tickFormat($scope.customFormat)
       if options.timeFormat?
         format = d3.time.format(options.timeFormat)
         axis.tickFormat((value) -> format(new Date(value)))
@@ -157,8 +164,8 @@ angular.module('ad3').directive 'd3Axis', ->
       scale.range(range())
       if options.domain
         data
-      if options.filter
-        domainValues = $scope.$eval("#{options.filter}(data)", { data: data })
+      if $scope.filter
+        domainValues = $scope.filter(data)
       else
         domainValues = (datum[options.name] for datum in data)
       if options.extent

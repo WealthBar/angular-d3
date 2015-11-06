@@ -1,14 +1,15 @@
 angular.module('ad3').directive 'd3Chart', ->
   restrict: 'EA'
-  scope: true
+  scope:
+    margin: '='
+    data: '='
 
   controller: ['$scope', '$element', '$attrs', '$window', '$timeout',
   ($scope, $el, $attrs, $window, $timeout) ->
     scales = $scope.scales = {}
     elements = $scope.elements = []
-    binding = $scope.binding = $attrs.data
 
-    @margin = $scope.$eval($attrs.margin) or { top: 10, right: 10, bottom: 10, left: 10 }
+    @margin = $scope.margin or { top: 10, right: 10, bottom: 10, left: 10 }
     svg = d3.select($el[0]).append('svg').attr('class', "d3")
       .attr("width", "100%")
       .attr("height", "100%")
@@ -42,7 +43,7 @@ angular.module('ad3').directive 'd3Chart', ->
       return if debounce or @width is 0 or @height is 0
       debounce = $timeout =>
         debounce = null
-        data = $scope.$eval(binding)
+        data = $scope.data
         for name, scale of scales
           scale.update(data)
         for element in elements.sort(sortOrder)
@@ -52,9 +53,9 @@ angular.module('ad3').directive 'd3Chart', ->
     $window.addEventListener 'resize', updateSize
 
     if $attrs.watch is 'deep'
-      $scope.$watch binding, @redraw, true
+      $scope.$watch 'data', @redraw, true
     else
-      $scope.$watch binding, @redraw
+      $scope.$watch 'data', @redraw
 
     # We check the size on all scope events since scope can affect chart
     # visibility and if the chart area is resized while not visible it won't
