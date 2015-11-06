@@ -1,6 +1,11 @@
 {
   "name": "angular-d3",
   "version": "0.0.29",
+  "license": "MIT",
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/WealthBar/angular-d3.git"
+  },
   "dependencies": {},
   "devDependencies": {
     "grunt": "~0.4.1",
