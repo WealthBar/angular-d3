@@ -8,7 +8,7 @@ angular.module('ad3').directive 'd3Axis', ->
   restrict: 'E'
   require: '^d3Chart'
   scope:
-    customFormat: '='
+    customTimeFormat: '='
     filter: '='
     tickValues: '='
 
@@ -56,15 +56,15 @@ angular.module('ad3').directive 'd3Axis', ->
         tickSize = options.tickSize.split(',')
         axis.innerTickSize(tickSize[0])
         axis.outerTickSize(tickSize[1])
-      if options.format?
-        format = d3.format(options.format)
-        axis.tickFormat(format)
-      if $scope.customFormat?
-        format = d3.format(options.format)
-        axis.tickFormat($scope.customFormat)
+      if $scope.customTimeFormat?
+        format = d3.time.format.multi($scope.customTimeFormat)
+        axis.tickFormat((value) -> format(new Date(value)))
       if options.timeFormat?
         format = d3.time.format(options.timeFormat)
         axis.tickFormat((value) -> format(new Date(value)))
+      else if options.format?
+        format = d3.format(options.format)
+        axis.tickFormat(format)
       axis
 
     positionLabel = (label) ->

@@ -47,3 +47,10 @@ angular.module('angularD3App').controller 'MainCtrl', ($scope, $interval) ->
     { offset: '0%', color: '#098aae', opacity: 0.6 },
     { offset: '100%', color: '#684684', opacity: 0.9 }
   ]
+
+  $scope.customTimeFormat = [
+    ["%a %d", (d) -> d.getDay() && d.getDate() != 1],
+    ["%b %d", (d) -> d.getDate() != 1],
+    ["%b", (d) -> d.getMonth()],
+    ["%Y", -> true]
+  ]

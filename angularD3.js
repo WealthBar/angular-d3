@@ -77,9 +77,12 @@
     return {
       restrict: 'E',
       require: '^d3Chart',
-      link: function(scope, el, attrs, chartController) {
+      scope: {
+        columns: '='
+      },
+      link: function($scope, $el, $attrs, chartController) {
         var area, areaElement, areaStacked, options, redraw, x, y;
-        options = angular.extend(defaults(), attrs);
+        options = angular.extend(defaults(), $attrs);
         x = chartController.getScale(options.xscale || options.x);
         y = chartController.getScale(options.yscale || options.y);
         if (options.vertical) {
@@ -121,8 +124,8 @@
           if (options.y != null) {
             columns = options.y;
           }
-          if (options.columns != null) {
-            columns = scope.$eval(options.columns);
+          if ($scope.columns != null) {
+            columns = $scope.columns;
           }
           if (columns == null) {
             return;
@@ -185,7 +188,7 @@
           }).remove();
         };
         if (options.columns != null) {
-          scope.$watch(options.columns, chartController.redraw, true);
+          $scope.$watch(options.columns, chartController.redraw, true);
         }
         return chartController.registerElement(redraw, options.order);
       }
@@ -209,6 +212,11 @@
       priority: 1,
       restrict: 'E',
       require: '^d3Chart',
+      scope: {
+        customTimeFormat: '=',
+        filter: '=',
+        tickValues: '='
+      },
       link: function($scope, $el, $attrs, chartController) {
         var adjustTickLabels, axisElement, drawGrid, getAxis, grid, label, options, positionLabel, range, redraw, scale, translation, updateScale;
         options = angular.extend(defaults(), $attrs);
@@ -254,23 +262,28 @@
           if (options.timeScale) {
             axis.ticks(d3.time[options.timeScale], options.timeInterval);
           }
-          if (options.tickValues) {
-            axis.tickValues($scope.$eval(options.tickValues));
+          if ($scope.tickValues) {
+            axis.tickValues($scope.tickValues);
           }
           if (options.tickSize) {
             tickSize = options.tickSize.split(',');
             axis.innerTickSize(tickSize[0]);
             axis.outerTickSize(tickSize[1]);
           }
-          if (options.format != null) {
-            format = d3.format(options.format);
-            axis.tickFormat(format);
+          if ($scope.customTimeFormat != null) {
+            format = d3.time.format.multi($scope.customTimeFormat);
+            axis.tickFormat(function(value) {
+              return format(new Date(value));
+            });
           }
           if (options.timeFormat != null) {
             format = d3.time.format(options.timeFormat);
             axis.tickFormat(function(value) {
               return format(new Date(value));
             });
+          } else if (options.format != null) {
+            format = d3.format(options.format);
+            axis.tickFormat(format);
           }
           return axis;
         };
@@ -363,10 +376,8 @@
           if (options.domain) {
             data;
           }
-          if (options.filter) {
-            domainValues = $scope.$eval("" + options.filter + "(data)", {
-              data: data
-            });
+          if ($scope.filter) {
+            domainValues = $scope.filter(data);
           } else {
             domainValues = (function() {
               var _i, _len, _results;
@@ -459,15 +470,17 @@
   angular.module('ad3').directive('d3Chart', function() {
     return {
       restrict: 'EA',
-      scope: true,
+      scope: {
+        margin: '=',
+        data: '='
+      },
       controller: [
         '$scope', '$element', '$attrs', '$window', '$timeout', function($scope, $el, $attrs, $window, $timeout) {
-          var binding, chart, debounce, elements, height, scales, sortOrder, svg, updateSize, width,
+          var chart, debounce, elements, height, scales, sortOrder, svg, updateSize, width,
             _this = this;
           scales = $scope.scales = {};
           elements = $scope.elements = [];
-          binding = $scope.binding = $attrs.data;
-          this.margin = $scope.$eval($attrs.margin) || {
+          this.margin = $scope.margin || {
             top: 10,
             right: 10,
             bottom: 10,
@@ -525,7 +538,7 @@
             return debounce = $timeout(function() {
               var data, element, name, scale, _i, _len, _ref, _results;
               debounce = null;
-              data = $scope.$eval(binding);
+              data = $scope.data;
               for (name in scales) {
                 scale = scales[name];
                 scale.update(data);
@@ -541,9 +554,9 @@
           };
           $window.addEventListener('resize', updateSize);
           if ($attrs.watch === 'deep') {
-            $scope.$watch(binding, this.redraw, true);
+            $scope.$watch('data', this.redraw, true);
           } else {
-            $scope.$watch(binding, this.redraw);
+            $scope.$watch('data', this.redraw);
           }
           $scope.$watch(updateSize);
           updateSize();
@@ -560,19 +573,16 @@
     'd3Service', function(d3) {
       return {
         restrict: 'E',
-        scope: false,
-        link: function(scope, el, attrs) {
-          var accessor, binding, callback, src;
-          src = attrs.src;
-          binding = attrs.data;
-          if (attrs.accessor) {
-            accessor = scope.$eval(attrs.accessor);
-          }
-          if (attrs.callback) {
-            callback = scope.$eval(attrs.callback);
-          }
-          return d3.csv(src, accessor, callback).then(function(rows) {
-            return scope[binding] = rows;
+        scope: {
+          accessor: '=',
+          callback: '=',
+          data: '='
+        },
+        link: function($scope, $el, $attrs) {
+          var src;
+          src = $attrs.src;
+          return d3.csv(src, $scope.accessor, $scope.callback).then(function(rows) {
+            return $scope.data = rows;
           }, function() {
             throw 'Error loading CSV via D3';
           });
