@@ -57,7 +57,9 @@ angular.module('ad3').directive 'd3Axis', ->
         axis.innerTickSize(tickSize[0])
         axis.outerTickSize(tickSize[1])
       if $scope.customTimeFormat?
-        format = d3.time.format.multi($scope.customTimeFormat)
+        # We copy this because D3 is bad and mutates the time format.
+        # See: https://github.com/mbostock/d3/issues/1769
+        format = d3.time.format.multi(angular.copy($scope.customTimeFormat))
         axis.tickFormat((value) -> format(new Date(value)))
       if options.timeFormat?
         format = d3.time.format(options.timeFormat)
