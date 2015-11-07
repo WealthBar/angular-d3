@@ -271,7 +271,7 @@
             axis.outerTickSize(tickSize[1]);
           }
           if ($scope.customTimeFormat != null) {
-            format = d3.time.format.multi($scope.customTimeFormat);
+            format = d3.time.format.multi(angular.copy($scope.customTimeFormat));
             axis.tickFormat(function(value) {
               return format(new Date(value));
             });
