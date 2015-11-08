@@ -397,9 +397,7 @@
         };
         chartController.addScale(options.name, scale, updateScale);
         chartController.registerElement(redraw, options.order);
-        if (options.tickValues != null) {
-          return $scope.$watch(options.tickValues, chartController.redraw, true);
-        }
+        return $scope.$watchCollection('tickValues', chartController.redraw);
       }
     };
   });

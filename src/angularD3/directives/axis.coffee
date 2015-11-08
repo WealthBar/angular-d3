@@ -177,4 +177,4 @@ angular.module('ad3').directive 'd3Axis', ->
 
     chartController.addScale(options.name, scale, updateScale)
     chartController.registerElement(redraw, options.order)
-    $scope.$watch options.tickValues, chartController.redraw, true if options.tickValues?
+    $scope.$watchCollection 'tickValues', chartController.redraw
