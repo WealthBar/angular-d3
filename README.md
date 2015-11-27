@@ -11,6 +11,12 @@ AngularD3 is available via Bower as `angularD3`
 bower install angularD3
 ```
 
+AngularD3 is available via NPM as `angular_d3`
+
+```
+npm install angular_d3
+```
+
 ## Project Goals
 
 This provides an AngularJS module called `ad3` which in turn provides a
@@ -85,19 +91,11 @@ to rely on a quick reading of the code.
 
 ## Try it out
 
-This project uses Yeoman and provides a fully functional demo project under the
-`/app` folder. To run it clone this repo and do:
+This project uses NPM and Webpack. To run it clone this repo and run:
 
 ```
 npm install
-npm install -g bower
-npm install -g grunt
-
-# If you don't already have bower installed then install it with
-
-bower install
-
-grunt server
+npm start
 ```
 
 ## Feature Roadmap

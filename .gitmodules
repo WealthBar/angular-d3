@@ -1,3 +1,0 @@
-[submodule "dist"]
-	path = dist
-	url = git@github.com:wealthbar/angular-d3.git

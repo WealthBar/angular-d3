@@ -1,3 +1,5 @@
+d3 = require('d3')
+
 angular.module('ad3').directive 'd3Arc', ->
   defaults = ->
     x: 0

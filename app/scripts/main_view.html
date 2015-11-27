@@ -1,6 +1,6 @@
-<div ng-controller="MainCtrl">
-  <d3-data src="data/data.csv" data="line" accessor="parseValues" callback="log"></d3-data>
-  <d3-data src="data/donutData.csv" data="pie" accessor="parseValues" callback="log"></d3-data>
+<div>
+  <d3-data src="{{dataUrl}}" data="line" accessor="parseValues" callback="log"></d3-data>
+  <d3-data src="{{donutDataUrl}}" data="pie" accessor="parseValues" callback="log"></d3-data>
 
   <section id="graphs" class="well">
     <h1>Basic Graphs</h1>

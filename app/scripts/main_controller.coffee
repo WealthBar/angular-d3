@@ -1,4 +1,9 @@
-angular.module('angularD3App').controller 'MainCtrl', ($scope, $interval) ->
+dataUrl = require('../data/data.csv')
+donutDataUrl = require('../data/donutData.csv')
+
+module.exports = ['$scope', '$interval', ($scope, $interval) ->
+  $scope.dataUrl = dataUrl
+  $scope.donutDataUrl = donutDataUrl
   $scope.$watch '', ->
     $('body').scrollspy('refresh')
 
@@ -54,3 +59,4 @@ angular.module('angularD3App').controller 'MainCtrl', ($scope, $interval) ->
     ["%b", (d) -> d.getMonth()],
     ["%Y", -> true]
   ]
+]

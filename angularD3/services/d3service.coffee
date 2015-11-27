@@ -1,3 +1,5 @@
+d3 = require('d3')
+
 angular.module('ad3').provider 'd3Service', () ->
   defaults = @defaults = {}
 

@@ -1,7 +1,7 @@
 {
   "name": "angularD3",
   "version": "0.0.33",
-  "main": "angularD3.js",
+  "main": "dist/angularD3.js",
   "ignore": [
     ".*",
     "app",
@@ -16,12 +16,6 @@
   "dependencies": {
     "d3": "~3.4",
     "angular": "*"
-  },
-  "devDependencies": {
-    "angular-mocks": "~1.4",
-    "angular-scenario": "~1.4",
-    "bootstrap": "~3.1",
-    "jquery": "2.1"
   },
   "homepage": "http://wealthbar.github.io/angular-d3",
   "authors": [
