@@ -98,6 +98,16 @@ npm install
 npm start
 ```
 
+## Building
+
+You can build a minified `angularD3.js` which will be saved in `/dist` by running
+
+    npm run-script build
+
+You can also update the docs which will be saved in `/docs` by running
+
+    npm run-script docs
+
 ## Feature Roadmap
 
 - [x] Basic chart forms for: Area, Line and Bars
