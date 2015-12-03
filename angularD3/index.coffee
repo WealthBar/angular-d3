@@ -2,7 +2,7 @@ angular = require('angular')
 
 angular.module('ad3', [])
 
-require('./services/d3Service')
+require('./services/d3service')
 require('./directives/arc')
 require('./directives/area')
 require('./directives/axis')

@@ -1,6 +1,6 @@
 {
   "name": "angular_d3",
-  "version": "0.0.33",
+  "version": "0.0.34",
   "description": "AngularJS chart directives and other integrations for D3.js",
   "keywords": [
     "AngularJS",
