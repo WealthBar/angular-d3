@@ -178,3 +178,6 @@ angular.module('ad3').directive 'd3Axis', ->
     chartController.addScale(options.name, scale, updateScale)
     chartController.registerElement(redraw, options.order)
     $scope.$watchCollection 'tickValues', chartController.redraw
+    $scope.$watchCollection 'customTimeFormat', chartController.redraw
+    $scope.$watch 'filter', chartController.redraw
+    $scope.$watch 'tickValues', chartController.redraw
