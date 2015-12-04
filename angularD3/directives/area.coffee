@@ -63,5 +63,5 @@ angular.module('ad3').directive 'd3Area', ->
         .attr("d", (d,i) -> if i is 0 then area(d.values) else areaStacked(d.values))
         .remove()
 
-    $scope.$watch options.columns, chartController.redraw, true if options.columns?
+    $scope.$watch 'columns', chartController.redraw, true
     chartController.registerElement(redraw, options.order)
