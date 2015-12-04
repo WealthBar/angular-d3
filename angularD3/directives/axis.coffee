@@ -89,23 +89,23 @@ angular.module('ad3').directive 'd3Axis', ->
           .attr("style", "text-anchor: middle;")
           .attr("transform", "rotate(90)")
 
-    drawGrid = (grid) ->
+    drawGrid = (grid, axis) ->
       if options.orientation is 'bottom'
-        grid.call(getAxis().tickSize(chartController.innerHeight, 0, 0)
+        grid.call(axis.tickSize(chartController.innerHeight, 0, 0)
           .tickFormat('')
         )
       else if options.orientation is 'top'
         grid.attr("transform", "translate(0, #{chartController.innerHeight})")
-          .call(getAxis().tickSize(chartController.innerHeight, 0, 0)
+          .call(axis.tickSize(chartController.innerHeight, 0, 0)
           .tickFormat('')
         )
       else if options.orientation is 'left'
         grid.attr("transform", "translate(#{chartController.innerWidth}, 0)")
-          .call(getAxis().tickSize(chartController.innerWidth, 0, 0)
+          .call(axis.tickSize(chartController.innerWidth, 0, 0)
           .tickFormat('')
         )
       else if options.orientation is 'right'
-        grid.call(getAxis().tickSize(chartController.innerWidth, 0, 0)
+        grid.call(axis.tickSize(chartController.innerWidth, 0, 0)
           .tickFormat('')
         )
 
@@ -147,17 +147,18 @@ angular.module('ad3').directive 'd3Axis', ->
         grid ||= chartController.getChart().append("g")
           .attr("class", "axis-grid axis-grid-#{options.name}")
 
+      axis = getAxis()
       return unless data? and data.length isnt 0
       positionLabel(label.transition().duration(500)) if label
       axisElement.transition().duration(500)
         .attr("transform", translation())
-        .call(getAxis())
+        .call(axis)
         .selectAll('tick text')
           .tween("attr.dx", null)
           .tween("attr.dy", null)
           .tween("style.text-anchor", null)
 
-      drawGrid(grid.transition().duration(500)) if grid?
+      drawGrid(grid.transition().duration(500), axis) if grid?
       tickLabels = axisElement.selectAll('.tick text')
       axisElement.call(adjustTickLabels)
 
