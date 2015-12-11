@@ -5,13 +5,10 @@
   "ignore": [
     ".*",
     "app",
-    "**/.*",
     "node_modules",
     "bower_components",
-    "app/components",
     "test",
     "tests",
-    "dist"
   ],
   "dependencies": {
     "d3": "~3.4",
