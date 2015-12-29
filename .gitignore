@@ -3,3 +3,5 @@ node_modules
 .sass-cache
 app/components
 .sublime-*
+typings
+npm-debug.log

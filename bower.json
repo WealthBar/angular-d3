@@ -11,9 +11,9 @@
     "tests"
   ],
   "dependencies": {
-    "d3": "~3.4",
-    "angular": "*"
-  },
+    "d3": "~3.5",
+    "angular2": "2.0.0-beta.0"
+  ,
   "homepage": "http://wealthbar.github.io/angular-d3",
   "authors": [
     "Chris Nicola <chnicola@gmail.com>"
