@@ -1,73 +1,106 @@
-// Example webpack configuration with asset fingerprinting in production.
-'use strict';
+// @AngularClass
 
+/*
+ * Helper: root(), and rootDir() are defined at the bottom
+ */
 var path = require('path');
-var url = require('url');
 var webpack = require('webpack');
-var HtmlWebpackPlugin = require('html-webpack-plugin');
-var ExtractTextPlugin = require('extract-text-webpack-plugin')
+// Webpack Plugins
+var CommonsChunkPlugin = webpack.optimize.CommonsChunkPlugin;
 
-var PATHS = {
-  app: path.join(__dirname, 'app'),
-  angularD3: './index.js',
-  dist: path.join(__dirname, 'dist'),
-  docs: path.join(__dirname, 'docs'),
-  styles: path.join(__dirname, 'app/styles/index.scss'),
-}
+/*
+ * Config
+ */
+module.exports = {
+  // for faster builds use 'eval'
+  devtool: 'source-map',
+  debug: true, // remove in production
 
-var config = {
   entry: {
-    "angularD3": PATHS.angularD3,
-    "app": PATHS.app
+    'vendor': './src/vendor.ts',
+    'app': './src/bootstrap.ts' // our angular app
   },
-  resolve: { extensions: ['', '.js', '.coffee', '.css', '.scss', '.less'], },
+
+  // Config for our build files
   output: {
-    path: PATHS.dist,
-    filename: "[name].js"
+    path: root('__build__'),
+    filename: '[name].js',
+    sourceMapFilename: '[name].map',
+    chunkFilename: '[id].chunk.js',
+    publicPath: '/__build__/'
   },
+
+  resolve: {
+    // ensure loader extensions match
+    extensions: ['','.ts','.js','.json', '.css', '.html', '.scss']
+  },
+
   module: {
+    preLoaders: [ { test: /\.ts$/, loader: 'tslint-loader' } ],
     loaders: [
-      { test: /\.coffee$/, loader: "coffee-loader" },
-      { test: /\.css$/, loader: ExtractTextPlugin.extract("style", "css") },
-      { test: /\.scss$/, loader: ExtractTextPlugin.extract("style-loader", "css-loader?sourceMap!sass-loader?sourceMap") },
+      // Support for .ts files.
+      {
+        test: /\.ts$/,
+        loader: 'ts-loader',
+        query: {
+          'ignoreDiagnostics': [
+            2403, // 2403 -> Subsequent variable declarations
+            2300, // 2300 -> Duplicate identifier
+            2374, // 2374 -> Duplicate number index signature
+            2375  // 2375 -> Duplicate string index signature
+          ]
+        },
+        exclude: [ /\.(spec|e2e)\.ts$/, /node_modules/ ]
+      },
+
+      // Support for *.json files.
+      { test: /\.json$/,  loader: 'json-loader' },
+
+      // Support for CSS as raw text
+      { test: /\.css$/, loader: 'raw!style!css' },
+      { test: /\.scss$/, loader: 'raw!style!css!sass' },
+
+      // support for .html as raw text
+      { test: /\.html$/,  loader: 'raw-loader' },
       { test: /\.(ttf|svg|png|gif|jpg|woff|woff2|eot|csv)$/, loader: "file" },
-      { test: /\.html$/, loader: "ngtemplate!html" },
-    ]
+    ],
+    noParse: [ /.+zone\.js\/dist\/.+/, /.+angular2\/bundles\/.+/ ]
   },
+
   plugins: [
-     new ExtractTextPlugin("[name].css")
-  ]
+    new CommonsChunkPlugin({ name: 'vendor', filename: 'vendor.js', minChunks: Infinity }),
+    new CommonsChunkPlugin({ name: 'common', filename: 'common.js', minChunks: 2, chunks: ['app', 'vendor'] }),
+    new webpack.ProvidePlugin({
+      $: "jquery",
+      jQuery: "jquery",
+      "window.jQuery": "jquery",
+      "System": "system",
+      "window.System": "system",
+    }),
+   // include uglify in production
+  ],
+
+  // Other module loader config
+  tslint: {
+    emitErrors: false,
+    failOnHint: false
+  },
+  // our Webpack Development Server config
+  devServer: {
+    historyApiFallback: true,
+    contentBase: 'src/public',
+    publicPath: '/__build__/'
+  }
+};
+
+// Helper functions
+
+function root(args) {
+  args = Array.prototype.slice.call(arguments, 0);
+  return path.join.apply(path, [__dirname].concat(args));
 }
 
-if (process.env.BUILD_ASSETS === "true") {
-  console.log("Building assets...")
-  config.entry = { "angularD3": PATHS.angularD3 }
-  config.devtool = 'source-map'
-  config.output.devtoolModuleFilenameTemplate = '[resourcePath]'
-  config.output.devtoolFallbackModuleFilenameTemplate = '[resourcePath]?[hash]'
-  config.externals ={ "angular": "angular", "d3": "d3"}
-
-} else if (process.env.BUILD_DOCS === "true") {
-  config.devtool = 'source-map'
-  config.output.path = PATHS.docs
-  config.output.devtoolModuleFilenameTemplate = '[resourcePath]'
-  config.output.devtoolFallbackModuleFilenameTemplate = '[resourcePath]?[hash]'
-  config.plugins.push (
-    new HtmlWebpackPlugin({
-      template: path.join(PATHS.app, 'index.html'),
-      favicon: path.join(PATHS.app, 'favicon.ico'),
-      inject: 'body'
-    })
-  )
-} else {
-  config.devtool = 'source-map'
-  config.plugins.push (
-    new HtmlWebpackPlugin({
-      template: path.join(PATHS.app, 'index.html'),
-      favicon: path.join(PATHS.app, 'favicon.ico'),
-      inject: 'body'
-    })
-  )
+function rootNode(args) {
+  args = Array.prototype.slice.call(arguments, 0);
+  return root.apply(path, ['node_modules'].concat(args));
 }
-
-module.exports = config;

@@ -1,1 +1,0 @@
-require('./angularD3')

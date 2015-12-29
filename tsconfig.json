@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "ES5",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "removeComments": false,
+    "noImplicitAny": false
+  },
+  "exclude": [
+    "node_modules"
+  ],
+  "files": [
+    "typings/main.d.ts",
+    "test/injector.spec.ts",
+    "test/sanity-test.spec.ts",
+    "src/app/app.ts",
+    "src/bootstrap.ts",
+    "src/vendor.ts",
+    "src/angularD3/index.ts"
+  ],
+  "compileOnSave": false
+}
