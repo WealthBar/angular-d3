@@ -67,13 +67,13 @@ The directives are meant to be used to compost charts like so:
 ```html
   <d3-data src="data/data.csv" data="line" columns="year, savings, total, optimal"></d3-data>
   <d3-data src="data/donutData.csv" data="pie" columns="age,population"></d3-data>
-  <div d3-chart>
-    <d3-axis data="line" name="year" label="Year" extent="true" orientation="bottom" ticks="5"></d3-axis>
-    <d3-axis data="line" name="savings" label="Deposits" orientation="left" ticks="5"></d3-axis>
-    <d3-axis data="line" name="total" label="Savings" orientation="right" ticks="5"></d3-axis>
-    <d3-line data="line" x="year" y="optimal" yscale="total"></d3-line>
-    <d3-area data="line" x="year" y="total"></d3-area>
-    <d3-bars data="line" x="year" y="savings"></d3-bars>
+  <div d3-chart data="line" margin="{ top: 20, right: 30, bottom: 40, left: 20 }">
+    <d3-axis name="year" label="Year" extent="true" orientation="bottom" ticks="5"></d3-axis>
+    <d3-axis name="savings" label="Deposits" orientation="left" ticks="5"></d3-axis>
+    <d3-axis name="total" label="Savings" orientation="right" ticks="5"></d3-axis>
+    <d3-line x="year" y="optimal" yscale="total"></d3-line>
+    <d3-area x="year" y="total"></d3-area>
+    <d3-bars x="year" y="savings"></d3-bars>
   </div>
 ```
 
