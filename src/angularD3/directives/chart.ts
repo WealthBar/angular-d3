@@ -8,33 +8,87 @@ export interface Margin {
   bottom: number;
 }
 
+export interface D3Element {
+  name: string
+  order: number
+  redraw(data: {}[]): void
+}
+
+export interface D3Scale {
+  name: string
+  scale
+  update(data: {}[]): void
+}
+
 /*
  * Directive
  * D3Chart is the base element in building charts with AngularD3
  * <d3-chart></d3-chart>
  */
 @Directive({
-  selector: 'd3-chart',
-  inputs: ['margin', 'data'],
+  selector: '[d3-chart]',
+  inputs: ['margin', 'data', 'debounce'],
 })
 export class D3Chart {
   element: any;
   svg: any;
   chart: any;
-  public margin: Margin;
-  public data: any;
+  debounce = 200;
+  scales = {}
+  elements = []
+
+  private _margin: Margin = { top: 10, right: 10, bottom: 10, left: 10 };
+  private _timeout;
+  private _data: {}[];
 
   constructor(elementRef: ElementRef) {
     this.element = elementRef.nativeElement;
-    this.margin = this.margin || { top: 10, right: 10, bottom: 10, left: 10 };
     this.svg = d3.select(this.element).append('svg').attr('class', "d3")
       .attr("width", "100%")
       .attr("height", "100%");
     this.chart = this.svg.append("g")
-      .attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
+    window.addEventListener('resize', this.updateSize)
   }
 
   get width() { return this.element.offsetWidth; }
 
+  get innerWidth() { return this.width - this.margin.left - this.margin.right }
+
   get height() { return this.element.offsetHeight; }
+
+  get innerHeight() { return this.height - this.margin.top - this.margin.bottom }
+
+  addScale(scale: D3Scale) {
+    this.scales[scale.name] = scale
+  }
+
+  addElement(element: D3Element) {
+    this.elements.push(element)
+  }
+
+  get margin() { return this._margin }
+  set margin(value: Margin) {
+    if (value) {
+      this._margin = value
+      this.chart.attr("transform", `translate(${value.left || '0'}, ${value.top || '0'})`);
+    }
+  }
+
+  get data() { return this._data }
+  set data(value: {}[]) {
+    this._data = value
+    if (this._timeout || this.width === 0 || this.height === 0) return;
+    this._timeout = setTimeout(() => {
+      for (var name in this.scales) {
+        this.scales[name].update(this._data)
+      }
+      for (var element of this.elements.sort(this.sortOrder)) {
+        element.redraw(this._data)
+      }
+    }, this.debounce)
+  }
+
+  updateSize() { }
+
+  private sortOrder(a, b) { return a.order - b.order }
 }

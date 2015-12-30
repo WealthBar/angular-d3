@@ -5,30 +5,30 @@
   <section id="graphs" class="well">
     <h1>Basic Graphs</h1>
     <p>Basic line, area and bar charts can be composed together in the same chart.</p>
-    <d3-chart data="line" margin="{ top: 40, right: 60, bottom: 40, left: 60}">
-      <d3-axis name="date" label="Date" extent="true" orientation="bottom" ticks="5" time-format="%Y-%m-%d"></d3-axis>
-      <d3-axis name="savings" label="Deposits" orientation="left" ticks="3"></d3-axis>
+    <div d3-chart [data]="line" [margin]="{ top: 40, right: 60, bottom: 40, left: 60}">
+      <d3-axis name="date" label="Date" [extent]="true" orientation="bottom" [ticks]="5" time-format="%Y-%m-%d"></d3-axis>
+      <d3-axis name="savings" label="Deposits" orientation="left" [ticks]="3"></d3-axis>
       <d3-axis name="total" label="Savings" orientation="right"></d3-axis>
       <d3-line x="date" y="optimal" yscale="total"></d3-line>
       <d3-area x="date" y="total"></d3-area>
       <d3-bars x="date" y="savings"></d3-bars>
       <d3-gradient x1="0%" x2="100%" y1="0%" y2="100%" stops="gradient" ref='gradient'></d3-gradient>
-    </d3-chart>
+    </div>
   </section>
 
   <section id="stacked" class="well">
     <h1>Stacked Areas</h1>
     <p>Area charts can be stacked by specifying multiple y propeties</p>
-    <div data="line" d3-chart margin="{ top: 20, right: 30, bottom: 40, left: 20}">
-      <d3-axis grid="true" name="date" label="Date" extent="true" orientation="top"
+    <div d3-chart [data]="line" [margin]="{ top: 20, right: 30, bottom: 40, left: 20}">
+      <d3-axis grid="true" name="date" label="Date" [extent]="true" orientation="top"
         scale="time"
         tick-dx="0.1em" tick-dy="1.1em" tick-anchor="start" tick-size="0,0"
-        custom-time-format="customTimeFormat" time-scale="months" time-interval="3"
-        order="1"></d3-axis>
-      <d3-axis grid="true" name="total" filter="stackDomain" orientation="right"
+        [custom-time-format]="customTimeFormat" time-scale="months" time-interval="3"
+        [order]="1"></d3-axis>
+      <d3-axis grid="true" name="total" [filter]="stackDomain" orientation="right"
         label="Savings"
         format="$,"
-        tick-Values="[125,250,500,1000]" tick-dx="-0.5em" tick-dy="-0.3em" tick-anchor="end" tick-size="0,0" order="1"></d3-axis>
+        [tick-values]="[125,250,500,1000]" tick-dx="-0.5em" tick-dy="-0.3em" tick-anchor="end" tick-size="0,0" [order]="1"></d3-axis>
       <d3-area x="date" yscale="total" columns="columns"></d3-area>
     </div>
   </section>
@@ -36,24 +36,24 @@
   <section id="pie-charts" class="well">
     <h1>Pie and Donut Charts</h1>
     <div class="row">
-      <d3-chart data="pie" class="col-sm-6" margin="{left: 30, right: 30, bottom: 30, top: 30}">
+      <div d3-chart [data]="pie" class="col-sm-6" [margin]="{left: 30, right: 30, bottom: 30, top: 30}">
         <d3-pie label="age" value="population" colors="category20"></d3-pie>
-      </d3-chart>
-      <d3-chart data="pie" class="col-sm-6" margin="{left: 30, right: 30, bottom: 30, top: 30}">
+      </div>
+      <div d3-chart [data]="pie" class="col-sm-6" [margin]="{left: 30, right: 30, bottom: 30, top: 30}">
         <d3-pie inner-radius="0.5" label-radius="0.8" label="age" value="population" colors="category20"></d3-pie>
-      </d3-chart>
+      </div>
     </div>
   </section>
 
   <section id="arc-charts" class="well">
     <h1>Arc Charts</h1>
     <div class="row">
-      <d3-chart data="arcs.arc1" class="col-sm-6 simple-arc1" margin="{left: 30, right: 30, bottom: 30, top: 30}">
+      <div d3-chart [data]="arcs.arc1" class="col-sm-6 simple-arc1" [margin]="{left: 30, right: 30, bottom: 30, top: 30}">
         <d3-arc inner-radius="0.5" transition="bounce" transition-duration="1000"></d3-arc>
-      </d3-chart>
-      <d3-chart data="arcs.arc2" class="col-sm-6 simple-arc2" margin="{left: 30, right: 30, bottom: 30, top: 30}">
+      </div>
+      <div d3-chart [data]="arcs.arc2" class="col-sm-6 simple-arc2" [margin]="{left: 30, right: 30, bottom: 30, top: 30}">
         <d3-arc inner-radius="0.5"></d3-arc>
-      </d3-chart>
+      </div>
     </div>
   </section>
 </div>

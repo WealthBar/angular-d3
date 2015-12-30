@@ -21,6 +21,7 @@ export class App {
   dataUrl: string
   line: {}[]
   pie: {}[]
+  margin = { top: 40, right: 60, bottom: 40, left: 60 }
 
   constructor() {
     this.arcs = {
