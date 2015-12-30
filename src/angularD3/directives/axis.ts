@@ -14,7 +14,7 @@ import d3 = require('d3')
   ]
 })
 export class D3Axis implements D3Element, D3Scale {
-  name: string; orientation: string; format: string; timeFormat: string;
+  name: string; format: string; timeFormat: string;
   timeScale: string; timeInterval: string; tickSize: string;
   tickDx: string; tickDy: string; tickAnchor: string;
   firstTickDx: string; firstTickDy: string; firstTickAnchor: string;
@@ -22,11 +22,12 @@ export class D3Axis implements D3Element, D3Scale {
 
   customTimeFormat: any[];
   tickValues: any[];
-  reverse: Boolean
-  extent: Boolean
   filter: Function
-  ticks: number
-  order: number
+  orientation = 'bottom'
+  reverse = false
+  extent = false
+  ticks = 5
+  order = 1
 
   private _label
   private _labelElement
@@ -95,9 +96,11 @@ export class D3Axis implements D3Element, D3Scale {
     } else {
       range = [this._chart.innerHeight, 0]
     }
-    if (this.reverse) { range = range.reverse }
+    if (this.reverse) { range = range.reverse() }
+    console.log(range)
     return range
   }
+
   private get translation(): string {
     switch (this.orientation) {
       case 'bottom':

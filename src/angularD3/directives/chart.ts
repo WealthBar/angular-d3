@@ -34,8 +34,8 @@ export class D3Chart {
   svg: any;
   chart: any;
   debounce = 200;
-  scales = {}
-  elements = []
+  scales: D3Scale[] = []
+  elements: D3Element[] = []
 
   private _margin: Margin = { top: 10, right: 10, bottom: 10, left: 10 };
   private _timeout;
@@ -58,13 +58,13 @@ export class D3Chart {
 
   get innerHeight() { return this.height - this.margin.top - this.margin.bottom }
 
-  addScale(scale: D3Scale) {
-    this.scales[scale.name] = scale
+  addScale(scale: D3Scale) { this.scales.push(scale) }
+
+  getScale(name: string): D3Scale {
+    return this.scales.find((s) => { return s.name === name })
   }
 
-  addElement(element: D3Element) {
-    this.elements.push(element)
-  }
+  addElement(element: D3Element) { this.elements.push(element) }
 
   get margin() { return this._margin }
   set margin(value: Margin) {
@@ -79,8 +79,8 @@ export class D3Chart {
     this._data = value
     if (this._timeout || this.width === 0 || this.height === 0) return;
     this._timeout = setTimeout(() => {
-      for (var name in this.scales) {
-        this.scales[name].update(this._data)
+      for (var scale of this.scales) {
+        scale.update(this._data)
       }
       for (var element of this.elements.sort(this.sortOrder)) {
         element.redraw(this._data)
