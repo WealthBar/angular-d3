@@ -12,7 +12,7 @@ import d3 = require('d3')
 })
 export class D3Area implements D3Element {
   name: string
-  order = 1
+  order: number = 0
   vertical: boolean
   xDataName: string
   yDataName: string

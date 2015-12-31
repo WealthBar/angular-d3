@@ -16,7 +16,7 @@ export class D3Line implements D3Element {
   yDataName: any = 1
   xScaleName: string
   yScaleName: string
-  order = 1
+  order: number = 0
 
   private _chart: D3Chart
   private _xScale
