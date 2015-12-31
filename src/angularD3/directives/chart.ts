@@ -1,4 +1,4 @@
-import {Input, Directive, ElementRef} from 'angular2/core';
+import {Input, Directive, ViewContainerRef, ElementRef} from 'angular2/core';
 import d3 = require('d3');
 
 export interface Margin {
@@ -30,7 +30,6 @@ export interface D3Scale {
 })
 export class D3Chart {
   element: any;
-  svg: any;
   chart: any;
   debounce = 200;
   scales: D3Scale[] = []
@@ -40,20 +39,17 @@ export class D3Chart {
   private _timeout;
   private _data: {}[];
 
-  constructor(elementRef: ElementRef) {
+  constructor(elementRef: ElementRef, public view: ViewContainerRef) {
     this.element = elementRef.nativeElement;
-    this.svg = d3.select(this.element).append('svg').attr('class', "d3")
-      .attr("width", "100%")
-      .attr("height", "100%");
-    this.chart = this.svg.append("g")
+    this.chart = d3.select(this.element).attr('class', "d3").attr("width", "100%")
     window.addEventListener('resize', this.updateSize)
   }
 
-  get width() { return this.element.offsetWidth; }
+  get width() { return this.element.parentNode.offsetWidth; }
 
   get innerWidth() { return this.width - this.margin.left - this.margin.right }
 
-  get height() { return this.element.offsetHeight; }
+  get height() { return this.element.parentNode.offsetHeight; }
 
   get innerHeight() { return this.height - this.margin.top - this.margin.bottom }
 

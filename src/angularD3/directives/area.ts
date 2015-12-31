@@ -1,9 +1,9 @@
-import {Directive} from 'angular2/core'
+import {Directive, ElementRef} from 'angular2/core'
 import {D3Chart, D3Element, D3Scale} from './chart'
 import d3 = require('d3')
 
 @Directive({
-  selector: 'd3-area',
+  selector: '[d3-area]',
   inputs: [
     'xDataName: x', 'yDataName: y', 'name', 'yScaleName: yscale',
     'xScaleName: xscale', 'stroke', 'order', 'columns', 'vertical',
@@ -21,14 +21,13 @@ export class D3Area implements D3Element {
   offset: any
 
   private _areaElement
-  private _chart: D3Chart
   private _columns
   private _xScale: D3Scale
   private _yScale: D3Scale
 
-  constructor(chart: D3Chart) {
-    this._chart = chart
-    chart.addElement(this)
+  constructor(private _chart: D3Chart, el: ElementRef) {
+    this._areaElement = d3.select(el.nativeElement).attr("class", "area")
+    _chart.addElement(this)
   }
 
   get columns() {
@@ -47,8 +46,6 @@ export class D3Area implements D3Element {
   }
 
   redraw(data) {
-    this._areaElement = this._areaElement ||
-      this._chart.chart.append("g").attr("class", "area")
 
     var stack = d3.layout.stack()
     if (this.offset) stack.offset(this.offset)

@@ -1,9 +1,9 @@
-import {Directive} from 'angular2/core'
+import {Directive, ElementRef} from 'angular2/core'
 import {D3Chart, D3Element, D3Scale} from './chart'
 import d3 = require('d3')
 
 @Directive({
-  selector: 'd3-axis',
+  selector: '[d3-axis]',
   inputs: [
     'name', 'label', 'extent', 'orientation', 'timeFormat: time-format',
     'filter', 'format', 'timeScale: time-scale', 'timeInterval: time-interval',
@@ -31,18 +31,18 @@ export class D3Axis implements D3Element, D3Scale {
   ticks = 5
   order = 1
 
+  private _element
   private _label
   private _labelElement
   private _axisElement
   private _grid
   private _gridElement
-  private _chart: D3Chart
   private _scale: any = d3.scale.linear()
 
-  constructor(chart: D3Chart) {
-    this._chart = chart
-    chart.addScale(this)
-    chart.addElement(this)
+  constructor(private _chart: D3Chart, el: ElementRef) {
+    this._element = d3.select(el.nativeElement).append("g")
+    _chart.addScale(this)
+    _chart.addElement(this)
   }
 
   redraw(data) {
@@ -158,7 +158,7 @@ export class D3Axis implements D3Element, D3Scale {
 
   private updateAxis() {
     if (!this._axisElement) {
-      this._axisElement = this._chart.chart.append("g")
+      this._axisElement = this._element.append("g")
     }
     var axis = this._axisElement
     axis.attr("class", `axis axis-${this.orientation} axis-${this.name}`)
@@ -211,7 +211,7 @@ export class D3Axis implements D3Element, D3Scale {
 
   private updateGrid() {
     if (this._grid && this._axisElement) {
-      this._gridElement = this._gridElement || this._chart.chart.append("g")
+      this._gridElement = this._gridElement || this._element.append("g")
         .attr("class", `axis-grid axis-grid-${this.name}`)
       this.drawGrid()
     } else if (this._gridElement) {

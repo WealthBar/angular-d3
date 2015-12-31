@@ -1,9 +1,9 @@
-import {Directive} from 'angular2/core'
+import {Directive, ElementRef} from 'angular2/core'
 import {D3Chart, D3Element, D3Scale} from './chart'
 import d3 = require('d3')
 
 @Directive({
-  selector: 'd3-bars',
+  selector: '[d3-bars]',
   inputs: [
     'xDataName: x', 'yDataName: y', 'name', 'yScaleName: yscale',
     'xScaleName: xscale', 'order', 'width'
@@ -21,17 +21,13 @@ export class D3Bars implements D3Element {
   private _barsElement
   private _xScale: D3Scale
   private _yScale: D3Scale
-  private _chart: D3Chart
 
-  constructor(chart: D3Chart) {
-    this._chart = chart
-    chart.addElement(this)
+  constructor(private _chart: D3Chart, el: ElementRef) {
+    this._barsElement = d3.select(el.nativeElement).attr("class", "bars")
+    _chart.addElement(this)
   }
 
   redraw(data) {
-    this._barsElement = this._barsElement || this._chart.chart.append("g")
-      .attr("class", "bars")
-
     var bars = this._barsElement.selectAll("rect.bar").data(data)
     bars.exit().transition().duration(500)
       .attr("y", () => { return this._chart.innerHeight })

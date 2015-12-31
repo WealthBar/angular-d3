@@ -2,6 +2,7 @@
  * Angular 2 decorators and services
  */
 import {Component} from 'angular2/core';
+import {CORE_DIRECTIVES} from 'angular2/common';
 import {D3_DIRECTIVES} from '../angularD3';
 
 /*
@@ -11,12 +12,12 @@ import {D3_DIRECTIVES} from '../angularD3';
 @Component({
   selector: 'app', // <app></app>
   providers: [],
-  directives: [D3_DIRECTIVES],
+  directives: [D3_DIRECTIVES, CORE_DIRECTIVES],
   pipes: [],
-  template: require('./app.html')
+  template: require('./app.html'),
 })
 export class App {
-  dataUrl: string
+  dataUrl: string = require('./data/data.csv')
   line: {}[]
   pie: {}[]
   margin = { top: 40, right: 60, bottom: 40, left: 60 }
@@ -40,13 +41,7 @@ export class App {
     ["%Y", () => { return true }],
   ]
 
-  constructor() {
-    this.arcs = {
-      arc1: { value: 60, label: '60%' },
-      arc2: { value: 90, label: '90%' },
-    }
-    this.dataUrl = require('./data/data.csv')
-  }
+  constructor() { }
 
   lineLoaded(event) { this.line = event.rows; }
 
