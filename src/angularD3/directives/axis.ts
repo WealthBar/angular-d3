@@ -15,10 +15,10 @@ import d3 = require('d3')
     'lastTickAnchor: last-tick-anchor', 'tickValues: tick-values',
   ]
 })
-export class D3Axis implements D3Element, D3Scale { name: string;
+export class D3Axis implements D3Element, D3Scale {
+  name: string;
   format: string; timeFormat: string; timeScale: string; timeInterval: string;
-  tickSize: string;
-  tickDx: string; tickDy: string; tickAnchor: string;
+  tickSize: string; tickDx: string; tickDy: string; tickAnchor: string;
   firstTickDx: string; firstTickDy: string; firstTickAnchor: string;
   lastTickDx: string; lastTickDy: string; lastTickAnchor: string;
 
