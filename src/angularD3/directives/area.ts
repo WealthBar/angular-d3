@@ -54,7 +54,7 @@ export class D3Area implements D3Element {
     if (this.offset) stack.offset(this.offset)
     stack.values((d: any) => { return d.values })
 
-    var stackedData = stack(this.mapData(data))
+    var stackedData = stack(this.mapColumns(data))
 
     var area = this.getArea()
     var elements = this._areaElement.selectAll('path.area').data(stackedData)
@@ -98,21 +98,25 @@ export class D3Area implements D3Element {
       if (i === 0) {
         return area(d.values)
       } else {
-         return areaStacked(d.values)
+        return areaStacked(d.values)
       }
     }
   }
 
-  private mapData(data) {
+  private mapColumns(data) {
     return this.columns.map((c) => {
       return {
         name: c,
-        values: data.map((d) => {
-          return {
-            x: d[this.xDataName],
-            y: d[c]
-          }
-        })
+        values: this.mapValues(data, c)
+      }
+    })
+  }
+
+  private mapValues(data, c) {
+    return data.map((d) => {
+      return {
+        x: d[this.xDataName],
+        y: d[c]
       }
     })
   }
