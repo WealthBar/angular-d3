@@ -1,3 +1,4 @@
+require('./styles/styles.scss')
 /*
  * Providers provided by Angular
  */
@@ -12,3 +13,4 @@ import {bootstrap} from 'angular2/platform/browser';
 import {App} from './app/app';
 
 bootstrap(App)
+

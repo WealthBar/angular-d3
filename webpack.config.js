@@ -18,7 +18,7 @@ module.exports = {
 
   entry: {
     'vendor': './src/vendor.ts',
-    'app': './src/bootstrap.ts' // our angular app
+    'app': './src/bootstrap.ts', // our angular app
   },
 
   // Config for our build files
@@ -57,8 +57,8 @@ module.exports = {
       { test: /\.json$/,  loader: 'json-loader' },
 
       // Support for CSS as raw text
-      { test: /\.css$/, loader: 'raw!style!css' },
-      { test: /\.scss$/, loader: 'raw!style!css!sass' },
+      { test: /\.css$/, loader: 'style!css' },
+      { test: /\.scss$/, loader: 'style!css!sass' },
 
       // support for .html as raw text
       { test: /\.html$/,  loader: 'raw-loader' },

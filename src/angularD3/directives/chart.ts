@@ -9,7 +9,6 @@ export interface Margin {
 }
 
 export interface D3Element {
-  name: string
   order: number
   redraw(data: {}[]): void
 }

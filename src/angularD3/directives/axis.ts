@@ -1,21 +1,23 @@
-import {Directive, Host} from 'angular2/core'
+import {Directive} from 'angular2/core'
 import {D3Chart, D3Element, D3Scale} from './chart'
 import d3 = require('d3')
 
 @Directive({
   selector: 'd3-axis',
   inputs: [
-    'name', 'label', 'extent', 'orientation', 'ticks', 'timeFormat', 'filter',
-    'format', 'timeScale', 'timeInterval', 'tickSize', 'reverse', 'scale',
-    'tickDx', 'tickDy', 'tickAnchor', 'order',
-    'firstTickDx', 'firstTickDy', 'firstTickAnchor',
-    'lastTickDx', 'lastTickDy', 'lastTickAnchor',
-    'tickValues', 'customTimeFormat'
+    'name', 'label', 'extent', 'orientation', 'timeFormat: time-format',
+    'filter', 'format', 'timeScale: time-scale', 'timeInterval: time-interval',
+    'reverse', 'scale', 'customTimeFormat: custom-time-format', 'grid',
+    'ticks', 'tickSize: tick-size', 'tickDx: tick-dx', 'tickDy: tick-dy',
+    'tickAnchor: tick-anchor', 'order', 'firstTickDx: first-tick-dx',
+    'firstTickDy: first-tick-dy', 'firstTickAnchor: first-tick-anchor',
+    'lastTickDx: last-tick-dx', 'lastTickDy: last-tick-dy',
+    'lastTickAnchor: last-tick-anchor', 'tickValues: tick-values',
   ]
 })
-export class D3Axis implements D3Element, D3Scale {
-  name: string; format: string; timeFormat: string;
-  timeScale: string; timeInterval: string; tickSize: string;
+export class D3Axis implements D3Element, D3Scale { name: string;
+  format: string; timeFormat: string; timeScale: string; timeInterval: string;
+  tickSize: string;
   tickDx: string; tickDy: string; tickAnchor: string;
   firstTickDx: string; firstTickDy: string; firstTickAnchor: string;
   lastTickDx: string; lastTickDy: string; lastTickAnchor: string;
@@ -32,7 +34,7 @@ export class D3Axis implements D3Element, D3Scale {
   private _label
   private _labelElement
   private _axisElement
-  private _grid: boolean
+  private _grid
   private _gridElement
   private _chart: D3Chart
   private _scale: any = d3.scale.linear()
@@ -78,15 +80,15 @@ export class D3Axis implements D3Element, D3Scale {
   }
 
   private get grid() { return this._grid }
-  private set grid(value: boolean) {
-    this._grid = value
+  private set grid(value) {
+    this._grid = (value === 'true' || value === true)
     this.updateGrid()
   }
 
   private get label() { return this._label }
   private set label(value: string) {
     this._label = value
-    this.updateLabel()
+    if (this._labelElement) this._labelElement.text(value)
   }
 
   private get range(): [number, number] {
@@ -97,7 +99,6 @@ export class D3Axis implements D3Element, D3Scale {
       range = [this._chart.innerHeight, 0]
     }
     if (this.reverse) { range = range.reverse() }
-    console.log(range)
     return range
   }
 
@@ -127,19 +128,19 @@ export class D3Axis implements D3Element, D3Scale {
       // See: https://github.com/mbostock/d3/issues/1769
       var copy = Object.assign([] , this.customTimeFormat)
       var mf = d3.time.format.multi(copy)
-      axis.tickFormat((value) => { return mf(new Date(value)) })
+      axis.tickFormat((d) => { return mf(new Date(d)) })
     }
     if (this.timeFormat) {
       var tf = d3.time.format(this.timeFormat)
-      axis.tickFormat((value) => { return tf(new Date(value)) })
+      axis.tickFormat((d) => { return tf(new Date(d)) })
     } else if (this.format) {
       axis.tickFormat(d3.format(this.format))
     }
     return axis
   }
 
-  private adjustTickLabels(elements) {
-    var tickLabels = elements
+  private adjustTickLabels(axis) {
+    var tickLabels = axis.selectAll('.tick text')
     if (this.tickDy) tickLabels.attr('dy', this.tickDy);
     if (this.tickDx) tickLabels.attr('dx', this.tickDx);
     if (this.tickAnchor) tickLabels.style('text-anchor', this.tickAnchor);
@@ -161,14 +162,10 @@ export class D3Axis implements D3Element, D3Scale {
     }
     var axis = this._axisElement
     axis.attr("class", `axis axis-${this.orientation} axis-${this.name}`)
-      .transition().duration(500)
       .attr("transform", this.translation)
       .call(this.createAxis())
-      .selectAll('.tick text')
-        .tween("attr.dx", null)
-        .tween("attr.dy", null)
-        .tween("style.text-anchor", null)
-        .call(this.adjustTickLabels)
+
+    this.adjustTickLabels(axis)
   }
 
   private updateLabel() {
@@ -178,46 +175,44 @@ export class D3Axis implements D3Element, D3Scale {
         .append("text")
         .attr("class", "axis-label")
     }
-    this._labelElement.call(this.positionLabel).text(this._label)
+    this._labelElement.text(this._label)
+    this.positionLabel(this._labelElement)
   }
 
-  private positionLabel(elements) {
-    var label = elements.transition().duration(500)
+  private positionLabel(label) {
     switch (this.orientation) {
       case 'bottom':
-        label.attr("x", `#{this._chart.innerWidth / 2}`)
-        .attr("dy", `#{this._chart.margin.bottom}`)
-        .attr("style", "text-anchor: middle;")
+        label.attr("x", `${this._chart.innerWidth / 2}`)
+          .attr("dy", `${this._chart.margin.bottom}`)
+          .attr("style", "text-anchor: middle;")
         break;
 
       case 'top':
         label.attr("x", `${this._chart.innerWidth / 2}`)
-        .attr("dy", `${-this._chart.margin.top}`)
-        .attr("style", "text-anchor: middle;")
+          .attr("dy", `${-this._chart.margin.top}`)
+          .attr("style", "text-anchor: middle;")
         break;
 
       case 'left':
         label.attr("x", `-${this._chart.innerHeight / 2}`)
-        .attr("dy", `${-this._chart.margin.left + 18}`)
-        .attr("style", "text-anchor: middle;")
-        .attr("transform", "rotate(-90)")
+          .attr("dy", `${-this._chart.margin.left + 18}`)
+          .attr("style", "text-anchor: middle;")
+          .attr("transform", "rotate(-90)")
         break;
 
       case 'right':
         label.attr("x", `${this._chart.innerHeight / 2}`)
-        .attr("dy", `${-this._chart.margin.right + 18}`)
-        .attr("style", "text-anchor: middle;")
-        .attr("transform", "rotate(90)")
+          .attr("dy", `${-this._chart.margin.right + 18}`)
+          .attr("style", "text-anchor: middle;")
+          .attr("transform", "rotate(90)")
         break;
     }
   }
 
   private updateGrid() {
-    if (this._grid) {
-      if (!this._gridElement) {
-        this._gridElement = this._axisElement.append("g")
-          .attr("class", `axis-grid axis-grid-${this.name}`)
-      }
+    if (this._grid && this._axisElement) {
+      this._gridElement = this._gridElement || this._chart.chart.append("g")
+        .attr("class", `axis-grid axis-grid-${this.name}`)
       this.drawGrid()
     } else if (this._gridElement) {
       this._gridElement.remove()
@@ -233,12 +228,12 @@ export class D3Axis implements D3Element, D3Scale {
         break;
 
       case 'top':
-        transform = `translate(0, #{this._chart.innerHeight})`
+        transform = `translate(0, ${this._chart.innerHeight})`
         size = this._chart.innerHeight
         break;
 
       case 'left':
-        transform = `translate(#{this._chart.innerWidth}, 0)`
+        transform = `translate(${this._chart.innerWidth}, 0)`
         size = this._chart.innerWidth
         break;
 
@@ -247,7 +242,7 @@ export class D3Axis implements D3Element, D3Scale {
         break;
     }
     if (transform) this._gridElement.attr("transform", transform);
-    var axis = this.createAxis().tickSize(0).tickFormat('')
+    var axis = this.createAxis().innerTickSize(size).outerTickSize(0).tickFormat('')
     this._gridElement.call(axis)
   }
 }
