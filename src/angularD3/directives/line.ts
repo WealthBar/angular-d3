@@ -19,8 +19,8 @@ export class D3Line implements D3Element {
   order: number = 0
 
   private _chart: D3Chart
-  private _xScale
-  private _yScale
+  private _xScale: D3Scale
+  private _yScale: D3Scale
   private _line
   private _linePath
 
@@ -42,12 +42,12 @@ export class D3Line implements D3Element {
 
   private get xScale() {
     return (this._xScale = this._xScale
-      || this._chart.getScale(this.xScaleName || this.xDataName).scale)
+      || this._chart.getScale(this.xScaleName || this.xDataName)).scale
   }
 
   private get yScale() {
     return (this._yScale = this._yScale
-      || this._chart.getScale(this.yScaleName || this.yDataName).scale)
+      || this._chart.getScale(this.yScaleName || this.yDataName)).scale
   }
 
   private x(d) { return this.xScale(d[this.xDataName]) }

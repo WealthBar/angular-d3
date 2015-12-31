@@ -23,8 +23,8 @@ export class D3Area implements D3Element {
   private _areaElement
   private _chart: D3Chart
   private _columns
-  private _xScale
-  private _yScale
+  private _xScale: D3Scale
+  private _yScale: D3Scale
 
   constructor(chart: D3Chart) {
     this._chart = chart
@@ -123,11 +123,11 @@ export class D3Area implements D3Element {
 
   private get x() {
     return (this._xScale = this._xScale
-      || this._chart.getScale(this.xScaleName || this.xDataName).scale)
+      || this._chart.getScale(this.xScaleName || this.xDataName)).scale
   }
 
   private get y() {
     return (this._yScale = this._yScale
-      || this._chart.getScale(this.yScaleName || this.yDataName).scale)
+      || this._chart.getScale(this.yScaleName || this.yDataName)).scale
   }
 }
