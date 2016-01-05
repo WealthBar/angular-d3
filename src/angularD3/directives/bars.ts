@@ -6,12 +6,11 @@ import d3 = require('d3')
   selector: '[d3-bars]',
   inputs: [
     'xDataName: x', 'yDataName: y', 'name', 'yScaleName: yscale',
-    'xScaleName: xscale', 'order', 'width'
+    'xScaleName: xscale', 'width'
   ],
 })
 export class D3Bars implements D3Element {
   name: string
-  order: number = 0
   width: number = 15
   xDataName: string
   yDataName: string

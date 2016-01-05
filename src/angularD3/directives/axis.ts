@@ -9,7 +9,7 @@ import d3 = require('d3')
     'filter', 'format', 'timeScale: time-scale', 'timeInterval: time-interval',
     'reverse', 'scale', 'customTimeFormat: custom-time-format', 'grid',
     'ticks', 'tickSize: tick-size', 'tickDx: tick-dx', 'tickDy: tick-dy',
-    'tickAnchor: tick-anchor', 'order', 'firstTickDx: first-tick-dx',
+    'tickAnchor: tick-anchor', 'firstTickDx: first-tick-dx',
     'firstTickDy: first-tick-dy', 'firstTickAnchor: first-tick-anchor',
     'lastTickDx: last-tick-dx', 'lastTickDy: last-tick-dy',
     'lastTickAnchor: last-tick-anchor', 'tickValues: tick-values',
@@ -29,7 +29,6 @@ export class D3Axis implements D3Element, D3Scale {
   reverse = false
   extent = false
   ticks = 5
-  order = 1
 
   private _element
   private _label

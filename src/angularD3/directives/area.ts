@@ -6,13 +6,12 @@ import d3 = require('d3')
   selector: '[d3-area]',
   inputs: [
     'xDataName: x', 'yDataName: y', 'name', 'yScaleName: yscale',
-    'xScaleName: xscale', 'stroke', 'order', 'columns', 'vertical',
+    'xScaleName: xscale', 'stroke', 'columns', 'vertical',
     'offset'
   ],
 })
 export class D3Area implements D3Element {
   name: string
-  order: number = 0
   vertical: boolean
   xDataName: string
   yDataName: string
@@ -38,14 +37,18 @@ export class D3Area implements D3Element {
     }
   }
   set columns(value) {
+    if (value instanceof String) {
+      value = value.split(',').map((v) => { v.trim() })
+    }
     if (Array.isArray(value)) {
       this._columns = value
-    } else if (value instanceof String) {
-      this._columns = value.split(',').map((v) => { v.trim() })
+      this.redraw()
     }
   }
 
-  redraw(data) {
+  redraw(data = null) {
+    data = data || this._chart.data
+    if (!data || data.length == 0) return;
 
     var stack = d3.layout.stack()
     if (this.offset) stack.offset(this.offset)
@@ -54,42 +57,57 @@ export class D3Area implements D3Element {
     var stackedData = stack(this.mapColumns(data))
 
     var area = this.getArea()
+    var nullArea = this.getNullArea()
     var elements = this._areaElement.selectAll('path.area').data(stackedData)
     elements.enter()
       .append('path').attr('class', (d) => { return `area area-${d.name}` })
-      .transition().duration(500)
-      .attr("d", (d, i) => { return area(d, i) })
+      .attr("d", nullArea)
+    elements.transition().duration(500)
+      .attr('class', (d) => { return `area area-${d.name}` })
+      .attr("d", area)
     elements.exit()
-      .attr("d", (d, i) => { return area(d, i) })
+      .transition().duration(500)
+      .attr("d", nullArea)
       .remove()
+  }
+
+  private getNullArea() {
+    var area = d3.svg.area<any>()
+      .x((d, i) => { return this.x(d.x) })
+      .y0(() => { return this._chart.innerHeight })
+      .y1(() => { return this._chart.innerHeight })
+    var areaStacked = d3.svg.area<any>()
+      .x((d) => { return this.x(d.x) })
+      .y0((d) => { return this.y(d.y0) })
+      .y1((d) => { return this.y(d.y0) })
+    return (d, i) => {
+      if (i === 0) {
+        return area(d.values)
+      } else {
+        return areaStacked(d.values)
+      }
+    }
   }
 
   private getArea() {
     if (this.vertical) {
-      var area = d3.svg.area().y((d: any) => {
-        return this.x(d.x)
-      })
+      var area = d3.svg.area<any>()
+        .y((d) => { return this.x(d.x) })
         .x0(0)
-        .x1((d: any) => { return this.y(d.y) })
-      var areaStacked = d3.svg.area()
-        .y((d: any) => { return this.x(d.x) })
-        .x0((d: any) => { return this.y(d.y0) })
-        .x1((d: any) => { return this.y(d.y + d.y0) })
+        .x1((d) => { return this.y(d.y) })
+      var areaStacked = d3.svg.area<any>()
+        .y((d) => { return this.x(d.x) })
+        .x0((d) => { return this.y(d.y0) })
+        .x1((d) => { return this.y(d.y + d.y0) })
     } else {
-      var area = d3.svg.area()
-        .x((d: any) => {
-          return this.x(d.x)
-        })
-        .y0(() => {
-          return this._chart.innerHeight
-        })
-        .y1((d: any) => {
-          return this.y(d.y)
-        })
-      var areaStacked = d3.svg.area()
-        .x((d: any) => { return this.x(d.x) })
-        .y0((d: any) => { return this.y(d.y0) })
-        .y1((d: any) => { return this.y(d.y + d.y0) })
+      var area = d3.svg.area<any>()
+        .x((d) => { return this.x(d.x) })
+        .y0(() => { return this._chart.innerHeight })
+        .y1((d) => { return this.y(d.y) })
+      var areaStacked = d3.svg.area<any>()
+        .x((d) => { return this.x(d.x) })
+        .y0((d) => { return this.y(d.y0) })
+        .y1((d) => { return this.y(d.y + d.y0) })
     }
     return (d, i) => {
       if (i === 0) {

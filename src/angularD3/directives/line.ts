@@ -6,7 +6,7 @@ import d3 = require('d3');
   selector: '[d3-line]',
   inputs: [
     'xDataName: x', 'yDataName: y', 'name', 'yScaleName: yscale',
-    'xScaleName: xscale', 'stroke', 'order'
+    'xScaleName: xscale', 'stroke'
   ],
 })
 export class D3Line implements D3Element {
@@ -16,7 +16,6 @@ export class D3Line implements D3Element {
   yDataName: any = 1
   xScaleName: string
   yScaleName: string
-  order: number = 0
 
   private _xScale: D3Scale
   private _yScale: D3Scale

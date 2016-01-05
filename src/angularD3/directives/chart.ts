@@ -9,7 +9,6 @@ export interface Margin {
 }
 
 export interface D3Element {
-  order: number
   redraw(data: {}[]): void
 }
 
@@ -42,7 +41,7 @@ export class D3Chart {
   constructor(elementRef: ElementRef, public view: ViewContainerRef) {
     this.element = elementRef.nativeElement;
     this.chart = d3.select(this.element).attr('class', "d3").attr("width", "100%")
-    window.addEventListener('resize', this.updateSize)
+    window.addEventListener('resize', this.redraw)
   }
 
   get width() { return this.element.parentNode.offsetWidth; }
@@ -64,26 +63,25 @@ export class D3Chart {
   get margin() { return this._margin }
   set margin(value: Margin) {
     if (value) {
+      if (this._margin == value) return;
       this._margin = value
       this.chart.attr("transform", `translate(${value.left || '0'}, ${value.top || '0'})`);
+      this.redraw()
     }
   }
 
   get data() { return this._data }
-  set data(value: {}[]) {
+  set data(value: any) {
     this._data = value
     if (this._timeout || this.width === 0 || this.height === 0) return;
-    this._timeout = setTimeout(() => {
-      for (var scale of this.scales) {
-        scale.update(this._data)
-      }
-      for (var element of this.elements.sort(this.sortOrder)) {
-        element.redraw(this._data)
-      }
-    }, this.debounce)
+    this.redraw()
   }
 
-  updateSize() { }
-
-  private sortOrder(a, b) { return a.order - b.order }
+  redraw() {
+    this._timeout = setTimeout(() => {
+      this.scales.forEach((s) => { s.update(this._data) })
+      this.elements.forEach((e) => { e.redraw(this._data) })
+      this._timeout = null
+    }, this.debounce)
+  }
 }

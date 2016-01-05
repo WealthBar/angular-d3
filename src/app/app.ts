@@ -41,7 +41,25 @@ export class App {
     ["%Y", () => { return true }],
   ]
 
-  constructor() { }
+  constructor() {
+    setInterval(() => {
+      var val = Math.random() * 100
+      this.arcs.arc1 = { value: val, label: `${val.toFixed(0)}%` }
+    } , 1000 * 5)
+
+    setInterval(() => {
+      var val = Math.random() * 100
+      this.arcs.arc2 = { value: val, label: `${val.toFixed(0)}%` }
+    } , 1000 * 4)
+
+    setInterval(() => {
+      if (this.columns.length == 3) {
+        this.columns = ['savings', 'optimal']
+      } else {
+        this.columns = ['savings', 'optimal', 'total']
+      }
+    } , 1000 * 5)
+  }
 
   lineLoaded(event) { this.line = event.rows; }
 
