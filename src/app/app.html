@@ -65,14 +65,14 @@
   <section id="arc-charts" class="well">
     <h1>Arc Charts</h1>
     <div class="row">
-      <div class="d3-chart">
-        <svg d3-chart [data]="arcs.arc1" class="col-sm-6 simple-arc1" [margin]="{left: 30, right: 30, bottom: 30, top: 30}">
-          <g inner-radius="0.5" transition="bounce" transition-duration="1000"></g>
+      <div class="d3-chart col-sm-6 simple-arc1">
+        <svg d3-chart [data]="arcs.arc1" [margin]="{left: 30, right: 30, bottom: 30, top: 30}">
+          <g d3-arc transition="bounce" [duration]="1000"></g>
         </svg>
       </div>
-      <div class="d3-chart">
-        <svg d3-chart [data]="arcs.arc2" class="col-sm-6 simple-arc2" [margin]="{left: 30, right: 30, bottom: 30, top: 30}">
-          <g d3-arc inner-radius="0.5"></g>
+      <div class="d3-chart col-sm-6 simple-arc2" >
+        <svg d3-chart [data]="arcs.arc2" [margin]="{left: 30, right: 30, bottom: 30, top: 30}">
+          <g d3-arc [inner-radius]="0.7"></g>
         </svg>
       </div>
     </div>
