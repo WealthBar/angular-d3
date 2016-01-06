@@ -1,6 +1,7 @@
-import {Directive, ElementRef} from 'angular2/core'
-import {D3Chart, D3Element, D3Scale} from './chart'
+import {Host, Directive, ElementRef, Optional} from 'angular2/core'
+import {D3Chart, D3Margin, D3Element, D3Scale} from './chart'
 import d3 = require('d3')
+var clone = require('lodash.clonedeep')
 
 @Directive({
   selector: '[d3-axis]',
@@ -15,7 +16,7 @@ import d3 = require('d3')
     'lastTickAnchor: last-tick-anchor', 'tickValues: tick-values',
   ]
 })
-export class D3Axis implements D3Element, D3Scale {
+export class D3Axis extends D3Element implements D3Scale {
   name: string;
   format: string; timeFormat: string; timeScale: string; timeInterval: string;
   tickSize: string; tickDx: string; tickDy: string; tickAnchor: string;
@@ -30,7 +31,6 @@ export class D3Axis implements D3Element, D3Scale {
   extent = false
   ticks = 5
 
-  private _element
   private _label
   private _labelElement
   private _axisElement
@@ -38,10 +38,9 @@ export class D3Axis implements D3Element, D3Scale {
   private _gridElement
   private _scale: any = d3.scale.linear()
 
-  constructor(private _chart: D3Chart, el: ElementRef) {
-    this._element = d3.select(el.nativeElement).append("g")
-    _chart.addScale(this)
-    _chart.addElement(this)
+  constructor(chart: D3Chart, el: ElementRef, @Optional() margin?: D3Margin) {
+    super(chart, el, margin)
+    chart.addScale(this)
   }
 
   redraw(data) {
@@ -93,9 +92,9 @@ export class D3Axis implements D3Element, D3Scale {
   private get range(): [number, number] {
     var range;
     if (this.orientation === 'top' || this.orientation === 'bottom') {
-      range = [0, this._chart.innerWidth]
+      range = [0, this.width]
     } else {
-      range = [this._chart.innerHeight, 0]
+      range = [this.height, 0]
     }
     if (this.reverse) { range = range.reverse() }
     return range
@@ -104,9 +103,9 @@ export class D3Axis implements D3Element, D3Scale {
   private get translation(): string {
     switch (this.orientation) {
       case 'bottom':
-        return `translate(0, ${this._chart.innerHeight})`
+        return `translate(0, ${this.height})`
       case 'right':
-        return `translate(${this._chart.innerWidth}, 0)`
+        return `translate(${this.width}, 0)`
       default:
         return "translate(0, 0)"
     }
@@ -125,7 +124,7 @@ export class D3Axis implements D3Element, D3Scale {
     if (this.customTimeFormat) {
       // We copy this because D3 is bad and mutates the time format.
       // See: https://github.com/mbostock/d3/issues/1769
-      var copy = Object.assign([] , this.customTimeFormat)
+      var copy = clone(this.customTimeFormat)
       var mf = d3.time.format.multi(copy)
       axis.tickFormat((d) => { return mf(new Date(d)) })
     }
@@ -157,7 +156,7 @@ export class D3Axis implements D3Element, D3Scale {
 
   private updateAxis() {
     if (!this._axisElement) {
-      this._axisElement = this._element.append("g")
+      this._axisElement = this.element.append("g")
     }
     var axis = this._axisElement
     axis.attr("class", `axis axis-${this.orientation} axis-${this.name}`)
@@ -181,27 +180,27 @@ export class D3Axis implements D3Element, D3Scale {
   private positionLabel(label) {
     switch (this.orientation) {
       case 'bottom':
-        label.attr("x", `${this._chart.innerWidth / 2}`)
-          .attr("dy", `${this._chart.margin.bottom}`)
+        label.attr("x", `${this.width / 2}`)
+          .attr("dy", `${this.margin.bottom}`)
           .attr("style", "text-anchor: middle;")
         break;
 
       case 'top':
-        label.attr("x", `${this._chart.innerWidth / 2}`)
-          .attr("dy", `${-this._chart.margin.top}`)
+        label.attr("x", `${this.width / 2}`)
+          .attr("dy", `${-this.margin.top}`)
           .attr("style", "text-anchor: middle;")
         break;
 
       case 'left':
-        label.attr("x", `-${this._chart.innerHeight / 2}`)
-          .attr("dy", `${-this._chart.margin.left + 18}`)
+        label.attr("x", `-${this.height / 2}`)
+          .attr("dy", `${-this.margin.left + 18}`)
           .attr("style", "text-anchor: middle;")
           .attr("transform", "rotate(-90)")
         break;
 
       case 'right':
-        label.attr("x", `${this._chart.innerHeight / 2}`)
-          .attr("dy", `${-this._chart.margin.right + 18}`)
+        label.attr("x", `${this.height / 2}`)
+          .attr("dy", `${-this.margin.right + 18}`)
           .attr("style", "text-anchor: middle;")
           .attr("transform", "rotate(90)")
         break;
@@ -210,7 +209,7 @@ export class D3Axis implements D3Element, D3Scale {
 
   private updateGrid() {
     if (this._grid && this._axisElement) {
-      this._gridElement = this._gridElement || this._element.append("g")
+      this._gridElement = this._gridElement || this.element.append("g")
         .attr("class", `axis-grid axis-grid-${this.name}`)
       this.drawGrid()
     } else if (this._gridElement) {
@@ -223,21 +222,21 @@ export class D3Axis implements D3Element, D3Scale {
     var size; var transform;
     switch (this.orientation) {
       case 'bottom':
-        size = this._chart.innerHeight
+        size = this.height
         break;
 
       case 'top':
-        transform = `translate(0, ${this._chart.innerHeight})`
-        size = this._chart.innerHeight
+        transform = `translate(0, ${this.height})`
+        size = this.height
         break;
 
       case 'left':
-        transform = `translate(${this._chart.innerWidth}, 0)`
-        size = this._chart.innerWidth
+        transform = `translate(${this.width}, 0)`
+        size = this.width
         break;
 
       case 'right':
-        size = this._chart.innerWidth
+        size = this.width
         break;
     }
     if (transform) this._gridElement.attr("transform", transform);

@@ -1,15 +1,51 @@
-import {Input, Directive, ViewContainerRef, ElementRef} from 'angular2/core';
+import {Input, Directive, Optional, ElementRef} from 'angular2/core';
 import d3 = require('d3');
 
-export interface Margin {
-  top: number;
-  left: number;
-  right: number;
-  bottom: number;
+export interface ID3Element {
+  redraw(data: {}[]): void;
 }
 
-export interface D3Element {
-  redraw(data: {}[]): void
+export class D3Element implements ID3Element {
+  element
+  _margin = { top: 0, left: 0, right: 0, bottom: 0 }
+
+  constructor(
+    public chart: D3Chart,
+    public el: ElementRef,
+    @Optional() private _marginEl?: D3Margin
+  ) {
+    this.element = d3.select(el.nativeElement)
+    chart.addElement(this)
+  }
+
+  get margin() {
+    if (this._marginEl) return this._marginEl.margin
+    return this._margin
+  }
+
+  get nativeElement() { return this.el.nativeElement }
+
+  get width() {
+    if (this._marginEl) {
+      return this._marginEl.width
+    } else {
+      return this.chart.width
+    }
+  }
+
+  get height() {
+    if (this._marginEl) {
+      return this._marginEl.height
+    } else {
+      return this.chart.height
+    }
+  }
+
+  get data() { return this.chart.data }
+
+  getScale(name) { return this.chart.getScale(name) }
+
+  redraw(data: {}[]) {}
 }
 
 export interface D3Scale {
@@ -25,32 +61,30 @@ export interface D3Scale {
  */
 @Directive({
   selector: '[d3-chart]',
-  inputs: ['margin', 'data', 'debounce'],
+  inputs: ['data', 'debounce'],
 })
 export class D3Chart {
   element: any;
   chart: any;
   debounce = 200;
   scales: D3Scale[] = []
-  elements: D3Element[] = []
+  elements: ID3Element[] = []
 
-  private _margin: Margin = { top: 10, right: 10, bottom: 10, left: 10 };
   private _timeout;
   private _data: {}[];
 
-  constructor(elementRef: ElementRef, public view: ViewContainerRef) {
+  constructor(elementRef: ElementRef) {
     this.element = elementRef.nativeElement;
-    this.chart = d3.select(this.element).attr('class', "d3").attr("width", "100%")
+    this.chart = d3.select(this.element).attr('class', "d3-chart")
     window.addEventListener('resize', this.redraw)
   }
 
-  get width() { return this.element.parentNode.offsetWidth; }
+  get width() { return this.element.offsetWidth; }
+  set width(value: number) { this.chart.attr("width", `${value}px`) }
 
-  get innerWidth() { return this.width - this.margin.left - this.margin.right }
+  get height() { return this.element.offsetHeight; }
+  set height(value: number) { this.chart.attr("height", `${value}px`) }
 
-  get height() { return this.element.parentNode.offsetHeight; }
-
-  get innerHeight() { return this.height - this.margin.top - this.margin.bottom }
 
   addScale(scale: D3Scale) { this.scales.push(scale) }
 
@@ -58,17 +92,7 @@ export class D3Chart {
     return this.scales.find((s) => { return s.name === name })
   }
 
-  addElement(element: D3Element) { this.elements.push(element) }
-
-  get margin() { return this._margin }
-  set margin(value: Margin) {
-    if (value) {
-      if (this._margin == value) return;
-      this._margin = value
-      this.chart.attr("transform", `translate(${value.left || '0'}, ${value.top || '0'})`);
-      this.redraw()
-    }
-  }
+  addElement(element: ID3Element) { this.elements.push(element) }
 
   get data() { return this._data }
   set data(value: any) {
@@ -83,5 +107,47 @@ export class D3Chart {
       this.elements.forEach((e) => { e.redraw(this._data) })
       this._timeout = null
     }, this.debounce)
+  }
+}
+
+export interface Margin {
+  top: number;
+  left: number;
+  right: number;
+  bottom: number;
+}
+
+@Directive({
+  selector: '[d3-margin]',
+  inputs: ['margin: d3-margin'],
+})
+export class D3Margin implements ID3Element {
+  element
+  private _margin: Margin = { top: 0, left: 0, bottom: 0, right: 0 }
+
+  constructor(public chart: D3Chart, public el: ElementRef) {
+    this.element = d3.select(el.nativeElement)
+    chart.addElement(this)
+  }
+
+  get width() {
+    return this.chart.width - this.margin.left - this.margin.right
+  }
+
+  get height() { return this.chart.height - this.margin.top - this.margin.bottom }
+
+  get margin() { return this._margin }
+  set margin(value: Margin) {
+    if (value) {
+      if (this._margin === value) return;
+      this._margin = value
+      this.redraw()
+      this.chart.redraw()
+    }
+  }
+
+  redraw() {
+    this.element
+      .attr("transform", `translate(${this.margin.left || '0'} ${this.margin.top || '0'})`)
   }
 }

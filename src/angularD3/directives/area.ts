@@ -1,5 +1,5 @@
-import {Directive, ElementRef} from 'angular2/core'
-import {D3Chart, D3Element, D3Scale} from './chart'
+import {Optional, Directive, ElementRef} from 'angular2/core'
+import {D3Chart, D3Element, D3Scale, D3Margin} from './chart'
 import d3 = require('d3')
 
 @Directive({
@@ -10,7 +10,7 @@ import d3 = require('d3')
     'offset'
   ],
 })
-export class D3Area implements D3Element {
+export class D3Area extends D3Element {
   name: string
   vertical: boolean
   xDataName: string
@@ -24,9 +24,9 @@ export class D3Area implements D3Element {
   private _xScale: D3Scale
   private _yScale: D3Scale
 
-  constructor(private _chart: D3Chart, el: ElementRef) {
-    this._areaElement = d3.select(el.nativeElement).attr("class", "area")
-    _chart.addElement(this)
+  constructor(chart: D3Chart, el: ElementRef, @Optional() margin?: D3Margin) {
+    super(chart, el, margin)
+    this._areaElement = this.element.attr("class", "area")
   }
 
   get columns() {
@@ -47,8 +47,8 @@ export class D3Area implements D3Element {
   }
 
   redraw(data = null) {
-    data = data || this._chart.data
-    if (!data || data.length == 0) return;
+    data = data || this.data
+    if (!data || data.length === 0) return;
 
     var stack = d3.layout.stack()
     if (this.offset) stack.offset(this.offset)
@@ -74,8 +74,8 @@ export class D3Area implements D3Element {
   private getNullArea() {
     var area = d3.svg.area<any>()
       .x((d, i) => { return this.x(d.x) })
-      .y0(() => { return this._chart.innerHeight })
-      .y1(() => { return this._chart.innerHeight })
+      .y0(() => { return this.height })
+      .y1(() => { return this.height })
     var areaStacked = d3.svg.area<any>()
       .x((d) => { return this.x(d.x) })
       .y0((d) => { return this.y(d.y0) })
@@ -102,7 +102,7 @@ export class D3Area implements D3Element {
     } else {
       var area = d3.svg.area<any>()
         .x((d) => { return this.x(d.x) })
-        .y0(() => { return this._chart.innerHeight })
+        .y0(() => { return this.height })
         .y1((d) => { return this.y(d.y) })
       var areaStacked = d3.svg.area<any>()
         .x((d) => { return this.x(d.x) })
@@ -138,11 +138,11 @@ export class D3Area implements D3Element {
 
   private get x() {
     return (this._xScale = this._xScale
-      || this._chart.getScale(this.xScaleName || this.xDataName)).scale
+      || this.getScale(this.xScaleName || this.xDataName)).scale
   }
 
   private get y() {
     return (this._yScale = this._yScale
-      || this._chart.getScale(this.yScaleName || this.yDataName)).scale
+      || this.getScale(this.yScaleName || this.yDataName)).scale
   }
 }

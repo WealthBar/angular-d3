@@ -18,6 +18,7 @@ import {D3_DIRECTIVES} from '../angularD3';
 })
 export class App {
   dataUrl: string = require('./data/data.csv')
+  pieDataUrl: string = require('./data/pieData.csv')
   line: {}[]
   pie: {}[]
   margin = { top: 40, right: 60, bottom: 40, left: 60 }
@@ -45,15 +46,17 @@ export class App {
     setInterval(() => {
       var val = Math.random() * 100
       this.arcs.arc1 = { value: val, label: `${val.toFixed(0)}%` }
+      val = Math.random() * 100
+      this.arcs.arc2 = { value: val, label: `${val.toFixed(0)}%` }
+      var newPie = this.pie.slice()
+      newPie.forEach((v: any) => {
+         v.population *= 2 - 1.5 * Math.random()
+      })
+      this.pie = newPie
     } , 1000 * 5)
 
     setInterval(() => {
-      var val = Math.random() * 100
-      this.arcs.arc2 = { value: val, label: `${val.toFixed(0)}%` }
-    } , 1000 * 4)
-
-    setInterval(() => {
-      if (this.columns.length == 3) {
+      if (this.columns.length === 3) {
         this.columns = ['savings', 'optimal']
       } else {
         this.columns = ['savings', 'optimal', 'total']
@@ -63,7 +66,9 @@ export class App {
 
   lineLoaded(event) { this.line = event.rows; }
 
-  pieLoaded(event) { this.pie = event.rows }
+  pieLoaded(event) {
+    this.pie = event.rows
+  }
 
   parseValues(row) {
     for (var key in row) {

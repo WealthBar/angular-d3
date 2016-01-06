@@ -1,5 +1,5 @@
-import {Directive, ElementRef} from 'angular2/core';
-import {D3Chart, D3Element, D3Scale} from './chart'
+import {Optional, Directive, ElementRef} from 'angular2/core'
+import {D3Chart, D3Element, D3Scale, D3Margin} from './chart'
 import d3 = require('d3');
 
 @Directive({
@@ -9,7 +9,7 @@ import d3 = require('d3');
     'xScaleName: xscale', 'stroke'
   ],
 })
-export class D3Line implements D3Element {
+export class D3Line extends D3Element {
   name: string
   stroke: string
   xDataName: any = 0
@@ -22,9 +22,9 @@ export class D3Line implements D3Element {
   private _line
   private _linePath
 
-  constructor(private _chart: D3Chart, el: ElementRef) {
-    this._linePath = d3.select(el.nativeElement).append("path")
-    _chart.addElement(this)
+  constructor(chart: D3Chart, el: ElementRef, @Optional() margin?: D3Margin) {
+    super(chart, el, margin)
+    this._linePath = this.element.append("path")
   }
 
   redraw(data) {
@@ -39,12 +39,12 @@ export class D3Line implements D3Element {
 
   private get xScale() {
     return (this._xScale = this._xScale
-      || this._chart.getScale(this.xScaleName || this.xDataName)).scale
+      || this.getScale(this.xScaleName || this.xDataName)).scale
   }
 
   private get yScale() {
     return (this._yScale = this._yScale
-      || this._chart.getScale(this.yScaleName || this.yDataName)).scale
+      || this.getScale(this.yScaleName || this.yDataName)).scale
   }
 
   private x(d) { return this.xScale(d[this.xDataName]) }

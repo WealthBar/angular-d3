@@ -17,6 +17,10 @@ svg {
   width: 100%;
 }
 
+#arc-charts, #pie-charts {
+  svg { height: auto; }
+}
+
 footer {
   min-height: 500px;
 }
@@ -43,32 +47,32 @@ footer {
 }
 
 #graphs {
-  .d3 .area {
+  .d3-chart .area {
     fill: url(#gradient);
   }
 }
 @-moz-document url-prefix() {
-  #graphs .d3 .area {
+  #graphs .d3-chart .area {
     fill: url(/#gradient);
   }
 }
 
 /* Axis */
 
-.d3 .axis {
+.d3-chart .axis {
   line { fill: none; stroke-width: 1px; stroke: $black; opacity: 0.5; }
   path { fill: none; stroke-width: 1px; stroke: $black; opacity: 0.5; }
   text { fill: $black; }
 }
 
-.d3 .axis-grid {
+.d3-chart .axis-grid {
   line { fill: none; stroke-width: 1px; stroke: $black; opacity: 0.5; }
   text { display: none; }
 }
 
 /* Area Chart */
 
-.d3 .area {
+.d3-chart .area {
   fill: $blue;
   stroke-width: 0px;
   stroke: $black;
@@ -76,7 +80,7 @@ footer {
 
 /* Line Chart */
 
-.d3 .line {
+.d3-chart .line {
   fill: none;
   stroke-width: 1.5px;
   stroke: $black;
@@ -84,7 +88,7 @@ footer {
 
 /* Bar Chart */
 
-.d3 .bar {
+.d3-chart .bar {
   fill: $orange;
   stroke-width: 0px;
   stroke: $black;
@@ -93,27 +97,27 @@ footer {
 
 /* Pie Chart */
 
-.d3 {
-  .pie.pie-0 path { fill: #98abc5; }
-  .pie.pie-1 path { fill: #8a89a6; }
-  .pie.pie-2 path { fill: #7b6888; }
-  .pie.pie-3 path { fill: #6b486b; }
-  .pie.pie-4 path { fill: #a05d56; }
-  .pie.pie-5 path { fill: #d0743c; }
-  .pie.pie-6 path { fill: #ff8c00; }
+.d3-chart {
+  .pie.pie-0 { fill: #98abc5; }
+  .pie.pie-1 { fill: #8a89a6; }
+  .pie.pie-2 { fill: #7b6888; }
+  .pie.pie-3 { fill: #6b486b; }
+  .pie.pie-4 { fill: #a05d56; }
+  .pie.pie-5 { fill: #d0743c; }
+  .pie.pie-6 { fill: #ff8c00; }
 }
 
 /* Simple Arcs */
 
-.d3 path.arc {
+.d3-chart path.arc {
   fill: #98abc5;
 }
 
-.simple-arc1 .d3 .arc {
+.simple-arc1 .d3-chart .arc {
   fill: #98abc5;
 }
 
-.simple-arc2 .d3 .arc {
+.simple-arc2 .d3-chart .arc {
   fill: #d0743c;
 }
 
