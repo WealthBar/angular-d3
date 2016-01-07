@@ -70,13 +70,11 @@ export class D3Pie extends D3PieBase implements D3Element {
 
   private _center
   private _arc
-  private _label
   private _colorScale
 
   constructor(chart: D3Chart, el: ElementRef, @Optional() margin?: D3Margin) {
     super(chart, el, margin)
     this._center = this.element.attr("class", "pie")
-    this._label = this._center.append("text").attr("class", "arc-label")
   }
 
   get colorScale(): any { return this._colorScale }
