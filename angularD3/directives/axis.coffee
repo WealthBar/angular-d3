@@ -1,4 +1,4 @@
-angular.module('ad3').directive 'd3Axis', ->
+angular.module('ad3').directive 'd3Axis', ['d3locale', (d3locale) ->
   defaults = ->
     orientation: 'bottom'
     ticks: '5'
@@ -14,6 +14,7 @@ angular.module('ad3').directive 'd3Axis', ->
 
   link: ($scope, $el, $attrs, chartController) ->
     options = angular.extend(defaults(), $attrs)
+    locale = d3locale.getD3LocaleFor('') # TODO: Get global language setting
 
     range = ->
       if options.orientation is 'top' or options.orientation is 'bottom'
@@ -59,13 +60,13 @@ angular.module('ad3').directive 'd3Axis', ->
       if $scope.customTimeFormat?
         # We copy this because D3 is bad and mutates the time format.
         # See: https://github.com/mbostock/d3/issues/1769
-        format = d3.time.format.multi(angular.copy($scope.customTimeFormat))
+        format = locale.timeFormat.multi(angular.copy($scope.customTimeFormat))
         axis.tickFormat((value) -> format(new Date(value)))
       if options.timeFormat?
-        format = d3.time.format(options.timeFormat)
+        format = locale.timeFormat(options.timeFormat)
         axis.tickFormat((value) -> format(new Date(value)))
       else if options.format?
-        format = d3.format(options.format)
+        format = locale.numberFormat(options.format)
         axis.tickFormat(format)
       axis
 
@@ -182,3 +183,4 @@ angular.module('ad3').directive 'd3Axis', ->
     $scope.$watchCollection 'customTimeFormat', chartController.redraw
     $scope.$watch 'filter', chartController.redraw
     $scope.$watch 'tickValues', chartController.redraw
+]
