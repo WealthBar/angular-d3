@@ -14,10 +14,6 @@ angular.module('ad3').directive 'd3Axis', ['d3locale', (d3locale) ->
 
   link: ($scope, $el, $attrs, chartController) ->
     options = angular.extend(defaults(), $attrs)
-    lang = $('html').attr('lang')
-    locale = d3locale.getD3Locale(lang)
-    d3.format = locale.numberFormat
-    d3.time.format = locale.timeFormat
 
     range = ->
       if options.orientation is 'top' or options.orientation is 'bottom'

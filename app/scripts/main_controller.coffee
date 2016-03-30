@@ -7,9 +7,6 @@ module.exports = ['$scope', '$interval', '$location', ($scope, $interval, $locat
   $scope.$watch '', ->
     $('body').scrollspy('refresh')
 
-  if locale = $location.search().locale
-    $('html').attr('lang', locale)
-
   $scope.arcs =
     arc1: { value: 60, label: '60%' }
     arc2: { value: 90, label: '90%' }
