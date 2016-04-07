@@ -137,6 +137,7 @@ angular.module('ad3').directive 'd3Axis', ->
     label = null
 
     redraw = (data) ->
+      return unless data? and data.length isnt 0
       # Append x-axis to chart
       axisElement ||= chartController.getChart().append("g")
         .attr("class", "axis axis-#{options.orientation} axis-#{options.name}")
@@ -148,7 +149,6 @@ angular.module('ad3').directive 'd3Axis', ->
           .attr("class", "axis-grid axis-grid-#{options.name}")
 
       axis = getAxis()
-      return unless data? and data.length isnt 0
       positionLabel(label.transition().duration(500)) if label
       axisElement.transition().duration(500)
         .attr("transform", translation())
