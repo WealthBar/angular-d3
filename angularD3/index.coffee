@@ -3,6 +3,7 @@ angular = require('angular')
 angular.module('ad3', [])
 
 require('./services/d3service')
+require('./services/d3locale')
 require('./directives/arc')
 require('./directives/area')
 require('./directives/axis')

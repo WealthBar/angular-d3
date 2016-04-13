@@ -1,4 +1,4 @@
-angular.module('ad3').directive 'd3Axis', ->
+angular.module('ad3').directive 'd3Axis', ['d3locale', (d3locale) ->
   defaults = ->
     orientation: 'bottom'
     ticks: '5'
@@ -182,3 +182,4 @@ angular.module('ad3').directive 'd3Axis', ->
     $scope.$watchCollection 'customTimeFormat', chartController.redraw
     $scope.$watch 'filter', chartController.redraw
     $scope.$watch 'tickValues', chartController.redraw
+]

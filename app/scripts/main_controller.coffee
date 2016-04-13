@@ -1,7 +1,7 @@
 dataUrl = require('../data/data.csv')
 donutDataUrl = require('../data/donutData.csv')
 
-module.exports = ['$scope', '$interval', ($scope, $interval) ->
+module.exports = ['$scope', '$interval', '$location', ($scope, $interval, $location) ->
   $scope.dataUrl = dataUrl
   $scope.donutDataUrl = donutDataUrl
   $scope.$watch '', ->
