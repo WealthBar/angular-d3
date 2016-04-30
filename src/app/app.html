@@ -18,7 +18,7 @@
         <text>Test</text>
         <defs>
           <linearGradient id="gradient" x1="0%" x2="100%" y1="0%" y2="100%">
-            <stop *ngFor="#s of gradient" [attr.offset]="s.offset" [attr.stop-color]="s.color" [attr.stop-opacity]="s.opacity"></stop>
+            <stop *ngFor="let s of gradient" [attr.offset]="s.offset" [attr.stop-color]="s.color" [attr.stop-opacity]="s.opacity"></stop>
           </linearGradient>
         </defs>
       </svg>

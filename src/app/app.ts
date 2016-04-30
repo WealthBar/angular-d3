@@ -50,7 +50,7 @@ export class App {
       this.arcs.arc2 = { value: val, label: `${val.toFixed(0)}%` }
       var newPie = this.pie.slice()
       newPie.forEach((v: any) => {
-        if(v.population < 1000000) {
+        if (v.population < 1000000) {
           v.population *= 1.5
         } else {
           v.population *= 2 - 1.6 * Math.random()

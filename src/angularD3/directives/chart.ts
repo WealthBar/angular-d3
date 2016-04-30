@@ -45,7 +45,7 @@ export class D3Element implements ID3Element {
 
   getScale(name) { return this.chart.getScale(name) }
 
-  redraw(data: {}[]) {}
+  redraw(data: {}[]) { return }
 }
 
 export interface D3Scale {
