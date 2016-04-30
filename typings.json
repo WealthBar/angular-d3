@@ -1,15 +1,10 @@
 {
-  "dependencies": {
-    "es6-promise": "github:typings/typed-es6-promise#9243c53f70fb4909ed7cce3094bec221b9fb6d5f"
-  },
+  "dependencies": {},
   "devDependencies": {},
   "ambientDependencies": {
-    "angular-protractor": "github:angular/DefinitelyTyped/angular-protractor/angular-protractor.d.ts#31e7317c9a0793857109236ef7c7f223305a8aa9",
-    "es6-shim": "github:angular/DefinitelyTyped/es6-shim/es6-shim.d.ts#31e7317c9a0793857109236ef7c7f223305a8aa9",
-    "hammerjs": "github:angular/DefinitelyTyped/hammerjs/hammerjs.d.ts#31e7317c9a0793857109236ef7c7f223305a8aa9",
-    "jasmine": "github:angular/DefinitelyTyped/jasmine/jasmine.d.ts#31e7317c9a0793857109236ef7c7f223305a8aa9",
-    "node": "github:angular/DefinitelyTyped/node/node.d.ts#31e7317c9a0793857109236ef7c7f223305a8aa9",
-    "selenium-webdriver": "github:angular/DefinitelyTyped/selenium-webdriver/selenium-webdriver.d.ts#31e7317c9a0793857109236ef7c7f223305a8aa9",
-    "zone": "github:angular/DefinitelyTyped/zone/zone.d.ts#31e7317c9a0793857109236ef7c7f223305a8aa9"
+    "d3": "registry:dt/d3#0.0.0+20160317120654",
+    "es6-shim": "registry:dt/es6-shim#0.31.2+20160317120654",
+    "jasmine": "registry:dt/jasmine#2.2.0+20160412134438",
+    "require": "registry:dt/require#2.1.20+20160316155526"
   }
 }

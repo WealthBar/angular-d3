@@ -25,7 +25,6 @@
     "server": "webpack-dev-server --inline --progress --profile --colors --display-error-details --display-cached --port 4000",
     "webdriver-update": "webdriver-manager update",
     "webdriver-start": "webdriver-manager start",
-    "lint": "tsconfig-lint",
     "e2e": "protractor",
     "test": "karma start",
     "ci": "npm run e2e && npm run test",
@@ -34,8 +33,12 @@
     "postinstall": "typings install"
   },
   "dependencies": {
-    "angular2": "2.0.0-beta.0",
-    "d3": "^3.5.12"
+    "angular2": "^2.0.0-beta.17",
+    "d3": "^3.5.16",
+    "es6-shim": "^0.35.0",
+    "rxjs": "5.0.0-beta.6",
+    "reflect-metadata": "0.1.2",
+    "zone.js": "^0.6.12"
   },
   "devDependencies": {
     "bootstrap-loader": "^1.0.1",
@@ -54,6 +57,7 @@
     "karma-phantomjs-launcher": "^0.2.1",
     "karma-sourcemap-loader": "^0.3.6",
     "karma-webpack": "1.7.0",
+    "lodash.clonedeep": "^4.3.2",
     "node-sass": "^3.4.2",
     "phantomjs": "^1.9.18",
     "phantomjs-polyfill": "0.0.1",
@@ -65,13 +69,12 @@
     "sass-loader": "^3.1.2",
     "script-loader": "^0.6.1",
     "style-loader": "^0.13.0",
-    "ts-loader": "^0.7.2",
-    "tsconfig-lint": "^0.2.0",
-    "tslint": "^3.2.0",
-    "tslint-loader": "^2.1.0",
+    "ts-loader": "^0.8.2",
+    "tslint": "^3.7.0-dev.2",
+    "tslint-loader": "^2.1.4",
     "typedoc": "^0.3.12",
-    "typescript": "^1.7.3",
-    "typings": "^0.3.1",
+    "typescript": "^1.9.0-dev.20160409",
+    "typings": "^0.8.1",
     "url-loader": "^0.5.6",
     "webpack": "^1.12.9",
     "webpack-dev-server": "^1.12.1"
