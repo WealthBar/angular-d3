@@ -76,13 +76,13 @@ export class D3Chart {
   constructor(elementRef: ElementRef) {
     this.element = elementRef.nativeElement;
     this.chart = d3.select(this.element).attr('class', "d3-chart")
-    window.addEventListener('resize', this.redraw)
+    window.addEventListener('resize', () => this.redraw())
   }
 
-  get width() { return this.element.offsetWidth; }
+  get width() { return this.element.clientWidth; }
   set width(value: number) { this.chart.attr("width", `${value}px`) }
 
-  get height() { return this.element.offsetHeight; }
+  get height() { return this.element.clientHeight; }
   set height(value: number) { this.chart.attr("height", `${value}px`) }
 
 
